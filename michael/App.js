@@ -14,8 +14,8 @@ export default function App() {
     <AuthProvider>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false  }}>
-          <Stack.Screen name="SendTexts" component={SendTexts} />
           <Stack.Screen name="VerifyPhone" component={VerifyPhone} />
+          <Stack.Screen name="SendTexts" component={SendTexts} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>
