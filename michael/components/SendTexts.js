@@ -6,6 +6,7 @@ import React, {
 import { useAuth } from '../contexts/AuthContext';
 import * as SMS from 'expo-sms';
 import axios from 'axios';
+import { NODE_URL } from '../utils/constants'
 
 // NOTE: RIGHT NOW THERE'S A TWILIO SERVER THAT YOU HAVE TO RUN FOR THIS TO WORK
 export default function SendTexts() {
@@ -14,13 +15,13 @@ export default function SendTexts() {
   const { currentUser } = useAuth();
 
   // Just a single phone number for now
-  const [phoneNumber, setPhoneNumber] = useState();
+  const [phoneNumbers, setPhoneNumbers] = useState();
   const [message, setMessage] = useState();
 
   const hitServer = () => {
-    axios.post('http://localhost:3001/api/messages', {
-      to: phoneNumber,
-      body: message
+    axios.post(NODE_URL + '/api/messages', {
+      numbers: phoneNumbers.split('\n'),
+      body: message,
     }).then(
       function(value) {
         alertMessageSent();
@@ -54,18 +55,20 @@ export default function SendTexts() {
 
   return (
     <View style={styles.container}>
-      <Text>SendTexts</Text>
+      <Text>Enter in numbers and send a blast:</Text>
       <TextInput
-        style={{ marginVertical: 10, fontSize: 17 }}
-        placeholder="+1 999 999 9999"
+        style={styles.numbersInput}
+        multiline={true}
+        placeholder={`+1 999 999 9999 \n+1 999 999 9999 \n+1 999 999 9999 \n...`}
         autoCompleteType="tel"
         keyboardType="phone-pad"
         textContentType="telephoneNumber"
         autoFocus
-        onChangeText={phoneNumber => setPhoneNumber(phoneNumber)}
+        onChangeText={nums => setPhoneNumbers(nums)}
       />
       <TextInput
-        style={{ marginVertical: 10, fontSize: 17 }}
+        style={styles.numbersInput}
+        multiline={true}
         placeholder="enter a message to send!"
         onChangeText={mess => setMessage(mess)}
       />
@@ -91,5 +94,13 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  numbersInput: {
+    padding: 20,
+    borderWidth: 1,
+    borderRadius: 20,
+    margin: 20,
+    width: '50%',
+    height: 100
   }
 })

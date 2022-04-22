@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "pm2": "^5.2.0",
+    "twilio": "^3.76.1"
+  },
+
+  "scripts": {
+    "start": "pm2-runtime start ecosystem.config.js"
+  }
+}
