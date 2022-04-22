@@ -2,18 +2,23 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Signup from './components/Signup';
+import { AuthProvider } from './contexts/AuthContext';
+import VerifyPhone from './components/VerifyPhone';
+import SendTexts from './components/SendTexts';
 
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false  }}>
-        <Stack.Screen name="Signup" component={Signup} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AuthProvider>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false  }}>
+          <Stack.Screen name="SendTexts" component={SendTexts} />
+          <Stack.Screen name="VerifyPhone" component={VerifyPhone} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthProvider>
   );
 }
 
