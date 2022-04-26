@@ -16,7 +16,7 @@ app.listen(port, () =>
 );
 
 app.get('/', (req, res) => {
-  res.send('hi, it do be running')
+  res.send('hi, it really do be running')
 })
 
 app.post('/api/messages', async (req, res) => {
