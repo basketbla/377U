@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthProvider } from './contexts/AuthContext';
 import VerifyPhone from './components/VerifyPhone';
 import SendTexts from './components/SendTexts';
+import Username from './components/Username';
 
 
 const Stack = createNativeStackNavigator();
@@ -15,6 +16,7 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false  }}>
           <Stack.Screen name="VerifyPhone" component={VerifyPhone} />
+          <Stack.Screen name="Username" component={Username} />
           <Stack.Screen name="SendTexts" component={SendTexts} />
         </Stack.Navigator>
       </NavigationContainer>

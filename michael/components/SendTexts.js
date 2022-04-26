@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, Pressable, Alert } from 'react-native'
+import { StyleSheet, Text, View, TextInput, Pressable, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native'
 import React, {
   useState,
   useEffect
@@ -6,7 +6,7 @@ import React, {
 import { useAuth } from '../contexts/AuthContext';
 import * as SMS from 'expo-sms';
 import axios from 'axios';
-import { NODE_URL } from '../utils/constants'
+import { NODE_URL, cleanNumber } from '../utils/constants'
 
 // NOTE: RIGHT NOW THERE'S A TWILIO SERVER THAT YOU HAVE TO RUN FOR THIS TO WORK
 export default function SendTexts() {
@@ -20,7 +20,7 @@ export default function SendTexts() {
 
   const hitServer = () => {
     axios.post(NODE_URL + '/api/messages', {
-      numbers: phoneNumbers.split('\n'),
+      numbers: phoneNumbers.split('\n').map(number => cleanNumber(number)),
       body: message,
     }).then(
       function(value) {
@@ -54,28 +54,30 @@ export default function SendTexts() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text>Enter in numbers and send a blast:</Text>
-      <TextInput
-        style={styles.numbersInput}
-        multiline={true}
-        placeholder={`+1 999 999 9999 \n+1 999 999 9999 \n+1 999 999 9999 \n...`}
-        autoCompleteType="tel"
-        keyboardType="phone-pad"
-        textContentType="telephoneNumber"
-        autoFocus
-        onChangeText={nums => setPhoneNumbers(nums)}
-      />
-      <TextInput
-        style={styles.numbersInput}
-        multiline={true}
-        placeholder="enter a message to send!"
-        onChangeText={mess => setMessage(mess)}
-      />
-      <Pressable onPress={hitServer} style={styles.sendButton}>
-        <Text style={{color: 'white'}}>Send texts</Text>
-      </Pressable>
-    </View>
+    <TouchableWithoutFeedback style={styles.container} onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <Text>Enter in numbers and send a blast:</Text>
+        <TextInput
+          style={styles.numbersInput}
+          multiline={true}
+          placeholder={`(999) 999-9999 \n999 999 9999 \n9999999999 \n...`}
+          autoCompleteType="tel"
+          keyboardType="phone-pad"
+          textContentType="telephoneNumber"
+          autoFocus
+          onChangeText={nums => setPhoneNumbers(nums)}
+          />
+        <TextInput
+          style={styles.numbersInput}
+          multiline={true}
+          placeholder="enter a message to send!"
+          onChangeText={mess => setMessage(mess)}
+        />
+        <Pressable onPress={hitServer} style={styles.sendButton}>
+          <Text style={{color: 'white'}}>Send texts</Text>
+        </Pressable>
+      </View>
+    </TouchableWithoutFeedback>
   )
 }
 

@@ -16,6 +16,7 @@ import { FirebaseRecaptchaVerifierModal, FirebaseRecaptchaBanner } from 'expo-fi
 import { PhoneAuthProvider, signInWithCredential } from 'firebase/auth';
 import { app, auth } from '../utils/firebase';
 import { useNavigation } from '@react-navigation/native';
+import { cleanNumber } from '../utils/constants';
 
 // STARTING WITH ENTIRE PAGE COPIED FROM HERE:
 // https://docs.expo.dev/versions/latest/sdk/firebase-recaptcha/1
@@ -65,12 +66,17 @@ export default function VerifyPhone() {
       {/* Doesn't work if we don't have the plus, might want to change?*/}
       <TextInput
         style={{ marginVertical: 10, fontSize: 17 }}
-        placeholder="+1 999 999 9999"
+        placeholder="(999) 999-9999"
         autoFocus
         autoCompleteType="tel"
         keyboardType="phone-pad"
         textContentType="telephoneNumber"
-        onChangeText={phoneNumber => setPhoneNumber(phoneNumber)}
+        onChangeText={phoneNumber => {
+          // Clean it up
+          number = cleanNumber(phoneNumber);
+          
+          setPhoneNumber(number);
+        }}
       />
       {/* Button does standard firebase text auth */}
       <Button
@@ -113,7 +119,7 @@ export default function VerifyPhone() {
               verificationCode
             );
             await signInWithCredential(auth, credential);
-            navigation.navigate('SendTexts');
+            navigation.navigate('Username');
           } catch (err) {
             showMessage({ text: `Error: ${err.message}`, color: 'red' });
           }
