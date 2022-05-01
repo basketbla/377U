@@ -69,12 +69,22 @@ const ContactEntry = ({ contact, type, profilePicsMap }) => (
         }}
       />
     }
-    <Text style={styles.contactName}>
+    <View style={styles.contactName}>
+      <Text style={styles.contactName}>
+        {
+          // Just truncating name but dang this is ugly
+          (contact.firstName + ' ' + (contact.lastName ? contact.lastName : '')).substring(0,20) + ((contact.firstName + ' ' + (contact.lastName ? contact.lastName : '')).length > 20 ? '...' : '')
+        }
+      </Text>
       {
-        // Just truncating name but dang this is ugly
-        (contact.firstName + ' ' + (contact.lastName ? contact.lastName : '')).substring(0,20) + ((contact.firstName + ' ' + (contact.lastName ? contact.lastName : '')).length > 20 ? '...' : '')
+        type === "Add" ?
+        <Text style={styles.contactUsername}>
+          {contact.username}
+        </Text>
+        :
+        <></>
       }
-    </Text>
+    </View>
     <Text style={styles.inviteButton}>{type}</Text>
   </Pressable>
 );
@@ -125,6 +135,16 @@ export default function ContactsPage({ navigation }) {
           return {...user, profilePic: profileMap[user.emails[0].email]}
         })
 
+        // Doing the same thing as profile pic but with username
+        let usernames = Object.values(users).map(user => user.username);
+        let usernameMap = {};
+        existingEmails.forEach((element, index) => {
+          usernameMap[element] = usernames[index];
+        });
+        existingAccounts = existingAccounts.map(user => {
+          return {...user, username: usernameMap[user.emails[0].email]}
+        })
+
         setAllExistingAccounts(existingAccounts);
         setAllOtherContacts(otherContacts);
         setSectionData([{title: "Contacts on Din Din", data: existingAccounts, renderItem: renderExistingItem }, {title: "Invite Other Contacts", data: otherContacts, renderItem: renderNewItem}]);
@@ -153,7 +173,7 @@ export default function ContactsPage({ navigation }) {
   const handleSearch = text => {
     setSearch(text);
     text = text.toLowerCase();
-    setSectionData([{title: "Contacts on Din Din", data: allExistingAccounts.filter(item => ((item.firstName && item.firstName.toLowerCase().startsWith(text)) || (item.lastName && item.lastName.toLowerCase().startsWith(text)))), renderItem: renderExistingItem }, {title: "Invite Other Contacts", data: allOtherContacts.filter(item => item.firstName && item.firstName.startsWith(text)), renderItem: renderNewItem}]);
+    setSectionData([{title: "Contacts on Din Din", data: allExistingAccounts.filter(item => (item.firstName + ' ' + item.lastName).toLowerCase().includes(text)), renderItem: renderExistingItem }, {title: "Invite Other Contacts", data: allOtherContacts.filter(item => (item.firstName + ' ' + item.lastName).toLowerCase().includes(text)), renderItem: renderNewItem}]);
   }
   
   if (contactStatus === 'granted') {
@@ -240,6 +260,10 @@ const styles = StyleSheet.create({
   contactName: {
     color: COLORS.grey,
     fontWeight: 'bold',
+    fontSize: 15,
+  },
+  contactUsername: {
+    color: COLORS.grey,
     fontSize: 15,
   },
   profilePic: {

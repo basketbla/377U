@@ -28,15 +28,15 @@ export default function App() {
     <AuthProvider>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false, gestureEnabled: 'false'}}>
-          <Stack.Screen name="Onboarding" component={Onboarding} />
           <Stack.Screen name="ContactsPage" component={ContactsPage} />
-          <Stack.Screen name="CalendarSync" component={CalendarSync} />
+          <Stack.Screen name="LandingTab" component={LandingTab} />
           <Stack.Screen name="SignUp" component={SignUp}/>
+          <Stack.Screen name="Onboarding" component={Onboarding} />
+          <Stack.Screen name="CalendarSync" component={CalendarSync} />
           <Stack.Screen name="SignIn" component={SignIn}/>
           <Stack.Screen name="Username" component={Username} />
           <Stack.Screen name="VerifyPhone" component={VerifyPhone} />
           <Stack.Screen name="SendTexts" component={SendTexts} />
-          <Stack.Screen name="LandingTab" component={LandingTab} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>

@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getDatabase, ref, set, get, child } from "firebase/database";
 import { getStorage } from "firebase/storage";
+import { DEFUALT_PROFILE_PIC } from "./constants";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -24,9 +25,12 @@ const dbRef = ref(database);
 const storage = getStorage(app);
 
 // I think I'm just gonna make my firebase funcs here and export them
-export const saveName = async (userId, name) => {
+export const saveName = async (userId, name, username, email) => {
   await set(ref(database, 'users/' + userId), {
-    name: name
+    name: name,
+    username: username,
+    email: email,
+    profilePic: DEFUALT_PROFILE_PIC
   });
 }
 
