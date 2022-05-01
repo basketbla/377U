@@ -5,7 +5,7 @@ import {
   FlatList, 
   Pressable,
   SectionList,
-  Alert
+  Image
 } from 'react-native'
 import { SearchBar } from 'react-native-elements';
 import React, {
@@ -13,12 +13,12 @@ import React, {
   useState
 } from 'react'
 import * as Contacts from 'expo-contacts';
-import { COLORS, PROFILE_COLORS } from '../utils/constants';
+import { COLORS, DEFUALT_PROFILE_PIC, PROFILE_COLORS } from '../utils/constants';
 import { getUsers } from '../utils/firebase';
 import * as SMS from 'expo-sms';
 
 // Entry for contacts list
-const ContactEntry = ({ contact, type }) => (
+const ContactEntry = ({ contact, type, profilePicsMap }) => (
   <Pressable style={styles.contactEntry} onPress={async () => {
     
     // Invite in app instead of messaging
@@ -50,9 +50,25 @@ const ContactEntry = ({ contact, type }) => (
       'Download dindin! https://www.youtube.com/watch?v=dQw4w9WgXcQ'
     );
   }}>
-    <View style={{...styles.profilePic, backgroundColor: `${PROFILE_COLORS[contact.firstName.charCodeAt(1) % PROFILE_COLORS.length]}`}}>
+    {/* <View style={{...styles.profilePic, backgroundColor: `${PROFILE_COLORS[contact.firstName.charCodeAt(1) % PROFILE_COLORS.length]}`}}>
       <Text style={styles.profileLetters}>{contact.firstName[0].toUpperCase() + (contact.lastName ? contact.lastName[0].toUpperCase() : '')}</Text>
-    </View>
+    </View> */}
+    {
+      type === "Add" ?
+      <Image
+        style={styles.profilePicReal}
+        source={{
+          uri: contact.profilePic
+        }}
+      />
+      :
+      <Image
+        style={styles.profilePicReal}
+        source={{
+          uri: DEFUALT_PROFILE_PIC
+        }}
+      />
+    }
     <Text style={styles.contactName}>
       {
         // Just truncating name but dang this is ugly
@@ -88,6 +104,13 @@ export default function ContactsPage({ navigation }) {
         // Check which contacts have dindin and which ones don't
         let users = await getUsers();
         let existingEmails = Object.values(users).map(user => user.email);
+        
+        // Map emails to profile pics so we can get people's images
+        let profilePics = Object.values(users).map(user => user.profilePic);
+        let profileMap = {};
+        existingEmails.forEach((element, index) => {
+          profileMap[element] = profilePics[index];
+        });
 
         let existingAccounts = data.filter(user => {
           return (user.emails && existingEmails.includes(user.emails[0].email) && user.firstName);
@@ -95,6 +118,11 @@ export default function ContactsPage({ navigation }) {
 
         let otherContacts = data.filter(user => {
           return (!(user.emails && existingEmails.includes(user.emails[0].email)) && user.firstName);
+        })
+
+        // This is ugly, hopefully it works
+        existingAccounts = existingAccounts.map(user => {
+          return {...user, profilePic: profileMap[user.emails[0].email]}
         })
 
         setAllExistingAccounts(existingAccounts);
@@ -124,7 +152,8 @@ export default function ContactsPage({ navigation }) {
 
   const handleSearch = text => {
     setSearch(text);
-    setSectionData([{title: "Contacts on Din Din", data: allExistingAccounts.filter(item => item.firstName && item.firstName.startsWith(text)), renderItem: renderExistingItem }, {title: "Invite Other Contacts", data: allOtherContacts.filter(item => item.firstName && item.firstName.startsWith(text)), renderItem: renderNewItem}]);
+    text = text.toLowerCase();
+    setSectionData([{title: "Contacts on Din Din", data: allExistingAccounts.filter(item => ((item.firstName && item.firstName.toLowerCase().startsWith(text)) || (item.lastName && item.lastName.toLowerCase().startsWith(text)))), renderItem: renderExistingItem }, {title: "Invite Other Contacts", data: allOtherContacts.filter(item => item.firstName && item.firstName.startsWith(text)), renderItem: renderNewItem}]);
   }
   
   if (contactStatus === 'granted') {
@@ -249,5 +278,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 15,
     marginBottom: 100,
+  },
+  profilePicReal: {
+    height: 50,
+    width: 50,
+    borderRadius: 25,
+    marginRight: 10,
+    marginLeft: 10,
   }
 })

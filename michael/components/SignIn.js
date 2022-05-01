@@ -33,9 +33,7 @@ export default function SignIn() {
 
     login(email, password).then(result => {
       setValidating(false);
-
-      // Change this to the landing page
-      navigation.navigate('Username');
+      navigation.navigate('LandingTab');
     }).catch(error => {
       setValidating(false);
       switch (error.code) {

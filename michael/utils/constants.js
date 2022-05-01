@@ -37,3 +37,5 @@ export const PROFILE_COLORS = [
   "#F7DD72",
   "#4E6766"
 ]
+
+export const DEFUALT_PROFILE_PIC = 'https://lh3.googleusercontent.com/a/default-user=s100';
