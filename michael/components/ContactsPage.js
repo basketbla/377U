@@ -34,6 +34,18 @@ const ContactEntry = ({ contact, type }) => (
       return
     }
 
+    if (!(await SMS.isAvailableAsync())) {
+      Alert.alert('SMS Not Available', 'It looks like this device can\'t send text invites', [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        { text: 'OK', onPress: () => console.log('OK Pressed') },
+      ]);
+      return
+    }
+
     if (!contact.phoneNumbers) {
       return;
     }
@@ -59,23 +71,23 @@ export default function ContactsPage({ navigation }) {
 
 
   const [contactStatus, setContactStatus] = useState('');
-  const [contacts, setContacts] = useState([]);
   const [search, setSearch] = useState('');
   const [sectionData, setSectionData] = useState();
+  const [allExistingAccounts, setAllExistingAccounts] = useState();
+  const [allOtherContacts, setAllOtherContacts] = useState();
 
   // Get contact permissions
   useEffect(() => {
     (async () => {
       console.log('use effecting');
+
+      // Check permission for contacts
       const { status } = await Contacts.requestPermissionsAsync();
 
       if (status === 'granted') {
         const { data } = await Contacts.getContactsAsync({
           fields: [Contacts.Fields.PhoneNumbers, Contacts.Fields.Emails],
         });
-        // console.log(data.map(item => item.emails ? item.emails[0].email : undefined))
-        // console.log(data);
-        // setContacts(data);
 
         // Check which contacts have dindin and which ones don't
         let users = await getUsers();
@@ -89,6 +101,8 @@ export default function ContactsPage({ navigation }) {
           return !(user.emails && existingEmails.includes(user.emails[0].email));
         })
 
+        setAllExistingAccounts(existingAccounts);
+        setAllOtherContacts(otherContacts);
         setSectionData([{title: "Contacts on Din Din", data: existingAccounts, renderItem: renderExistingItem }, {title: "Invite Other Contacts", data: otherContacts, renderItem: renderNewItem}]);
         setContactStatus(status);
       }
@@ -100,26 +114,21 @@ export default function ContactsPage({ navigation }) {
 
   // For rendering contacts with accounts
   const renderExistingItem = ({item}) => {
-    if (item.firstName && item.firstName.startsWith(search)) {
-      return <ContactEntry contact={item} type="Add"/>
-    }
-    else {
-      return <></>
-    }
+    return <ContactEntry contact={item} type="Add"/>
   };
 
    // For rendering contacts without accounts
    const renderNewItem = ({item}) => {
-    if (item.firstName && item.firstName.startsWith(search)) {
-      return <ContactEntry contact={item} type="Invite"/>
-    }
-    else {
-      return <></>
-    }
+    return <ContactEntry contact={item} type="Invite"/>
   };
 
   const handleNext = () => {
     navigation.navigate('CalendarSync')
+  }
+
+  const handleSearch = text => {
+    setSearch(text);
+    setSectionData([{title: "Contacts on Din Din", data: allExistingAccounts.filter(item => item.firstName && item.firstName.startsWith(text)), renderItem: renderExistingItem }, {title: "Invite Other Contacts", data: allOtherContacts.filter(item => item.firstName && item.firstName.startsWith(text)), renderItem: renderNewItem}]);
   }
   
   if (contactStatus === 'granted') {
@@ -127,7 +136,7 @@ export default function ContactsPage({ navigation }) {
       <View style={styles.container}>
         <SearchBar
           placeholder="Search for Contact"
-          onChangeText={text => setSearch(text)}
+          onChangeText={handleSearch}
           value={search}
           containerStyle={styles.search}
           platform="ios"
