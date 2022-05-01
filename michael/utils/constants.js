@@ -20,7 +20,8 @@ export const cleanNumber = (phoneNumber) => {
 
 export const COLORS = {
   grey: "#808080",
-  blue: "#4275ff"
+  blue: "#4275ff",
+  random: "#233D4D"
 }
 
 export const PROFILE_COLORS = [

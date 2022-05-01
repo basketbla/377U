@@ -23,32 +23,28 @@ const ContactEntry = ({ contact, type }) => (
     
     // Invite in app instead of messaging
     if (type==="Add") {
-      Alert.alert('Send Friend Request', 'I haven\'t implemented the friends stuff yet tho', [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        { text: 'OK', onPress: () => console.log('OK Pressed') },
-      ]);
+      alert('this should send a friend request')
       return
     }
 
     if (!(await SMS.isAvailableAsync())) {
-      Alert.alert('SMS Not Available', 'It looks like this device can\'t send text invites', [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        { text: 'OK', onPress: () => console.log('OK Pressed') },
-      ]);
+      alert('It looks like this device can\'t send text invites');
       return
     }
 
-    if (!contact.phoneNumbers) {
-      return;
+    if (!contact.phoneNumbers && !contact.emails) {
+      alert('There is no number or email saved for this contact...');
+      return
     }
+
+    if (!contact.phoneNumbers && contact.emails) {
+      await SMS.sendSMSAsync(
+        [contact.emails[0].email],
+        'Download dindin! https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+      );
+      return
+    }
+
     await SMS.sendSMSAsync(
       [contact.phoneNumbers[0].digits],
       'Download dindin! https://www.youtube.com/watch?v=dQw4w9WgXcQ'
@@ -94,11 +90,11 @@ export default function ContactsPage({ navigation }) {
         let existingEmails = Object.values(users).map(user => user.email);
 
         let existingAccounts = data.filter(user => {
-          return (user.emails && existingEmails.includes(user.emails[0].email));
+          return (user.emails && existingEmails.includes(user.emails[0].email) && user.firstName);
         })
 
         let otherContacts = data.filter(user => {
-          return !(user.emails && existingEmails.includes(user.emails[0].email));
+          return (!(user.emails && existingEmails.includes(user.emails[0].email)) && user.firstName);
         })
 
         setAllExistingAccounts(existingAccounts);
@@ -123,7 +119,7 @@ export default function ContactsPage({ navigation }) {
   };
 
   const handleNext = () => {
-    navigation.navigate('CalendarSync')
+    navigation.navigate('CalendarSync');
   }
 
   const handleSearch = text => {
@@ -160,10 +156,13 @@ export default function ContactsPage({ navigation }) {
     )
   }
 
-  if (contactStatus === 'blocked') {
+  if (contactStatus === 'denied') {
     return (
       <View style={styles.container}>
-        <Text>blocked</Text>
+        <Text style={styles.deniedText}>Please enable contacts to add your friends</Text>
+        <Pressable style={styles.nextButton} onPress={handleNext}>
+          <Text style={styles.nextLabel}>Next</Text>
+        </Pressable>
       </View>
     )
   }
@@ -244,5 +243,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 20,
     marginLeft: 10,
+  },
+  deniedText: {
+    color: COLORS.grey,
+    fontWeight: 'bold',
+    fontSize: 15,
+    marginBottom: 100,
   }
 })
