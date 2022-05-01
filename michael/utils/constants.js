@@ -17,3 +17,8 @@ export const cleanNumber = (phoneNumber) => {
   }
   return phoneNumber;
 }
+
+export const COLORS = {
+  grey: "#808080",
+  blue: "#4275ff"
+}

@@ -62,7 +62,6 @@ export default function SendTexts() {
           multiline={true}
           placeholder={`(999) 999-9999 \n999 999 9999 \n9999999999 \n...`}
           autoCompleteType="tel"
-          keyboardType="phone-pad"
           textContentType="telephoneNumber"
           autoFocus
           onChangeText={nums => setPhoneNumbers(nums)}

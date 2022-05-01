@@ -22,10 +22,10 @@ export const database = getDatabase();
 
 
 // I think I'm just gonna make my firebase funcs here and export them
-export const saveUsernameName = (userId, username, name) => {
+export const saveName = async (userId, name) => {
   const db = getDatabase();
-  set(ref(db, 'users/' + userId), {
-    username: username,
+  await set(ref(db, 'users/' + userId), {
     name: name
   });
 }
+
