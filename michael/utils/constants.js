@@ -22,3 +22,17 @@ export const COLORS = {
   grey: "#808080",
   blue: "#4275ff"
 }
+
+export const PROFILE_COLORS = [
+  "#233D4D",
+  "#FE7F2D",
+  "#A1C181",
+  "#619B8A",
+  "#AED9E0",
+  "#8B687F",
+  "#9B2915",
+  "#8A817C",
+  "#A5C882",
+  "#F7DD72",
+  "#4E6766"
+]

@@ -15,7 +15,7 @@ import { COLORS } from '../utils/constants';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 
-export default function SignUp() {
+export default function SignIn() {
 
   const navigation = useNavigation();
 

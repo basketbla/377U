@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getDatabase, ref, set } from "firebase/database";
+import { getDatabase, ref, set, get, child } from "firebase/database";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -19,13 +19,21 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth();
 export const database = getDatabase();
-
+const dbRef = ref(database);
 
 // I think I'm just gonna make my firebase funcs here and export them
 export const saveName = async (userId, name) => {
-  const db = getDatabase();
-  await set(ref(db, 'users/' + userId), {
+  await set(ref(database, 'users/' + userId), {
     name: name
   });
 }
 
+export const getUsers = async () => {
+  snapshot = await get(child(dbRef, `users`))
+  if (snapshot.exists()) {
+    return snapshot.val();
+  } 
+  else {
+    return [];
+  }
+}
