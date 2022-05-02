@@ -64,6 +64,10 @@ export const uploadImageToStorage = async (uri, uid) => {
   return (await getDownloadURL(storageRef));
 }
 
+export const updateProfilePic = async (uri, uid) => {
+  return set(child(ref_db(database, 'users/' + uid), 'profilePic'), uri);
+}
+
 // Helper because fetch isn't working for me... (nvm)
 // function urlToBlob(url) {
 //   return new Promise((resolve, reject) => {

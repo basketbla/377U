@@ -9,7 +9,8 @@ import {
   Pressable
 } from 'react-native'
 import React, {
-  useState
+  useState,
+  useEffect
 } from 'react'
 import { COLORS } from '../utils/constants';
 import { useNavigation } from '@react-navigation/native';
@@ -31,6 +32,8 @@ export default function SignUp() {
   const [emailErrorText, setEmailErrorText] = useState('');
 
   const handleNext = () => {
+    Keyboard.dismiss();
+    setIsNew(true);
     setPasswordError(false);
     setEmailError(false);
     setValidating(true);
@@ -45,8 +48,8 @@ export default function SignUp() {
     }
 
     signup(email, password).then(result => {
-      setValidating(false);
-      setIsNew(true);
+      // setValidating(false);
+      // setIsNew(true);
       // navigation.navigate('Username');
     }).catch(error => {
       setValidating(false);

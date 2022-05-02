@@ -22,6 +22,7 @@ import Profile from './components/Profile';
 import EditProfile from './components/EditProfile';
 import NewFriends from './components/NewFriends';
 import OldFriends from './components/OldFriends';
+import AddProfilePic from './components/AddProfilePic';
 
 
 const Stack = createNativeStackNavigator();
@@ -85,6 +86,7 @@ function OnboardingStack() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false, gestureEnabled: 'false'}}>
         <Stack.Screen name="Username" component={Username} />
+        <Stack.Screen name="AddProfilePic" component={AddProfilePic} />
         <Stack.Screen name="Onboarding" component={Onboarding} />
         <Stack.Screen name="ContactsPage" component={ContactsPage} />
         <Stack.Screen name="CalendarSync" component={CalendarSync} />

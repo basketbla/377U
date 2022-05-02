@@ -16,7 +16,7 @@ const FreeNow = ({ user }) => (
         uri: user.profilePic
       }}
     />
-    <Text style={styles.freeNowText}>{user.name.substr(0, user.name.indexOf(' '))}</Text>
+    <Text style={styles.freeNowText}>{/*user.name.substr(0, user.name.indexOf(' '))*/}placeholder</Text>
   </View>
 );
 
@@ -80,6 +80,8 @@ export default function People({ navigation }) {
         keyExtractor={item => item.username}
         horizontal={true}
         style={styles.freeNowList}
+        contentContainerStyle={styles.freeNowContainer}
+        showsHorizontalScrollIndicator={false}
       />
       <Text style={styles.freeLabel}>Groups</Text>
       <FlatList
@@ -134,6 +136,9 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 100,
     flexGrow: 0,
+  },
+  freeNowContainer: {
+    paddingRight: 20,
   },
   profilePic: {
     width: 60,

@@ -41,7 +41,7 @@ export default function Username({ navigation }) {
 
     saveUserDetails(currentUser.uid, name, username, currentUser.email, DEFUALT_PROFILE_PIC).then(result => {
       setValidating(false);
-      navigation.navigate('Onboarding')
+      navigation.navigate('AddProfilePic')
     })
     .catch(error => {
       setValidating(false);

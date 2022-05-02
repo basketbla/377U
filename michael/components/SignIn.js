@@ -28,11 +28,12 @@ export default function SignIn() {
   const [validating, setValidating] = useState(false);
 
   const handleNext = () => {
+    Keyboard.dismiss();
     setError(false);
     setValidating(true);
 
     login(email, password).then(result => {
-      setValidating(false);
+      // setValidating(false);
     }).catch(error => {
       setValidating(false);
       switch (error.code) {
