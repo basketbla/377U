@@ -35,7 +35,7 @@ const Group = ({ group }) => {
 }
 
 
-export default function People() {
+export default function People({ navigation }) {
 
   const [search, setSearch] = useState('');
   const [temp, setTemp] = useState([]);
@@ -60,9 +60,9 @@ export default function People() {
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <Ionicons name={'person-add'} size={30} color={COLORS.darkGrey}/>
+        <Ionicons name={'people'} size={30} color={COLORS.darkGrey} onPress={() => navigation.navigate('FriendsTab')}/>
         <Pressable style={styles.addGroup}>
-          <Text style={styles.addText}>Add group</Text>
+          <Text style={styles.addText}>New group</Text>
           <Ionicons name={'add'} size={30} color={COLORS.darkGrey}/>
         </Pressable>
       </View>
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   addText: {
-    color: COLORS.grey,
+    color: COLORS.darkGrey,
     fontWeight: 'bold',
     fontSize: 15,
   },

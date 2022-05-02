@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AuthProvider } from './contexts/AuthContext';
 import { COLORS } from './utils/constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
 import VerifyPhone from './components/VerifyPhone';
 import SendTexts from './components/SendTexts';
@@ -19,10 +20,13 @@ import People from './components/People';
 import Chat from './components/Chat';
 import Profile from './components/Profile';
 import EditProfile from './components/EditProfile';
+import NewFriends from './components/NewFriends';
+import OldFriends from './components/OldFriends';
 
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+const matTab = createMaterialTopTabNavigator();
 
 export default function App() {
 
@@ -76,7 +80,7 @@ function LandingTab() {
     >
       <Tab.Screen 
         name="People" 
-        component={People}
+        component={PeopleNav}
       />
       <Tab.Screen 
         name="Chat" 
@@ -101,6 +105,37 @@ function ProfileNav() {
       />
     </Stack.Navigator>
   )
+}
+
+function PeopleNav() {
+  return (
+    <Stack.Navigator screenOptions={{ animationEnabled: false }}>
+      <Stack.Screen name="PeopleMain" component={People} options={{ headerShown: false }}/>
+      <Stack.Screen name="FriendsTab" component={FriendsTab} 
+        options={{
+          headerTitle: props => <Text style={{fontWeight: 'bold', fontSize: 20}}>Friends</Text>,
+        }}
+      />
+    </Stack.Navigator>
+  )
+}
+
+function FriendsTab() {
+  return (
+    <matTab.Navigator screenOptions={({ route }) => ({
+      tabBarLabelStyle: { fontSize: 20, textTransform: 'none' },
+      tabBarLabel: () => {
+        if (route.name === 'NewFriends') {
+          return <Text style={{fontWeight: 'bold'}}>Add Friends</Text>;
+        } 
+        return <Text style={{fontWeight: 'bold'}}>My Friends</Text>;
+      },
+    })}
+    >
+      <matTab.Screen name="NewFriends" component={NewFriends}/>
+      <matTab.Screen name="OldFriends" component={OldFriends}/>
+    </matTab.Navigator>
+  );
 }
 
 const styles = StyleSheet.create({
