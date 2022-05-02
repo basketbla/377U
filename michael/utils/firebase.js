@@ -64,18 +64,18 @@ export const uploadImageToStorage = async (uri, uid) => {
   return (await getDownloadURL(storageRef));
 }
 
-// Helper because fetch isn't working for me...
-function urlToBlob(url) {
-  return new Promise((resolve, reject) => {
-      var xhr = new XMLHttpRequest();
-      xhr.onerror = reject;
-      xhr.onreadystatechange = () => {
-          if (xhr.readyState === 4) {
-              resolve(xhr.response);
-          }
-      };
-      xhr.open('GET', url);
-      xhr.responseType = 'blob'; // convert type
-      xhr.send();
-  })
-}
+// Helper because fetch isn't working for me... (nvm)
+// function urlToBlob(url) {
+//   return new Promise((resolve, reject) => {
+//       var xhr = new XMLHttpRequest();
+//       xhr.onerror = reject;
+//       xhr.onreadystatechange = () => {
+//           if (xhr.readyState === 4) {
+//               resolve(xhr.response);
+//           }
+//       };
+//       xhr.open('GET', url);
+//       xhr.responseType = 'blob'; // convert type
+//       xhr.send();
+//   })
+// }
