@@ -11,9 +11,9 @@ import {
 import React, {
   useState
 } from 'react'
-import { COLORS } from '../utils/constants';
+import { COLORS, DEFUALT_PROFILE_PIC } from '../utils/constants';
 import { useAuth } from '../contexts/AuthContext';
-import { getUsers, saveName } from '../utils/firebase';
+import { getUsers, saveUserDetails } from '../utils/firebase';
 
 export default function Username({ navigation }) {
 
@@ -39,7 +39,7 @@ export default function Username({ navigation }) {
     }
 
 
-    saveName(currentUser.uid, name, username, currentUser.email).then(result => {
+    saveUserDetails(currentUser.uid, name, username, currentUser.email, DEFUALT_PROFILE_PIC).then(result => {
       setValidating(false);
       navigation.navigate('Onboarding')
     })

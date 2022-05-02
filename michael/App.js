@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { StyleSheet, Text, View, Button } from 'react-native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AuthProvider } from './contexts/AuthContext';
@@ -18,18 +18,20 @@ import CalendarSync from './components/CalendarSync';
 import People from './components/People';
 import Chat from './components/Chat';
 import Profile from './components/Profile';
+import EditProfile from './components/EditProfile';
 
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 export default function App() {
+
   return (
     <AuthProvider>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false, gestureEnabled: 'false'}}>
-          <Stack.Screen name="ContactsPage" component={ContactsPage} />
           <Stack.Screen name="LandingTab" component={LandingTab} />
+          <Stack.Screen name="ContactsPage" component={ContactsPage} />
           <Stack.Screen name="SignUp" component={SignUp}/>
           <Stack.Screen name="Onboarding" component={Onboarding} />
           <Stack.Screen name="CalendarSync" component={CalendarSync} />
@@ -82,9 +84,22 @@ function LandingTab() {
       />
       <Tab.Screen 
         name="Profile" 
-        component={Profile} 
+        component={ProfileNav} 
       />
     </Tab.Navigator>
+  )
+}
+
+function ProfileNav() {
+  return (
+    <Stack.Navigator screenOptions={{ animationEnabled: false }}>
+      <Stack.Screen name="ProfileMain" component={Profile} options={{ headerShown: false }}/>
+      <Stack.Screen name="EditProfile" component={EditProfile} 
+        options={{
+          headerTitle: props => <Text>Edit Profile</Text>,
+        }}
+      />
+    </Stack.Navigator>
   )
 }
 

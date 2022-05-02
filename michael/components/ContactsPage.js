@@ -65,7 +65,7 @@ const ContactEntry = ({ contact, type, profilePicsMap }) => (
       <Image
         style={styles.profilePicReal}
         source={{
-          uri: DEFUALT_PROFILE_PIC
+          uri: DEFUALT_PROFILE_PIC + '=s100'
         }}
       />
     }
