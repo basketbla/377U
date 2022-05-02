@@ -147,7 +147,7 @@ export default function NewFriends({ navigation }) {
 
         setAllExistingAccounts(existingAccounts);
         setAllOtherContacts(otherContacts);
-        setSectionData([{title: "Contacts on Din Din", data: existingAccounts, renderItem: renderExistingItem }, {title: "Invite Other Contacts", data: otherContacts, renderItem: renderNewItem}]);
+        setSectionData([{title: `Contacts on Din Din (${existingAccounts.length})`, data: existingAccounts, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
         setContactStatus(status);
       }
       else {
@@ -173,7 +173,9 @@ export default function NewFriends({ navigation }) {
   const handleSearch = text => {
     setSearch(text);
     text = text.toLowerCase();
-    setSectionData([{title: "Contacts on Din Din", data: allExistingAccounts.filter(item => (item.firstName + ' ' + item.lastName).toLowerCase().includes(text)), renderItem: renderExistingItem }, {title: "Invite Other Contacts", data: allOtherContacts.filter(item => (item.firstName + ' ' + item.lastName).toLowerCase().includes(text)), renderItem: renderNewItem}]);
+    let existing = allExistingAccounts.filter(item => (item.firstName + ' ' + item.lastName).toLowerCase().includes(text));
+    let otherContacts = allOtherContacts.filter(item => (item.firstName + ' ' + item.lastName).toLowerCase().includes(text))
+    setSectionData([{title: `Contacts on Din Din (${existing.length})`, data: existing, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
   }
   
   if (contactStatus === 'granted') {

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, ActivityIndicator, Pressable } from 'react-native'
+import { StyleSheet, Text, View, Image, ActivityIndicator, Pressable, Button, Alert } from 'react-native'
 import React, {
   useEffect,
   useState
@@ -9,7 +9,7 @@ import { useIsFocused } from "@react-navigation/native";
 
 export default function Profile({ navigation }) {
 
-  const { currentUser } = useAuth();
+  const { currentUser, logout } = useAuth();
 
   // Used to load screen on navigate back
   const isFocused = useIsFocused();
@@ -25,6 +25,20 @@ export default function Profile({ navigation }) {
     setLoading(false);
   }, [isFocused]);
 
+  const confirmSignOut = () => {
+    Alert.alert(
+      "Are you sure you want to sign out?",
+      undefined,
+      [
+        { text: "Cancel", onPress: undefined, style: "cancel" },
+        {
+          text: "Sign Out",
+          onPress: async () => await logout()
+        },
+      ]
+    );
+  }
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -35,7 +49,7 @@ export default function Profile({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Pressable style={styles.container} onPress={() => navigation.navigate('EditProfile', {userDetails: userDetails})}>
+      <Pressable style={styles.clickableProfile} onPress={() => navigation.navigate('EditProfile', {userDetails: userDetails})}>
         <Image
           style={styles.profilePic}
           source={{
@@ -45,6 +59,7 @@ export default function Profile({ navigation }) {
         <Text style={styles.name}>{userDetails.name}</Text>
         <Text style={styles.username}>{`@${userDetails.username}`}</Text>
       </Pressable>
+      <Button title="Sign Out" onPress={confirmSignOut}/>
     </View>
   )
 }
@@ -54,6 +69,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  clickableProfile: {
+    alignItems: 'center', 
+    marginBottom: 50,
   },
   profilePic: {
     width: 200,

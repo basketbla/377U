@@ -3,7 +3,8 @@ import * as Notifications from 'expo-notifications';
 import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, Button, Platform, StyleSheet, Pressable, Alert} from 'react-native';
 import * as Linking from 'expo-linking';
-import { COLORS } from '../utils/constants'
+import { COLORS } from '../utils/constants';
+import { useAuth } from '../contexts/AuthContext'
 
 // I put the notifications stuff in this component but it has nothing to
 // do with calendar. I may clean it up later.
@@ -20,6 +21,8 @@ export default function CalendarSync({ navigation }) {
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
+
+  const { setIsNew } = useAuth();
 
   useEffect(async () => {
     // Need to save this in some kind 
@@ -50,10 +53,10 @@ export default function CalendarSync({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={() => navigation.navigate('Test')}>
+      <Pressable onPress={() => console.log('do some calendar stuff')}>
         <Text>(The calendar syncing stuff is gonna go here)</Text>
       </Pressable>
-      <Pressable style={styles.nextButton} onPress={() => navigation.navigate('LandingTab') }>
+      <Pressable style={styles.nextButton} onPress={() => setIsNew(false) }>
         <Text style={styles.nextLabel}>Continue to the good stuff!</Text>
       </Pressable>
     </View>

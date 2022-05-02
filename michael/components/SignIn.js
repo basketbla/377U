@@ -33,7 +33,6 @@ export default function SignIn() {
 
     login(email, password).then(result => {
       setValidating(false);
-      navigation.navigate('LandingTab');
     }).catch(error => {
       setValidating(false);
       switch (error.code) {

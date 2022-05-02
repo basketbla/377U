@@ -19,7 +19,7 @@ export default function SignUp() {
 
   const navigation = useNavigation();
 
-  const { currentUser, signup } = useAuth();
+  const { currentUser, signup, setIsNew } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -46,7 +46,8 @@ export default function SignUp() {
 
     signup(email, password).then(result => {
       setValidating(false);
-      navigation.navigate('Username');
+      setIsNew(true);
+      // navigation.navigate('Username');
     }).catch(error => {
       setValidating(false);
       switch (error.code) {
