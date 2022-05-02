@@ -171,14 +171,18 @@ function FriendsTab() {
     <matTab.Navigator screenOptions={({ route }) => ({
       tabBarLabelStyle: { fontSize: 20, textTransform: 'none' },
       tabBarLabel: () => {
-        if (route.name === 'NewFriends') {
-          return <Text style={{fontWeight: 'bold'}}>Add Friends</Text>;
+        if (route.name === 'ContactsFriends') {
+          return <Text style={{fontWeight: 'bold'}}>Contacts</Text>;
+        } 
+        if (route.name === 'AllUsers') {
+          return <Text style={{fontWeight: 'bold'}}>All Users</Text>;
         } 
         return <Text style={{fontWeight: 'bold'}}>My Friends</Text>;
       },
     })}
     >
-      <matTab.Screen name="NewFriends" component={NewFriends}/>
+      <matTab.Screen name="ContactsFriends" component={NewFriends}/>
+      <matTab.Screen name="AllUsers" component={NewFriends}/>
       <matTab.Screen name="OldFriends" component={OldFriends}/>
     </matTab.Navigator>
   );

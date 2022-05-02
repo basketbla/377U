@@ -13,12 +13,13 @@ import React, {
   useState
 } from 'react'
 import * as Contacts from 'expo-contacts';
-import { COLORS, DEFUALT_PROFILE_PIC, PROFILE_COLORS } from '../utils/constants';
+import { COLORS, DEFUALT_PROFILE_PIC } from '../utils/constants';
 import { getUsers } from '../utils/firebase';
 import * as SMS from 'expo-sms';
 
 // Entry for contacts list
-const ContactEntry = ({ contact, type, profilePicsMap }) => (
+// Really should have made this one for contacts on app and one for others. Might change.
+const ContactEntry = ({ contact, type }) => (
   <Pressable style={styles.contactEntry} onPress={async () => {
     
     // Invite in app instead of messaging
@@ -89,6 +90,34 @@ const ContactEntry = ({ contact, type, profilePicsMap }) => (
   </Pressable>
 );
 
+const FriendRequest = ({ contact }) => {
+  return (
+    <View style={styles.contactEntry}>
+      <Image
+        style={styles.profilePicReal}
+        source={{
+          uri: contact.profilePic
+        }}
+      />
+      <View style={styles.contactName}>
+        <Text style={styles.contactName}>
+          {
+            // Just truncating name but dang this is ugly
+            // Yeah number of lines fixes this. Whatever.
+            (contact.firstName + ' ' + (contact.lastName ? contact.lastName : '')).substring(0,20) + ((contact.firstName + ' ' + (contact.lastName ? contact.lastName : '')).length > 20 ? '...' : '')
+          }
+        </Text>
+        <Text style={styles.contactUsername}>
+          {contact.username}
+        </Text>
+      </View>
+      <Pressable style={styles.acceptRequestButton} onPress={() => alert('accept request')}>
+        <Text style={styles.acceptRequestText}>Accept</Text>
+      </Pressable>
+    </View>
+  );
+}
+
 export default function NewFriends({ navigation }) {
 
 
@@ -147,7 +176,10 @@ export default function NewFriends({ navigation }) {
 
         setAllExistingAccounts(existingAccounts);
         setAllOtherContacts(otherContacts);
-        setSectionData([{title: `Contacts on Din Din (${existingAccounts.length})`, data: existingAccounts, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
+        // setSectionData([{title: `Contacts on Din Din (${existingAccounts.length})`, data: existingAccounts, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
+        let friendRequests = existingAccounts;
+        setSectionData([{title: `Friend Requests (${friendRequests.length})`, data: friendRequests, renderItem: renderFriendRequest}, {title: `Contacts on Din Din (${existingAccounts.length})`, data: existingAccounts, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
+        
         setContactStatus(status);
       }
       else {
@@ -161,9 +193,14 @@ export default function NewFriends({ navigation }) {
     return <ContactEntry contact={item} type="Add"/>
   };
 
-   // For rendering contacts without accounts
-   const renderNewItem = ({item}) => {
+  // For rendering contacts without accounts
+  const renderNewItem = ({item}) => {
     return <ContactEntry contact={item} type="Invite"/>
+  };
+
+  // For rendering contacts without accounts
+  const renderFriendRequest = ({item}) => {
+    return <FriendRequest contact={item}/>
   };
 
   const handleNext = () => {
@@ -174,15 +211,18 @@ export default function NewFriends({ navigation }) {
     setSearch(text);
     text = text.toLowerCase();
     let existing = allExistingAccounts.filter(item => (item.firstName + ' ' + item.lastName).toLowerCase().includes(text));
-    let otherContacts = allOtherContacts.filter(item => (item.firstName + ' ' + item.lastName).toLowerCase().includes(text))
-    setSectionData([{title: `Contacts on Din Din (${existing.length})`, data: existing, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
+    let otherContacts = allOtherContacts.filter(item => (item.firstName + ' ' + item.lastName).toLowerCase().includes(text));
+
+    // change this to actually get friend requests
+    let friendRequests = allExistingAccounts.filter(item => (item.firstName + ' ' + item.lastName).toLowerCase().includes(text));
+    setSectionData([{title: `Friend Requests(${friendRequests.length})`, data: existing, renderItem: renderExistingItem }, {title: `Contacts on Din Din (${existing.length})`, data: existing, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
   }
   
   if (contactStatus === 'granted') {
     return (
       <View style={styles.container}>
         <SearchBar
-          placeholder="Search for Contact"
+          placeholder="Search Contacts"
           onChangeText={handleSearch}
           value={search}
           containerStyle={styles.search}
@@ -307,5 +347,18 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginRight: 10,
     marginLeft: 10,
+  },
+  acceptRequestButton: {
+    backgroundColor: COLORS.blue,
+    marginLeft: 'auto',
+    alignItems: 'center',
+    marginRight: 20,
+    borderRadius: 10,
+    padding: 10,
+    width: 100,
+  },
+  acceptRequestText: {
+    fontWeight: 'bold',
+    color: 'white'
   }
 })

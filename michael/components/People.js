@@ -16,7 +16,7 @@ const FreeNow = ({ user }) => (
         uri: user.profilePic
       }}
     />
-    <Text style={styles.freeNowText}>{/*user.name.substr(0, user.name.indexOf(' '))*/}placeholder</Text>
+    <Text style={styles.freeNowText} numberOfLines={1}>{user.name.indexOf(' ') === -1 ? user.name : user.name.substr(0, user.name.indexOf(' '))}</Text>
   </View>
 );
 
@@ -131,6 +131,7 @@ const styles = StyleSheet.create({
   freeNow: {
     alignItems: 'center',
     marginLeft: 20,
+    width: 70,
   },
   freeNowList: {
     width: '100%',
