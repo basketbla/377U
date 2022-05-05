@@ -23,11 +23,21 @@ export default function Username({ navigation }) {
   const [username, setUsername] = useState('');
   const [usernameError, setUsernameError] = useState(false);
   const [usernameErrorText, setUsernameErrorText] = useState('');
+  const [nameError, setNameError] = useState(false);
+  const [nameErrorText, setNameErrorText] = useState('');
   const [validating, setValidating] = useState(false);
 
   const handleNext = async () => {
     setUsernameError(false);
+    setNameError(false);
     setValidating(true);
+
+    if (!name.includes(' ')) {
+      setNameError(true);
+      setNameErrorText('Please enter you full name (first and last)');
+      setValidating(false);
+      return;
+    }
 
     let usernames = Object.values(await getUsers()).map(item => item.username);
 
@@ -39,11 +49,13 @@ export default function Username({ navigation }) {
     }
 
 
-    saveUserDetails(currentUser.uid, name, username, currentUser.email, DEFUALT_PROFILE_PIC).then(result => {
+    // Changed this to save phone number instead of email.
+    saveUserDetails(currentUser.uid, name, username, currentUser.phoneNumber, DEFUALT_PROFILE_PIC).then(result => {
       setValidating(false);
       navigation.navigate('AddProfilePic')
     })
     .catch(error => {
+      console.log(error);
       setValidating(false);
       setUsernameError(true);
       setUsernameErrorText('There was an error contacting the database, try again')
@@ -57,11 +69,12 @@ export default function Username({ navigation }) {
         <Text style={styles.logo}>Din Din</Text>
         <Text style={styles.explainer}>Please enter your full name and username</Text>
         <TextInput
-          style={styles.input}
-          placeholder="Name"
+          style={nameError ? styles.errorInput : styles.input}
+          placeholder="Full Name"
           onChangeText={input => setName(input)}
           onSubmitEditing={Keyboard.dismiss}
         />
+        <Text style={{...styles.errorText, display: nameError ? 'flex' : 'none'}}>{nameErrorText}</Text>
         <TextInput
           style={usernameError ? styles.errorInput : styles.input}
           placeholder="Username"

@@ -58,6 +58,11 @@ export default function SignUpWithPhone() {
     return () => clearInterval(intervalId);
   }, [secs]);
 
+  // Prevent memory leak if user signs out and signs back in
+  useEffect(() => {
+    setIsNew(null);
+  }, [])
+
   // When confirmation code is 6 digits, try to submit
   useEffect(() => {
     if(confirmationCode.length !== 6){
@@ -79,7 +84,7 @@ export default function SignUpWithPhone() {
   }
 
   const handleSendCode = () => {
-    setSecs(60);
+    setValidating(true);
     sendVerification();
   }
 
@@ -94,9 +99,11 @@ export default function SignUpWithPhone() {
         recaptchaVerifier.current
       );
       setVerificationId(verificationId);
-      setCodeSent(true);
       setSecs(60);
+      setCodeSent(true);
+      setValidating(false);
     } catch (err) {
+      setValidating(false);
       setPhoneError(true);
       setPhoneErrorMessage('Something went wrong. Please try again.')
       console.log(err)
@@ -176,7 +183,12 @@ export default function SignUpWithPhone() {
           </Pressable>
           :
           <Pressable style={phoneNumber === '' ? styles.disabledNextButton : styles.nextButton} onPress={handleNext} disabled={phoneNumber === ''}>
-            <Text style={styles.nextLabel}>Next</Text>
+            {
+              validating ?
+              <ActivityIndicator/>
+              :
+              <Text style={styles.nextLabel}>Next</Text>
+            }
           </Pressable>
         }
         <FirebaseRecaptchaBanner style={{position: 'absolute', bottom: 20, margin: 10}}/>

@@ -24,22 +24,16 @@ export const database = getDatabase();
 const dbRef = ref_db(database);
 const storage = getStorage(app);
 
-export const getCurrentUser = async (userId) => {
-  snapshot = await get(child(dbRef, `users/` + userId))
-  if (snapshot.exists()) {
-    return snapshot.val();
-  } 
-  else {
-    return {};
-  }
+export const getCurrentUser = (userId) => {
+  return get(child(dbRef, `users/` + userId));
 }
 
 // I think I'm just gonna make my firebase funcs here and export them
-export const saveUserDetails = async (userId, name, username, email, profilePic) => {
+export const saveUserDetails = async (userId, name, username, phoneNumber, profilePic) => {
   await set(ref_db(database, 'users/' + userId), {
     name: name,
     username: username,
-    email: email,
+    phoneNumber: phoneNumber,
     profilePic: profilePic
   });
 }
@@ -55,11 +49,17 @@ export const getUsers = async () => {
 }
 
 export const uploadImageToStorage = async (uri, uid) => {
+  console.log('in upload!')
+  console.log(uri)
   const img = await fetch(uri);
   const bytes = await img.blob();
 
+  console.log('past fetch')
+
   let storageRef = ref_storage(storage, 'profilePic/' + uid);
   let snapshot = await uploadBytesResumable(storageRef, bytes);
+
+  console.log('did the upload stuff!')
 
   return (await getDownloadURL(storageRef));
 }

@@ -62,7 +62,7 @@ export default function AddProfilePic({navigation}) {
     if (!result.cancelled) {
       result = await convertToJPG(result);
       setImage(result.uri);
-      confirmPhoto();
+      confirmPhoto(result.uri);
     }
   };
 
@@ -89,7 +89,7 @@ export default function AddProfilePic({navigation}) {
     );
   }
 
-  const confirmPhoto = () => {
+  const confirmPhoto = (uri) => {
     Alert.alert(
       "Confirm Photo",
       "Is this photo good or do you want to select a different one?",
@@ -100,7 +100,7 @@ export default function AddProfilePic({navigation}) {
           onPress: async () => {
             // Upload photo
             setLoading(true);
-            let newUrl = await uploadImageToStorage(image, currentUser.uid);
+            let newUrl = await uploadImageToStorage(uri, currentUser.uid);
             await updateProfilePic(newUrl, currentUser.uid);
             setLoading(false);
           }
@@ -114,7 +114,7 @@ export default function AddProfilePic({navigation}) {
     photo = await convertToJPG(photo);
     setImage(photo.uri);
     setShowCamera(false);
-    confirmPhoto();
+    confirmPhoto(photo.uri);
   }
 
   const convertToJPG = async (photo) => {
