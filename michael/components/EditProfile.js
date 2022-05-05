@@ -135,7 +135,8 @@ export default function EditProfile({route, navigation}) {
       newPic = await uploadImageToStorage(image, currentUser.uid);
     }
 
-    await saveUserDetails(currentUser.uid, name, username, userDetails.email, newPic);
+    // Should change this to update so I don't have to include phone number
+    await saveUserDetails(currentUser.uid, name, username, userDetails.phoneNumber, newPic);
     setLoading(false); 
     navigation.navigate('ProfileMain');
   }
