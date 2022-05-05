@@ -65,7 +65,7 @@ export default function SignIn() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <Text style={styles.logo}>Din Din</Text>
-        <Text style={styles.explainer}>Sign up to find shared freetime with friends</Text>
+        <Text style={styles.explainer}>Sign in to find shared freetime with friends</Text>
         <TextInput
           style={error ? styles.errorInput : styles.input}
           placeholder="Email address"

@@ -23,6 +23,7 @@ import EditProfile from './components/EditProfile';
 import NewFriends from './components/NewFriends';
 import OldFriends from './components/OldFriends';
 import AddProfilePic from './components/AddProfilePic';
+import SignUpWithPhone from './components/SignUpWithPhone';
 
 
 const Stack = createNativeStackNavigator();
@@ -34,7 +35,7 @@ export default function PretendApp() {
   const { currentUser, isNew } = useAuth();
 
   // User is not signed in
-  if (currentUser === null) {
+  if (currentUser === null || isNew === null) {
     return (
       <SignInStack/>
     );
@@ -71,6 +72,7 @@ function SignInStack() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false, gestureEnabled: 'false'}}>
+        <Stack.Screen name="SignUpWithPhone" component={SignUpWithPhone}/>
         <Stack.Screen name="SignIn" component={SignIn}/>
         <Stack.Screen name="SignUp" component={SignUp}/>
         {/* <Stack.Screen name="VerifyPhone" component={VerifyPhone} /> */}

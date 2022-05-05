@@ -5,7 +5,8 @@ import {
   FlatList, 
   Pressable,
   SectionList,
-  Image
+  Image,
+  Keyboard
 } from 'react-native'
 import { SearchBar } from 'react-native-elements';
 import React, {
@@ -239,6 +240,8 @@ export default function NewFriends({ navigation }) {
             <Text style={styles.sectionHeader}>{title}</Text>
           )}
           maxToRenderPerBatch={10}
+          onScrollEndDrag={() => Keyboard.dismiss() }
+          onScrollBeginDrag={() => Keyboard.dismiss() }
         />
       </View>
     )
