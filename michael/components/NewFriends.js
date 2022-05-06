@@ -143,36 +143,65 @@ export default function NewFriends({ navigation }) {
 
         // Check which contacts have dindin and which ones don't
         let users = await getUsers();
+
         let existingEmails = Object.values(users).map(user => user.email);
+        let existingNumbers = Object.values(users).map(user => user.phoneNumber);
         
         // Map emails to profile pics so we can get people's images
         let profilePics = Object.values(users).map(user => user.profilePic);
-        let profileMap = {};
+        let profilePicNumberMap = {};
+        let profilePicEmailMap = {};
+        existingNumbers.forEach((element, index) => {
+          profilePicNumberMap[element] = profilePics[index];
+        });
         existingEmails.forEach((element, index) => {
-          profileMap[element] = profilePics[index];
+          profilePicEmailMap[element] = profilePics[index];
         });
 
         let existingAccounts = data.filter(user => {
-          return (user.emails && existingEmails.includes(user.emails[0].email) && user.firstName);
+          if (user.firstName) {
+            if (user.emails && existingEmails.includes(user.emails[0].email)) {
+              return true;
+            }
+            if (user.phoneNumbers && existingNumbers.includes(user.phoneNumbers[0].digits)) {
+              return true;
+            }
+          }
+          return false;
         })
 
         let otherContacts = data.filter(user => {
-          return (!(user.emails && existingEmails.includes(user.emails[0].email)) && user.firstName);
+          return (!existingAccounts.includes(user) && user.firstName);
         })
 
         // This is ugly, hopefully it works
         existingAccounts = existingAccounts.map(user => {
-          return {...user, profilePic: profileMap[user.emails[0].email]}
+          if (user.emails) {
+            return {...user, profilePic: profilePicEmailMap[user.emails[0].email]}
+          }
+          if (user.phoneNumbers) {
+            return {...user, profilePic: profilePicNumberMap[user.phoneNumbers[0].digits]}
+          }
         })
 
         // Doing the same thing as profile pic but with username
         let usernames = Object.values(users).map(user => user.username);
-        let usernameMap = {};
+        let usernameEmailMap = {};
+        let usernameNumberMap = {};
         existingEmails.forEach((element, index) => {
-          usernameMap[element] = usernames[index];
+          usernameEmailMap[element] = usernames[index];
         });
+        existingNumbers.forEach((element, index) => {
+          usernameNumberMap[element] = usernames[index];
+        });
+
         existingAccounts = existingAccounts.map(user => {
-          return {...user, username: usernameMap[user.emails[0].email]}
+          if (user.emails) {
+            return {...user, username: usernameEmailMap[user.emails[0].email]}
+          }
+          if (user.phoneNumbers) {
+            return {...user, username: usernameEmailMap[user.phoneNumbers[0].digits]}
+          }
         })
 
         setAllExistingAccounts(existingAccounts);

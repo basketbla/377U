@@ -116,6 +116,7 @@ export default function SignUpWithPhone() {
         verificationId,
         confirmationCode
       );
+      // Should have put this in firebase.js but I don't want to so whatever
       let response = await signInWithCredential(auth, credential);
       setIsNew(response._tokenResponse.isNewUser);
     } catch (err) {
