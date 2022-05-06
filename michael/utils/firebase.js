@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getDatabase, ref as ref_db, set, get, child } from "firebase/database";
+import { getDatabase, ref as ref_db, set, get, child, remove } from "firebase/database";
 import { getStorage, ref as ref_storage, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { DEFUALT_PROFILE_PIC } from "./constants";
 
@@ -54,12 +54,8 @@ export const uploadImageToStorage = async (uri, uid) => {
   const img = await fetch(uri);
   const bytes = await img.blob();
 
-  console.log('past fetch')
-
   let storageRef = ref_storage(storage, 'profilePic/' + uid);
   let snapshot = await uploadBytesResumable(storageRef, bytes);
-
-  console.log('did the upload stuff!')
 
   return (await getDownloadURL(storageRef));
 }
@@ -67,6 +63,50 @@ export const uploadImageToStorage = async (uri, uid) => {
 export const updateProfilePic = async (uri, uid) => {
   return set(child(ref_db(database, 'users/' + uid), 'profilePic'), uri);
 }
+
+export const addFriendRequest = (requesterId, requesteeId) => {
+  return set(ref_db(database, `friendRequests/${requesteeId}/${requesterId}`), true);
+}
+
+export const getFriendRequests = async (uid) => {
+  return get(ref_db(database, `friendRequests/${uid}`));
+}
+
+export const addFriend = async (requesterId, requesteeId) => {
+  await set(ref_db(database, `friends/${requesteeId}/${requesterId}`), true);
+  await set(ref_db(database, `friends/${requesterId}/${requesteeId}`), true);
+}
+
+export const getFriends = (uid) => {
+  return get(ref_db(database, `friends/${uid}`));
+}
+
+export const removeFriend = async (requesterId, requesteeId) => {
+  console.log(requesterId, requesteeId);
+  await remove(ref_db(database, `friends/${requesteeId}/${requesterId}`));
+  await remove(ref_db(database, `friends/${requesterId}/${requesteeId}`));
+}
+
+export const removeFriendRequest = (requesterId, requesteeId) => {
+  return remove(ref_db(database, `friendRequests/${requesteeId}/${requesterId}`));
+}
+
+export const addSentFriendRequest = (requesterId, requesteeId) => {
+  return set(ref_db(database, `sentFriendRequests/${requesterId}/${requesteeId}`), true);
+}
+
+export const removeSentFriendRequest = (requesterId, requesteeId) => {
+  return remove(ref_db(database, `sentFriendRequests/${requesterId}/${requesteeId}`));
+}
+
+export const getSentFriendRequests = (requesterId) => {
+  return get(ref_db(database, `sentFriendRequests/${requesterId}`));
+}
+
+// addFriendRequest('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');
+// addFriend('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');
+// removeFriend('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');
+// addFriend('9C5cQbqtM2fKOXZZl34xFty8Iee2', 'L5CTIRTqqiOp1QkqqcLsWJMva733')
 
 // Helper because fetch isn't working for me... (nvm)
 // function urlToBlob(url) {

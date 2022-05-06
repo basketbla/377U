@@ -20,62 +20,35 @@ import { getFriendRequests, getFriends, getUsers, removeFriend } from '../utils/
 import * as SMS from 'expo-sms';
 import { useAuth } from '../contexts/AuthContext';
 import { useIsFocused } from "@react-navigation/native";
+import ExistingContact from './ExistingContact';
 
-const User = ({ contact, handleRemoveFriend }) => {
+// const User = ({ contact }) => {
 
-  const [littleLoading, setLittleLoading] = useState(false);
+//   return (
+//     <Pressable style={styles.contactEntry} onPress={() => alert(`show the profile of ${contact.username}`)}>
+//       <Image
+//         style={styles.profilePicReal}
+//         source={{
+//           uri: contact.profilePic
+//         }}
+//       />
+//       <View style={styles.contactName}>
+//         <Text style={styles.contactName}>
+//           {
+//             // Just truncating name but dang this is ugly
+//             // Yeah number of lines fixes this. Whatever.
+//             contact.name.substring(0, 18) + (contact.name.length > 18 ? '...' : '')
+//           }
+//         </Text>
+//         <Text style={styles.contactUsername}>
+//           {contact.username}
+//         </Text>
+//       </View>
+//     </Pressable>
+//   );
+// }
 
-  const handleRemoveFriendLittle = async () => {
-    confirmRemove();
-  }
-
-  const confirmRemove = () => {
-    Alert.alert(
-      "Confirm Remove Friend",
-      `Are you sure you want to remove ${contact.username} from your friends?`,
-      [
-        {
-          text: "Confirm",
-          onPress: async () => {setLittleLoading(true); await handleRemoveFriend(contact.id)}
-        },
-        { text: "Cancel", onPress: undefined, style: "cancel" }
-      ]
-    );
-  }
-
-  return (
-    <View style={styles.contactEntry}>
-      <Image
-        style={styles.profilePicReal}
-        source={{
-          uri: contact.profilePic
-        }}
-      />
-      <View style={styles.contactName}>
-        <Text style={styles.contactName}>
-          {
-            // Just truncating name but dang this is ugly
-            // Yeah number of lines fixes this. Whatever.
-            contact.name.substring(0, 18) + (contact.name.length > 18 ? '...' : '')
-          }
-        </Text>
-        <Text style={styles.contactUsername}>
-          {contact.username}
-        </Text>
-      </View>
-      <Pressable style={styles.removeButton} onPress={handleRemoveFriendLittle} disabled={littleLoading}>
-        {
-          littleLoading ?
-          <ActivityIndicator/>
-          :
-          <Text style={styles.removeButtonText}>X</Text>  
-        }
-      </Pressable>
-    </View>
-  );
-}
-
-export default function OldFriends({ navigation }) {
+export default function AllUsers({ navigation }) {
 
   const isFocused = useIsFocused();
 
@@ -89,26 +62,17 @@ export default function OldFriends({ navigation }) {
 
   // Fetch all friends
   useEffect(async () => {
-      let friendsSnapshot = await getFriends(currentUser.uid);
       let users = await getUsers();
-      let friendUsers = [];
-      if (friendsSnapshot && friendsSnapshot.val()) {
-        friendUsers = Object.keys(friendsSnapshot.val()).map(id => {return {...users[id], id: id}});
-      }
-      setFriends(friendUsers);
-      setFriendsToDisplay(friendUsers);
+      users = Object.keys(users).map(id => {return {...users[id], id: id}});
+      setFriends(users);
+      setFriendsToDisplay(users);
       setLoading(false);
   }, [isFocused]);
 
   // For rendering contacts with accounts
   const renderItem = ({item}) => {
-    return <User contact={item} handleRemoveFriend={handleRemoveFriend}/>
+    return <ExistingContact contact={item}/>
   };
-
-  const handleRemoveFriend = async (friendId) => {
-    await removeFriend(friendId, currentUser.uid);
-    setFriendsToDisplay([...friendsToDisplay.filter(user => user.id !== friendId)])
-  }
 
   const handleSearch = text => {
     setSearch(text);
@@ -128,7 +92,7 @@ export default function OldFriends({ navigation }) {
   return (
     <View style={styles.container}>
       <SearchBar
-        placeholder="Search Friends"
+        placeholder="Search All Users"
         onChangeText={handleSearch}
         value={search}
         containerStyle={styles.search}

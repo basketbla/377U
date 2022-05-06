@@ -6,7 +6,8 @@ import {
   Pressable,
   SectionList,
   Image,
-  Keyboard
+  Keyboard,
+  ActivityIndicator
 } from 'react-native'
 import { SearchBar } from 'react-native-elements';
 import React, {
@@ -15,223 +16,240 @@ import React, {
 } from 'react'
 import * as Contacts from 'expo-contacts';
 import { COLORS, DEFUALT_PROFILE_PIC } from '../utils/constants';
-import { getUsers } from '../utils/firebase';
+import { addFriend, getFriendRequests, getFriends, getSentFriendRequests, getUsers, removeFriendRequest } from '../utils/firebase';
 import * as SMS from 'expo-sms';
+import { useAuth } from '../contexts/AuthContext'
+import { useIsFocused } from '@react-navigation/native';
+import ContactEntry from './ContactEntry';
+import ExistingContact from './ExistingContact';
+import FriendRequest from './FriendRequest';
+import { useFriends } from '../contexts/FriendsContext';
 
-// Entry for contacts list
-// Really should have made this one for contacts on app and one for others. Might change.
-const ContactEntry = ({ contact, type }) => (
-  <Pressable style={styles.contactEntry} onPress={async () => {
-    
-    // Invite in app instead of messaging
-    if (type==="Add") {
-      alert('this should send a friend request')
-      return
-    }
-
-    if (!(await SMS.isAvailableAsync())) {
-      alert('It looks like this device can\'t send text invites');
-      return
-    }
-
-    if (!contact.phoneNumbers && !contact.emails) {
-      alert('There is no number or email saved for this contact...');
-      return
-    }
-
-    if (!contact.phoneNumbers && contact.emails) {
-      await SMS.sendSMSAsync(
-        [contact.emails[0].email],
-        'Download dindin! https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-      );
-      return
-    }
-
-    await SMS.sendSMSAsync(
-      [contact.phoneNumbers[0].digits],
-      'Download dindin! https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-    );
-  }}>
-    {/* <View style={{...styles.profilePic, backgroundColor: `${PROFILE_COLORS[contact.firstName.charCodeAt(1) % PROFILE_COLORS.length]}`}}>
-      <Text style={styles.profileLetters}>{contact.firstName[0].toUpperCase() + (contact.lastName ? contact.lastName[0].toUpperCase() : '')}</Text>
-    </View> */}
-    {
-      type === "Add" ?
-      <Image
-        style={styles.profilePicReal}
-        source={{
-          uri: contact.profilePic
-        }}
-      />
-      :
-      <Image
-        style={styles.profilePicReal}
-        source={{
-          uri: DEFUALT_PROFILE_PIC + '=s100'
-        }}
-      />
-    }
-    <View style={styles.contactName}>
-      <Text style={styles.contactName}>
-        {
-          // Just truncating name but dang this is ugly
-          (contact.firstName + ' ' + (contact.lastName ? contact.lastName : '')).substring(0,20) + ((contact.firstName + ' ' + (contact.lastName ? contact.lastName : '')).length > 20 ? '...' : '')
-        }
-      </Text>
-      {
-        type === "Add" ?
-        <Text style={styles.contactUsername}>
-          {contact.username}
-        </Text>
-        :
-        <></>
-      }
-    </View>
-    <Text style={styles.inviteButton}>{type}</Text>
-  </Pressable>
-);
-
-const FriendRequest = ({ contact }) => {
-  return (
-    <View style={styles.contactEntry}>
-      <Image
-        style={styles.profilePicReal}
-        source={{
-          uri: contact.profilePic
-        }}
-      />
-      <View style={styles.contactName}>
-        <Text style={styles.contactName}>
-          {
-            // Just truncating name but dang this is ugly
-            // Yeah number of lines fixes this. Whatever.
-            (contact.firstName + ' ' + (contact.lastName ? contact.lastName : '')).substring(0,20) + ((contact.firstName + ' ' + (contact.lastName ? contact.lastName : '')).length > 20 ? '...' : '')
-          }
-        </Text>
-        <Text style={styles.contactUsername}>
-          {contact.username}
-        </Text>
-      </View>
-      <Pressable style={styles.acceptRequestButton} onPress={() => alert('accept request')}>
-        <Text style={styles.acceptRequestText}>Accept</Text>
-      </Pressable>
-    </View>
-  );
-}
 
 export default function NewFriends({ navigation }) {
 
+  const { currentUser } = useAuth();
+
+  const isFocused = useIsFocused();
+
+  // const { allExistingGlobal, setAllExistingGlobal, allFriendRequestsGlobal, setAllFriendRequestsGlobal } = useFriends();
 
   const [contactStatus, setContactStatus] = useState('');
   const [search, setSearch] = useState('');
   const [sectionData, setSectionData] = useState();
   const [allExistingAccounts, setAllExistingAccounts] = useState();
   const [allOtherContacts, setAllOtherContacts] = useState();
+  const [allFriendRequests, setAllFriendRequests] = useState();
+  const [pageLoading, setPageLoading] = useState(true);
 
   // Get contact permissions
-  useEffect(() => {
-    (async () => {
-      console.log('use effecting');
+  useEffect(async () => {
+    console.log('use effecting in newfriends');
 
-      // Check permission for contacts
-      const { status } = await Contacts.requestPermissionsAsync();
+    // used to filter out duplicates in existing
+    const isPropValuesEqual = (subject, target, propNames) =>
+      propNames.every(propName => subject[propName] === target[propName]);
 
-      if (status === 'granted') {
-        const { data } = await Contacts.getContactsAsync({
-          fields: [Contacts.Fields.PhoneNumbers, Contacts.Fields.Emails],
-        });
+    const getUniqueItemsByProperties = (items, propNames) => {
+      const propNamesArray = Array.from(propNames);
+    
+      return items.filter((item, index, array) =>
+        index === array.findIndex(foundItem => isPropValuesEqual(foundItem, item, propNamesArray))
+      );
+    };
 
-        // Check which contacts have dindin and which ones don't
-        let users = await getUsers();
+    // Check permission for contacts
+    const { status } = await Contacts.requestPermissionsAsync();
 
-        let existingEmails = Object.values(users).map(user => user.email);
-        let existingNumbers = Object.values(users).map(user => user.phoneNumber);
-        
-        // Map emails to profile pics so we can get people's images
-        let profilePics = Object.values(users).map(user => user.profilePic);
-        let profilePicNumberMap = {};
-        let profilePicEmailMap = {};
-        existingNumbers.forEach((element, index) => {
-          profilePicNumberMap[element] = profilePics[index];
-        });
-        existingEmails.forEach((element, index) => {
-          profilePicEmailMap[element] = profilePics[index];
-        });
+    if (status === 'granted') {
+      const { data } = await Contacts.getContactsAsync({
+        fields: [Contacts.Fields.PhoneNumbers, Contacts.Fields.Emails],
+      });
 
-        let existingAccounts = data.filter(user => {
-          if (user.firstName) {
-            if (user.emails && existingEmails.includes(user.emails[0].email)) {
-              return true;
-            }
-            if (user.phoneNumbers && existingNumbers.includes(user.phoneNumbers[0].digits)) {
-              return true;
-            }
-          }
-          return false;
-        })
+      // Check which contacts have dindin and which ones don't
+      let users = await getUsers();
 
-        let otherContacts = data.filter(user => {
-          return (!existingAccounts.includes(user) && user.firstName);
-        })
-
-        // This is ugly, hopefully it works
-        existingAccounts = existingAccounts.map(user => {
-          if (user.emails) {
-            return {...user, profilePic: profilePicEmailMap[user.emails[0].email]}
-          }
-          if (user.phoneNumbers) {
-            return {...user, profilePic: profilePicNumberMap[user.phoneNumbers[0].digits]}
-          }
-        })
-
-        // Doing the same thing as profile pic but with username
-        let usernames = Object.values(users).map(user => user.username);
-        let usernameEmailMap = {};
-        let usernameNumberMap = {};
-        existingEmails.forEach((element, index) => {
-          usernameEmailMap[element] = usernames[index];
-        });
-        existingNumbers.forEach((element, index) => {
-          usernameNumberMap[element] = usernames[index];
-        });
-
-        existingAccounts = existingAccounts.map(user => {
-          if (user.emails) {
-            return {...user, username: usernameEmailMap[user.emails[0].email]}
-          }
-          if (user.phoneNumbers) {
-            return {...user, username: usernameEmailMap[user.phoneNumbers[0].digits]}
-          }
-        })
-
-        setAllExistingAccounts(existingAccounts);
-        setAllOtherContacts(otherContacts);
-        // setSectionData([{title: `Contacts on Din Din (${existingAccounts.length})`, data: existingAccounts, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
-        let friendRequests = existingAccounts;
-        setSectionData([{title: `Friend Requests (${friendRequests.length})`, data: friendRequests, renderItem: renderFriendRequest}, {title: `Contacts on Din Din (${existingAccounts.length})`, data: existingAccounts, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
-        
-        setContactStatus(status);
+      // Get friendRequests
+      let friendRequests = await getFriendRequests(currentUser.uid);
+      if (friendRequests && friendRequests.val()) {
+        let friendRequestIds = Object.keys(friendRequests.val());
+        friendRequests = friendRequestIds.map(id => (
+          {...users[id], id: id}
+        ));
       }
       else {
-        setContactStatus(status);
+        friendRequests = [];
       }
-    })();
-  }, []);
+      let friendRequestNumbers = friendRequests.map(user => user.phoneNumber);
+      let friendRequestEmails = friendRequests.map(user => user.email);
+
+      let existingEmails = Object.values(users).map(user => user.email);
+      let existingNumbers = Object.values(users).map(user => user.phoneNumber);
+      
+      // Map emails to profile pics so we can get people's images
+      // let profilePics = Object.values(users).map(user => user.profilePic);
+      // let profilePicNumberMap = {};
+      // let profilePicEmailMap = {};
+      // existingNumbers.forEach((element, index) => {
+      //   profilePicNumberMap[element] = profilePics[index];
+      // });
+      // existingEmails.forEach((element, index) => {
+      //   profilePicEmailMap[element] = profilePics[index];
+      // });
+
+      let existingAccounts = data.filter(user => {
+        // Exclude friend requests
+        if (user.emails && friendRequestEmails.includes(user.emails[0].email)) {
+          return false;
+        }
+        if (user.phoneNumbers && friendRequestNumbers.includes(user.phoneNumbers[0].digits)) {
+          return false;
+        }
+
+        // Include the data that's in the existing emails OR phone numbers
+        if (user.firstName) {
+          if (user.emails && existingEmails.includes(user.emails[0].email)) {
+            return true;
+          }
+          if (user.phoneNumbers && existingNumbers.includes(user.phoneNumbers[0].digits)) {
+            return true;
+          }
+        }
+        return false;
+      })
+
+      let otherContacts = data.filter(user => {
+        return (!existingAccounts.includes(user) && user.firstName);
+      })
+
+      // Could save a lot of effort if we just map existing user contacts to actual user objects
+      let userList = Object.keys(users).map(key => {
+        return {...users[key], id: key}
+      })
+      existingAccounts = existingAccounts.map(contact => {
+        // Oh shit this may be inefficient... whatever
+        if (contact.phoneNumbers) {
+          return userList.filter(user => user.phoneNumber === contact.phoneNumbers[0].digits)[0]
+        }
+        if (contact.emails) {
+          return userList.filter(user => user.email === contact.emails[0].email)[0]
+        }
+        return null;
+      })
+
+      
+
+      // TODO: NEED TO CHECK IF REQUEST HAS BEEN SENT FOR EXISTING ONES
+      // Fuck. I think the best way to do this is just to add a 'sentFriendRequests' thing in the db,
+      // then update that whenever we do stuff with friends
+      let sentRequestsSnapshot = await getSentFriendRequests(currentUser.uid);
+      if (sentRequestsSnapshot && sentRequestsSnapshot.val()) {
+        let requestees = Object.keys(sentRequestsSnapshot.val());
+        existingAccounts = existingAccounts.map(user => {return {...user, requestSent: requestees.includes(user.id)}})
+      }
+
+      // Filter out the existingFriends
+      let friendsSnapshot = await getFriends(currentUser.uid);
+      if (friendsSnapshot && friendsSnapshot.val()) {
+        let friendIds = Object.keys(friendsSnapshot.val());
+        existingAccounts = existingAccounts.filter(user => !friendIds.includes(user.id))
+      }
+
+      // Filter out duplicates (same contact saved twice)
+      existingAccounts = existingAccounts.filter((v,i,a)=>a.findIndex(v2=>(v2.id===v.id))===i)
+
+
+      // if (friendsSnapshot && friendsSnapshot.val()) {
+      //   friendUsers = Object.keys(friendsSnapshot.val()).map(id => {return {...users[id], id: id}});
+      // }
+
+      // This is ugly, hopefully it works
+      // existingAccounts = existingAccounts.map(user => {
+      //   if (user.emails) {
+      //     return {...user, profilePic: profilePicEmailMap[user.emails[0].email]}
+      //   }
+      //   if (user.phoneNumbers) {
+      //     return {...user, profilePic: profilePicNumberMap[user.phoneNumbers[0].digits]}
+      //   }
+      // })
+
+      // Doing the same thing as profile pic but with username
+      // let usernames = Object.values(users).map(user => user.username);
+      // let usernameEmailMap = {};
+      // let usernameNumberMap = {};
+      // existingEmails.forEach((element, index) => {
+      //   usernameEmailMap[element] = usernames[index];
+      // });
+      // existingNumbers.forEach((element, index) => {
+      //   usernameNumberMap[element] = usernames[index];
+      // });
+
+      // existingAccounts = existingAccounts.map(user => {
+      //   if (user.emails) {
+      //     return {...user, username: usernameEmailMap[user.emails[0].email]}
+      //   }
+      //   if (user.phoneNumbers) {
+      //     return {...user, username: usernameEmailMap[user.phoneNumbers[0].digits]}
+      //   }
+      // })
+
+
+      // setAllFriendRequestsGlobal(friendRequests);
+      // setAllExistingGlobal(existingAccounts);
+
+      setAllExistingAccounts(existingAccounts);
+      setAllOtherContacts(otherContacts);
+      setAllFriendRequests(friendRequests);
+      setSectionData([{title: `Friend Requests (${friendRequests.length})`, data: friendRequests, renderItem: renderFriendRequest}, {title: `Contacts on Din Din (${existingAccounts.length})`, data: existingAccounts, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
+      
+      setContactStatus(status);
+    }
+    else {
+      setContactStatus(status);
+    }
+    setPageLoading(false);
+  }, [isFocused]);
+
+  // Jesus christ what am I doing
+  // useEffect(() => {
+  //   setAllFriendRequests(allFriendRequestsGlobal);
+  //   setAllExistingAccounts(allExistingGlobal);
+  // }, [allFriendRequestsGlobal, allExistingGlobal])
 
   // For rendering contacts with accounts
   const renderExistingItem = ({item}) => {
-    return <ContactEntry contact={item} type="Add"/>
+    return <ExistingContact contact={item}/>
   };
 
   // For rendering contacts without accounts
   const renderNewItem = ({item}) => {
-    return <ContactEntry contact={item} type="Invite"/>
+    return <ContactEntry contact={item}/>
   };
 
   // For rendering contacts without accounts
   const renderFriendRequest = ({item}) => {
-    return <FriendRequest contact={item}/>
+    return (
+      <FriendRequest 
+        contact={item} 
+        // allFriendReqs={allFriendRequests}
+        // setAllFriendReqs={setAllFriendRequests}
+        // allExisting={allExistingAccounts}
+        // setAllExisting={setAllExistingAccounts}
+        currUser={currentUser}
+        // handleAcceptBig={handleAcceptBig}
+      />
+    )
   };
+
+  // const handleAcceptBig = async (requesterId) => {
+  //   console.log(allFriendRequests);
+  //   console.log(allExistingAccounts);
+  //   await addFriend(requesterId, currentUser.uid);
+  //   await removeFriendRequest(requesterId, currentUser.uid);
+  //   setAllFriendRequests([...allFriendRequests.filter(user => user.id !== requesterId)]);
+  //   setAllExistingAccounts([...allExistingAccounts.filter(user => user.id !== requesterId)]);
+  //   handleSearch(search);
+  // }
 
   const handleNext = () => {
     navigation.navigate('CalendarSync');
@@ -244,8 +262,16 @@ export default function NewFriends({ navigation }) {
     let otherContacts = allOtherContacts.filter(item => (item.firstName + ' ' + item.lastName).toLowerCase().includes(text));
 
     // change this to actually get friend requests
-    let friendRequests = allExistingAccounts.filter(item => (item.firstName + ' ' + item.lastName).toLowerCase().includes(text));
-    setSectionData([{title: `Friend Requests(${friendRequests.length})`, data: existing, renderItem: renderExistingItem }, {title: `Contacts on Din Din (${existing.length})`, data: existing, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
+    let friendRequests = allFriendRequests.filter(item => (item.name.toLowerCase().includes(text) || item.username.toLowerCase().includes(text)));
+    setSectionData([{title: `Friend Requests(${friendRequests.length})`, data: friendRequests, renderItem: renderFriendRequest }, {title: `Contacts on Din Din (${existing.length})`, data: existing, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
+  }
+
+  if (pageLoading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator/>
+      </View>
+    )
   }
   
   if (contactStatus === 'granted') {
@@ -389,8 +415,29 @@ const styles = StyleSheet.create({
     padding: 10,
     width: 100,
   },
+  acceptRequestButtonDisabled: {
+    backgroundColor: COLORS.blue,
+    marginLeft: 'auto',
+    alignItems: 'center',
+    marginRight: 20,
+    borderRadius: 10,
+    padding: 10,
+    width: 100,
+    opacity: 0.5,
+  },
   acceptRequestText: {
     fontWeight: 'bold',
     color: 'white'
+  },
+  addButton: {
+    marginLeft: 'auto',
+    marginRight: 20,
+    borderRadius: 10,
+    borderWidth: 1,
+    padding: 10,
+    width: 100,
+  },
+  addButtonText: {
+    textAlign: 'center',
   }
 })

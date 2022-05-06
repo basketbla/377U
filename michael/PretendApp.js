@@ -24,6 +24,7 @@ import NewFriends from './components/NewFriends';
 import OldFriends from './components/OldFriends';
 import AddProfilePic from './components/AddProfilePic';
 import SignUpWithPhone from './components/SignUpWithPhone';
+import AllUsers from './components/AllUsers';
 
 
 const Stack = createNativeStackNavigator();
@@ -184,7 +185,7 @@ function FriendsTab() {
     })}
     >
       <matTab.Screen name="ContactsFriends" component={NewFriends}/>
-      <matTab.Screen name="AllUsers" component={NewFriends}/>
+      <matTab.Screen name="AllUsers" component={AllUsers}/>
       <matTab.Screen name="OldFriends" component={OldFriends}/>
     </matTab.Navigator>
   );
