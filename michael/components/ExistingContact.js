@@ -51,21 +51,26 @@ export default function ExistingContact({ contact }) {
           {contact.username}
         </Text>
       </View>
-      <Pressable style={(sent || loading) ? styles.acceptRequestButtonDisabled : styles.acceptRequestButton} onPress={handleSendRequest} disabled={sent || loading}>
-        {
-          loading ?
-          <ActivityIndicator/>
-          :
-          <>
-            {
-              sent ?
-              <Text style={styles.acceptRequestText}>Sent!</Text>
-              :
-              <Text style={styles.acceptRequestText}>Add</Text>
-            }
-          </>
-        }
-      </Pressable>
+      {
+        contact.isFriend ?
+        <></>
+        :
+        <Pressable style={(sent || loading) ? styles.acceptRequestButtonDisabled : styles.acceptRequestButton} onPress={handleSendRequest} disabled={sent || loading}>
+          {
+            loading ?
+            <ActivityIndicator/>
+            :
+            <>
+              {
+                sent ?
+                <Text style={styles.acceptRequestText}>Sent!</Text>
+                :
+                <Text style={styles.acceptRequestText}>Add</Text>
+              }
+            </>
+          }
+        </Pressable>
+      }
     </View>
   );
 }

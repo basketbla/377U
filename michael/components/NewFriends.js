@@ -147,6 +147,9 @@ export default function NewFriends({ navigation }) {
         let requestees = Object.keys(sentRequestsSnapshot.val());
         existingAccounts = existingAccounts.map(user => {return {...user, requestSent: requestees.includes(user.id)}})
       }
+      else {
+        existingAccounts = existingAccounts.map(user => {return {...user, requestSent: false}})
+      }
 
       // Filter out the existingFriends
       let friendsSnapshot = await getFriends(currentUser.uid);
@@ -154,6 +157,9 @@ export default function NewFriends({ navigation }) {
         let friendIds = Object.keys(friendsSnapshot.val());
         existingAccounts = existingAccounts.filter(user => !friendIds.includes(user.id))
       }
+
+      // For now just taking friends out, so setting isFriend to false
+      existingAccounts = existingAccounts.map(user => {return {...user, isFriend: false}})
 
       // Filter out duplicates (same contact saved twice)
       existingAccounts = existingAccounts.filter((v,i,a)=>a.findIndex(v2=>(v2.id===v.id))===i)

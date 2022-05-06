@@ -16,7 +16,7 @@ import React, {
 } from 'react'
 import * as Contacts from 'expo-contacts';
 import { COLORS, DEFUALT_PROFILE_PIC } from '../utils/constants';
-import { getFriendRequests, getFriends, getUsers, removeFriend } from '../utils/firebase';
+import { getFriendRequests, getFriends, getUsers, removeFriend, getSentFriendRequests } from '../utils/firebase';
 import * as SMS from 'expo-sms';
 import { useAuth } from '../contexts/AuthContext';
 import { useIsFocused } from "@react-navigation/native";
@@ -64,6 +64,28 @@ export default function AllUsers({ navigation }) {
   useEffect(async () => {
       let users = await getUsers();
       users = Object.keys(users).map(id => {return {...users[id], id: id}});
+
+      let sentRequestsSnapshot = await getSentFriendRequests(currentUser.uid);
+
+      // Show if friend request has been sent or not
+      if (sentRequestsSnapshot && sentRequestsSnapshot.val()) {
+        let requestees = Object.keys(sentRequestsSnapshot.val());
+        users = users.map(user => {return {...user, requestSent: requestees.includes(user.id)}})
+      }
+      else {
+        users = users.map(user => {return {...user, requestSent: false}})
+      }
+
+      // Show if friend or not
+      let friendsSnapshot = await getFriends(currentUser.uid);
+      if (friendsSnapshot && friendsSnapshot.val()) {
+        let friendIds = Object.keys(friendsSnapshot.val());
+        users = users.map(user => {return {...user, isFriend: friendIds.includes(user.id)}})
+      }
+      else {
+        users = users.map(user => {return {...user, isFriend: false}})
+      }
+
       setFriends(users);
       setFriendsToDisplay(users);
       setLoading(false);
