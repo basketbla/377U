@@ -144,6 +144,8 @@ export default function SignUpWithPhone() {
               placeholder="Confirmation code"
               onChangeText={input => setConfirmationCode(input)}
               onSubmitEditing={Keyboard.dismiss}
+              keyboardType="number-pad"
+              keyboardAppearance='dark'
             />
           </>
           :

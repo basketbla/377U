@@ -25,11 +25,13 @@ import OldFriends from './components/OldFriends';
 import AddProfilePic from './components/AddProfilePic';
 import SignUpWithPhone from './components/SignUpWithPhone';
 import AllUsers from './components/AllUsers';
+import CreateGroup from './components/CreateGroup';
 
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const matTab = createMaterialTopTabNavigator();
+
 
 export default function PretendApp() {
 
@@ -53,8 +55,12 @@ export default function PretendApp() {
   if (!!currentUser && !isNew) {
     return (
       <NavigationContainer>
+        {/* Can I delete these sceenoptions in the outer thing? */}
         <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false, gestureEnabled: 'false'}}>
-          <Stack.Screen name="LandingTab" component={LandingTab} />
+          <Stack.Group screenOptions={{ presentation: 'modal', gestureEnabled: 'true' }}>
+            <Stack.Screen name="LandingTab" component={LandingTab} />
+            <Stack.Screen name="CreateGroup" component={CreateGroup} />
+          </Stack.Group>
         </Stack.Navigator>
       </NavigationContainer>
     );

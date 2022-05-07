@@ -107,6 +107,7 @@ export const getSentFriendRequests = (requesterId) => {
 // addFriend('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');
 // removeFriend('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');
 // addFriend('9C5cQbqtM2fKOXZZl34xFty8Iee2', 'L5CTIRTqqiOp1QkqqcLsWJMva733')
+// addFriend('01WsqejuQ4esSapZysaarwvFFks1', 'L5CTIRTqqiOp1QkqqcLsWJMva733')
 // removeSentFriendRequest('L5CTIRTqqiOp1QkqqcLsWJMva733', '9C5cQbqtM2fKOXZZl34xFty8Iee2');
 
 

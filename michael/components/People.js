@@ -6,7 +6,8 @@ import React, {
 import { colors, SearchBar } from 'react-native-elements';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { COLORS, DEFUALT_PROFILE_PIC } from '../utils/constants';
-import { getUsers } from '../utils/firebase';
+import { getFriends, getUsers } from '../utils/firebase';
+import { useAuth } from '../contexts/AuthContext'
 
 const FreeNow = ({ user }) => (
   <View style={styles.freeNow}>
@@ -38,11 +39,17 @@ const Group = ({ group }) => {
 export default function People({ navigation }) {
 
   const [search, setSearch] = useState('');
-  const [temp, setTemp] = useState([]);
+  const [temp, setTemp] = useState({});
 
+  const { currentUser } = useAuth();
+
+  // Still just all friends, not free friends
   useEffect(async () => {
+    let friends = await getFriends(currentUser.uid);
+    let friendIds = Object.keys(friends.val());
     let users = await getUsers();
-    setTemp(users);
+    users = Object.keys(users).map(id => {return {...users[id], id: id}});
+    setTemp(users.filter(user => friendIds.includes(user.id)));
   }, [])
 
   const handleSearch = text => {
@@ -61,9 +68,10 @@ export default function People({ navigation }) {
     <View style={styles.container}>
       <View style={styles.topBar}>
         <Ionicons name={'people'} size={30} color={COLORS.darkGrey} onPress={() => navigation.navigate('FriendsTab')}/>
-        <Pressable style={styles.addGroup}>
-          <Text style={styles.addText}>New group</Text>
-          <Ionicons name={'add'} size={30} color={COLORS.darkGrey}/>
+        <Pressable style={styles.addGroup} onPress={() => navigation.navigate('CreateGroup')}>
+          {/* <Text style={styles.addText}>New group</Text> */}
+          {/* <Ionicons name={'add'} size={30} color={COLORS.darkGrey}/> */}
+          <Ionicons name="create-outline" size={30} color={COLORS.darkGrey} />
         </Pressable>
       </View>
       <SearchBar
