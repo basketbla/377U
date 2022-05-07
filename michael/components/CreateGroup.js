@@ -50,8 +50,7 @@ export default function CreateGroup({ navigation }) {
   const [friendsToDisplay, setFriendsToDisplay] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [highlightLastSelected, setHighlightLastSelected] = useState(false);
-
-  const [tempAllUsers, setTempAllUsers] = useState([]);
+  const [messageText, setMessageText] = useState('');
 
   useEffect(async () => {
     friendInputRef.current.focus();
@@ -63,7 +62,7 @@ export default function CreateGroup({ navigation }) {
     let users = await getUsers();
     users = Object.keys(users).map(id => {return {...users[id], id: id}});
     
-    setTempAllUsers(users);
+    // Just for testing
     setSelectedUsers(users);
 
     setAllFriends(users.filter(user => friendIds.includes(user.id)));
@@ -75,11 +74,18 @@ export default function CreateGroup({ navigation }) {
   };
 
   const handleSearchFriends = (text) => {
+    if (highlightLastSelected) {
+      setHighlightLastSelected(false);
+    }
     setFriendsText(text);
     setFriendsToDisplay(allFriends.filter(user => (user.name.toLowerCase().includes(text.toLowerCase()) || user.username.toLowerCase().includes(text.toLowerCase()))));
   }
 
   const handleDeleteSelected = () => {
+    if (friendsText !== "") {
+      return;
+    }
+
     // if nothing highlighted, highlight the last one
     // Otherwise, deselect the last one
     if (highlightLastSelected) {
@@ -122,6 +128,7 @@ export default function CreateGroup({ navigation }) {
           onKeyPress={({ nativeEvent }) => {
             nativeEvent.key === 'Backspace' ? handleDeleteSelected() : null
           }}
+          blurOnSubmit={false}
         />
       </View>
       <View style={styles.cancelButton}>
@@ -143,10 +150,11 @@ export default function CreateGroup({ navigation }) {
       <View style={styles.messageInputContainer}>
         <TextInput
           style={styles.otherInput}
-          placeholder="Add friends"
-          onChangeText={input => setFriendsText(input)}
-          value={friendsText}
+          placeholder="Send a message!"
+          onChangeText={input => setMessageText(input)}
+          value={messageText}
           returnKeyType="send"
+          onSubmitEditing={() => alert('send a message!')}
         />
       </View>
     </View>
@@ -274,7 +282,7 @@ const styles = StyleSheet.create({
   },
   friendInput: {
     height: 30,
-    paddingLeft: 10,
+    paddingLeft: 5,
     flexGrow: 1,
   },
   friendInputContainer: {
