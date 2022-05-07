@@ -22,7 +22,9 @@ export const COLORS = {
   grey: "#808080",
   blue: "#4275ff",
   random: "#233D4D",
-  darkGrey: "#5e5e5e"
+  darkGrey: "#5e5e5e",
+  lightGrey: "#e8e8e8",
+  iosBlue: "#007AFF"
 }
 
 export const PROFILE_COLORS = [
