@@ -9,11 +9,13 @@ import { useHeaderHeight } from '@react-navigation/elements';
 import useKeyboardHeight from 'react-native-use-keyboard-height';
 import { getFriends, getUsers } from '../utils/firebase';
 import { useAuth } from '../contexts/AuthContext';
+import { set } from 'firebase/database';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const User = ({ contact, selectedUsers, setSelectedUsers }) => {
+const User = ({ contact, selectedUsers, setSelectedUsers, setFriendsText }) => {
 
   return (
-    <Pressable style={styles.contactEntry} onPress={() => setSelectedUsers([...selectedUsers, contact])}>
+    <Pressable style={styles.contactEntry} onPress={() => {setSelectedUsers([...selectedUsers, contact]); setFriendsText('');}}>
       <Image
         style={styles.profilePicReal}
         source={{
@@ -52,6 +54,8 @@ export default function CreateGroup({ navigation }) {
   const [highlightLastSelected, setHighlightLastSelected] = useState(false);
   const [messageText, setMessageText] = useState('');
 
+  // TODO: make the text input not shitty and then actually make da groups!
+
   useEffect(async () => {
     friendInputRef.current.focus();
 
@@ -61,16 +65,12 @@ export default function CreateGroup({ navigation }) {
     let friendIds = Object.keys(friends.val());
     let users = await getUsers();
     users = Object.keys(users).map(id => {return {...users[id], id: id}});
-    
-    // Just for testing
-    setSelectedUsers(users);
-
     setAllFriends(users.filter(user => friendIds.includes(user.id)));
     setFriendsToDisplay(users.filter(user => friendIds.includes(user.id)));
   }, [])
 
   const renderItem = ({item}) => {
-    return <User contact={item} selectedUsers={selectedUsers} setSelectedUsers={setSelectedUsers}/>
+    return <User contact={item} selectedUsers={selectedUsers} setSelectedUsers={setSelectedUsers} setFriendsText={setFriendsText}/>
   };
 
   const handleSearchFriends = (text) => {
@@ -78,7 +78,10 @@ export default function CreateGroup({ navigation }) {
       setHighlightLastSelected(false);
     }
     setFriendsText(text);
-    setFriendsToDisplay(allFriends.filter(user => (user.name.toLowerCase().includes(text.toLowerCase()) || user.username.toLowerCase().includes(text.toLowerCase()))));
+
+    // Filter out selected
+    let newAllFriends = allFriends.filter(user => !selectedUsers.includes(user));
+    setFriendsToDisplay(newAllFriends.filter(user => (user.name.toLowerCase().includes(text.toLowerCase()) || user.username.toLowerCase().includes(text.toLowerCase()))));
   }
 
   const handleDeleteSelected = () => {
@@ -129,6 +132,7 @@ export default function CreateGroup({ navigation }) {
             nativeEvent.key === 'Backspace' ? handleDeleteSelected() : null
           }}
           blurOnSubmit={false}
+          onBlur={() => setFriendsText('')}
         />
       </View>
       <View style={styles.cancelButton}>
@@ -153,9 +157,13 @@ export default function CreateGroup({ navigation }) {
           placeholder="Send a message!"
           onChangeText={input => setMessageText(input)}
           value={messageText}
-          returnKeyType="send"
-          onSubmitEditing={() => alert('send a message!')}
+          multiline={true}
+          // returnKeyType="send"
+          // onSubmitEditing={() => alert('send a message!')}
         />
+        <Pressable style={{...styles.sendButton, backgroundColor: messageText === '' ? COLORS.lightGrey : COLORS.iosBlue}}>
+          <Ionicons name="arrow-up-outline" size={23} color='white'/>
+        </Pressable>
       </View>
     </View>
   )
@@ -177,17 +185,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 15,
     right: 10,
-  },
-  otherInput: {
-    width: '100%',
-    height: 50,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: 'lightgrey',
-    paddingLeft: 10
-  },
-  messageInputContainer: {
-    width: '100%',
   },
   nextButton: {
     width: '80%',
@@ -296,6 +293,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexWrap: 'wrap',
     paddingTop: 3,
+    paddingBottom: 3
   },
   selectedUser: {
     backgroundColor: COLORS.lightGrey,
@@ -314,5 +312,37 @@ const styles = StyleSheet.create({
   },
   selectedUserTextHighlight: {
     color: 'white',
-  }
+  },
+  otherInput: {
+    width: '95%',
+    borderWidth: 1,
+    borderColor: 'lightgrey',
+    borderRadius: 20,
+    marginTop: 10,
+    marginBottom: 5,
+    maxHeight: 200,
+    paddingLeft: 10,
+    paddingBottom: 10,
+    paddingTop: 10,
+    paddingRight: 40,
+    fontSize: 16,
+    // height: 50,
+    // borderTopWidth: 1,
+    // borderBottomWidth: 1,
+    // borderColor: 'lightgrey',
+    // paddingLeft: 10
+  },
+  messageInputContainer: {
+    width: '100%',
+  },
+  sendButton: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    right: 25,
+    bottom: 10 // Don't love this. Should change.
+  },
 })
