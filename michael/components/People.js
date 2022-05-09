@@ -44,8 +44,12 @@ export default function People({ navigation }) {
 
   const [search, setSearch] = useState('');
   const [temp, setTemp] = useState({});
-  const [groups, setGroups] = useState([]);
+  const [allGroups, setAllGroups] = useState([]);
+  const [groupsToDisplay, setGroupsToDisplay] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [allFriends, setAllFriends] = useState([]);
+  const [friendsToDisplay, setFriendsToDisplay] = useState([]);
+  const [friendsMap, setFriendsMap] = useState();
 
   const { currentUser, setUserFirebaseDetails } = useAuth();
 
@@ -57,7 +61,8 @@ export default function People({ navigation }) {
     setUserFirebaseDetails({...userStuff.val(), uid: currentUser.uid});
 
     let userGroups = await getUserGroups(currentUser.uid);
-    setGroups(userGroups.map(group => ({...group, numFree: 5, totalNum: Object.keys(group.users).length})));
+    setAllGroups(userGroups.map(group => ({...group, numFree: Object.keys(group.users).length, totalNum: Object.keys(group.users).length})));
+    setGroupsToDisplay(userGroups.map(group => ({...group, numFree: Object.keys(group.users).length, totalNum: Object.keys(group.users).length})));
     // {name: 'All Friends', numFree: 5, totalNum: 10, id: '1'}
 
 
@@ -65,13 +70,25 @@ export default function People({ navigation }) {
     let friendIds = Object.keys(friends.val());
     let users = await getUsers();
     users = Object.keys(users).map(id => {return {...users[id], id: id}});
-    setTemp(users.filter(user => friendIds.includes(user.id)));
+    let allFriendsStart = users.filter(user => friendIds.includes(user.id));
+    let friendsMapStart = {};
+    for (let friend of allFriendsStart) {
+      friendsMapStart[friend.id] = friend;
+    }
+    setFriendsMap(friendsMapStart);
+    setAllFriends(allFriendsStart);
+    setFriendsToDisplay(allFriendsStart);
 
     setLoading(false);
   }, [])
 
   const handleSearch = text => {
     setSearch(text);
+    text = text.toLowerCase();
+    let newFriends = allFriends.filter(item => (item.username.toLowerCase().includes(text) || item.name.toLowerCase().includes(text)));
+    setFriendsToDisplay(newFriends);
+    let newGroups = allGroups.filter(item => Object.keys(item.users).find(id => { if (friendsMap[id].name.toLowerCase().includes(text) || friendsMap[id].username.toLowerCase().includes(text)) {return true}}));
+    setGroupsToDisplay(newGroups);
   }
 
   const renderFreeNow = ({ item }) => (
@@ -109,13 +126,13 @@ export default function People({ navigation }) {
       />
       <Text style={styles.freeLabel}>Free Now</Text>
       {
-        temp.length === 0 ?
+        friendsToDisplay.length === 0 ?
         <View style={styles.noFreeContainer}>
-          <Text style={styles.noFreeText}>No one is free right now :(</Text>
+          <Text style={styles.noFreeText}>{search.length === 0 ? "No one is free right now :(" : "No matching users are free"}</Text>
         </View>
         :
         <FlatList
-          data={Object.values(temp)}
+          data={Object.values(friendsToDisplay)}
           renderItem={renderFreeNow}
           keyExtractor={item => item.username}
           horizontal={true}
@@ -126,12 +143,12 @@ export default function People({ navigation }) {
       }
       <Text style={styles.freeLabel}>Conversations</Text>
       {
-        groups.length === 0 ?
-        <Text style={styles.noFriendsText}>You don't have any groups yet...</Text>
+        groupsToDisplay.length === 0 ?
+        <Text style={styles.noFriendsText}>{search.length === 0 ? "You don't have any groups right now..." : "No groups with matching user"}</Text>
         :
         <FlatList
           // data={[{name: 'All Friends', numFree: 5, totalNum: 10, id: '1'}, {name: 'Roommates', numFree: 3, totalNum: 5, id: '2'}, {name: 'Foodies', numFree: 2, totalNum: 6, id: '3'}]}
-          data={groups}
+          data={groupsToDisplay}
           renderItem={renderGroups}
           keyExtractor={item => item.id}
           style={styles.groupList}
