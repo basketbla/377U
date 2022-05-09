@@ -9,7 +9,7 @@ import { useIsFocused } from "@react-navigation/native";
 
 export default function Profile({ navigation }) {
 
-  const { currentUser, logout } = useAuth();
+  const { currentUser, userFirebaseDetails} = useAuth();
 
   // Used to load screen on navigate back
   const isFocused = useIsFocused();
@@ -20,9 +20,8 @@ export default function Profile({ navigation }) {
   // Fetch user data from firebase on load
   useEffect(async () => {
     console.log('use effect on profile screen')
-    let userStuff = await getCurrentUser(currentUser.uid);
-    console.log(userStuff);
-    setUserDetails(userStuff.val());
+    // let userStuff = await getCurrentUser(currentUser.uid);
+    setUserDetails(userFirebaseDetails);
     setLoading(false);
   }, [isFocused]);
 

@@ -43,3 +43,13 @@ export const PROFILE_COLORS = [
 
 // Default profile image, can change the size if needed with =s100 (100 is the size)
 export const DEFUALT_PROFILE_PIC = 'https://lh3.googleusercontent.com/a/default-user';
+
+export const hash = (inputstr) => {
+  var hash = 0;
+  for (var i = 0; i < inputstr.length; i++) {
+      var code = inputstr.charCodeAt(i);
+      hash = ((hash<<5)-hash)+code;
+      hash = hash & hash; // Convert to 32bit integer
+  }
+  return hash;
+}

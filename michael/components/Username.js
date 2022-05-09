@@ -17,7 +17,7 @@ import { getUsers, saveUserDetails } from '../utils/firebase';
 
 export default function Username({ navigation }) {
 
-  const { currentUser, signup } = useAuth();
+  const { currentUser, signup, setUserFirebaseDetails } = useAuth();
 
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
@@ -52,6 +52,13 @@ export default function Username({ navigation }) {
     // Changed this to save phone number instead of email.
     saveUserDetails(currentUser.uid, name, username, currentUser.phoneNumber, DEFUALT_PROFILE_PIC).then(result => {
       setValidating(false);
+      setUserFirebaseDetails({
+        name: name,
+        username: username,
+        phoneNumber: phoneNumber,
+        profilePic: DEFUALT_PROFILE_PIC,
+        uid: currentUser.uid
+      })
       navigation.navigate('AddProfilePic')
     })
     .catch(error => {

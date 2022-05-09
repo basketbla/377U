@@ -30,7 +30,7 @@ import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 export default function EditProfile({route, navigation}) {
 
   const { userDetails } = route.params;
-  const { currentUser } = useAuth();
+  const { currentUser, logout, setUserFirebaseDetails, userFirebaseDetails } = useAuth();
   
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState(userDetails.name);
@@ -114,7 +114,14 @@ export default function EditProfile({route, navigation}) {
     setUsernameError(false);
     setLoading(true);
 
-    console.log(username);
+    // Update firebase details
+    setUserFirebaseDetails({
+      name: name,
+      username: username,
+      phoneNumber: userFirebaseDetails.phoneNumber,
+      profilePic: image,
+      uid: currentUser.uid
+    })
 
     // Need to check if this username is taken
     if (username !== userDetails.username) {

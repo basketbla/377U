@@ -28,7 +28,7 @@ import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { DEFUALT_PROFILE_PIC, COLORS } from '../utils/constants';
 
 export default function AddProfilePic({navigation}) {
-  const { currentUser } = useAuth();
+  const { currentUser, userFirebaseDetails, setUserFirebaseDetails } = useAuth();
   
   const [loading, setLoading] = useState(false);
   const [usernameError, setUsernameError] = useState(false);
@@ -100,6 +100,10 @@ export default function AddProfilePic({navigation}) {
           onPress: async () => {
             // Upload photo
             setLoading(true);
+
+            // Also update firebase details
+            setUserFirebaseDetails({...userFirebaseDetails, profilePic: uri})
+
             let newUrl = await uploadImageToStorage(uri, currentUser.uid);
             await updateProfilePic(newUrl, currentUser.uid);
             setLoading(false);

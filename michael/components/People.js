@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Pressable, FlatList, Image } from 'react-native'
+import { StyleSheet, Text, View, Pressable, FlatList, Image, ActivityIndicator } from 'react-native'
 import React, {
   useState,
   useEffect
@@ -6,11 +6,12 @@ import React, {
 import { colors, SearchBar } from 'react-native-elements';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { COLORS, DEFUALT_PROFILE_PIC } from '../utils/constants';
-import { getFriends, getUsers } from '../utils/firebase';
+import { getFriends, getUsers, getCurrentUser, getUserGroups } from '../utils/firebase';
 import { useAuth } from '../contexts/AuthContext'
+import { useNavigation } from '@react-navigation/native';
 
 const FreeNow = ({ user }) => (
-  <View style={styles.freeNow}>
+  <Pressable style={styles.freeNow}>
     <Image
       style={styles.profilePic}
       source={{
@@ -18,20 +19,23 @@ const FreeNow = ({ user }) => (
       }}
     />
     <Text style={styles.freeNowText} numberOfLines={1}>{user.name.indexOf(' ') === -1 ? user.name : user.name.substr(0, user.name.indexOf(' '))}</Text>
-  </View>
+  </Pressable>
 );
 
 const Group = ({ group }) => {
+
+  const navigation = useNavigation();
+
   return (
-    <View style={styles.groupEntry}>
+    <Pressable onPress={() => navigation.navigate('Chat', {group: group})} style={styles.groupEntry}>
       <View style={styles.groupEntryTextContainer}>
         <Text style={styles.groupEntryName}>{group.name}</Text>
         <Text style={styles.groupEntryFree}>{`${group.numFree}/${group.totalNum} free`}</Text>
       </View>
-      <Pressable style={styles.contactButton}>
+      {/* <Pressable style={styles.contactButton}>
         <Text style={styles.contactButtonText}>Contact!</Text>
-      </Pressable>
-    </View>
+      </Pressable> */}
+    </Pressable>
   )
 }
 
@@ -40,16 +44,30 @@ export default function People({ navigation }) {
 
   const [search, setSearch] = useState('');
   const [temp, setTemp] = useState({});
+  const [groups, setGroups] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const { currentUser } = useAuth();
+  const { currentUser, setUserFirebaseDetails } = useAuth();
 
   // Still just all friends, not free friends
   useEffect(async () => {
+
+    // Setting userFirebaseDetails here too
+    let userStuff = await getCurrentUser(currentUser.uid);
+    setUserFirebaseDetails({...userStuff.val(), uid: currentUser.uid});
+
+    let userGroups = await getUserGroups(currentUser.uid);
+    setGroups(userGroups.map(group => ({...group, numFree: 5, totalNum: Object.keys(group.users).length})));
+    // {name: 'All Friends', numFree: 5, totalNum: 10, id: '1'}
+
+
     let friends = await getFriends(currentUser.uid);
     let friendIds = Object.keys(friends.val());
     let users = await getUsers();
     users = Object.keys(users).map(id => {return {...users[id], id: id}});
     setTemp(users.filter(user => friendIds.includes(user.id)));
+
+    setLoading(false);
   }, [])
 
   const handleSearch = text => {
@@ -63,6 +81,14 @@ export default function People({ navigation }) {
   const renderGroups = ({ item }) => (
     <Group group={item}/>
   );
+
+  if (loading) {
+    return (
+      <View style={{...styles.container, justifyContent: 'center'}}>
+        <ActivityIndicator/>
+      </View>
+    )
+  }
 
   return (
     <View style={styles.container}>
@@ -82,23 +108,36 @@ export default function People({ navigation }) {
         platform="ios"
       />
       <Text style={styles.freeLabel}>Free Now</Text>
-      <FlatList
-        data={Object.values(temp)}
-        renderItem={renderFreeNow}
-        keyExtractor={item => item.username}
-        horizontal={true}
-        style={styles.freeNowList}
-        contentContainerStyle={styles.freeNowContainer}
-        showsHorizontalScrollIndicator={false}
-      />
-      <Text style={styles.freeLabel}>Groups</Text>
-      <FlatList
-        data={[{name: 'All Friends', numFree: 5, totalNum: 10, id: '1'}, {name: 'Roommates', numFree: 3, totalNum: 5, id: '2'}, {name: 'Foodies', numFree: 2, totalNum: 6, id: '3'}]}
-        renderItem={renderGroups}
-        keyExtractor={item => item.id}
-        style={styles.groupList}
-        contentContainerStyle={styles.groupListContainer}
-      />
+      {
+        temp.length === 0 ?
+        <View style={styles.noFreeContainer}>
+          <Text style={styles.noFreeText}>No one is free right now :(</Text>
+        </View>
+        :
+        <FlatList
+          data={Object.values(temp)}
+          renderItem={renderFreeNow}
+          keyExtractor={item => item.username}
+          horizontal={true}
+          style={styles.freeNowList}
+          contentContainerStyle={styles.freeNowContainer}
+          showsHorizontalScrollIndicator={false}
+        />
+      }
+      <Text style={styles.freeLabel}>Conversations</Text>
+      {
+        groups.length === 0 ?
+        <Text style={styles.noFriendsText}>You don't have any groups yet...</Text>
+        :
+        <FlatList
+          // data={[{name: 'All Friends', numFree: 5, totalNum: 10, id: '1'}, {name: 'Roommates', numFree: 3, totalNum: 5, id: '2'}, {name: 'Foodies', numFree: 2, totalNum: 6, id: '3'}]}
+          data={groups}
+          renderItem={renderGroups}
+          keyExtractor={item => item.id}
+          style={styles.groupList}
+          contentContainerStyle={styles.groupListContainer}
+        />
+      }
     </View>
   )
 }
@@ -163,7 +202,7 @@ const styles = StyleSheet.create({
   },
   groupEntry: {
     width: '100%',
-    height: 100,
+    height: 80,
     borderTopWidth: 1,
     borderTopColor: COLORS.grey,
     flexDirection: 'row',
@@ -197,5 +236,22 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: COLORS.darkGrey,
     fontWeight: 'bold'
+  },
+  noFriendsText: {
+    fontSize: 20,
+    color: COLORS.darkGrey,
+    fontWeight: 'bold',
+    marginTop: 30,
+    width: '80%',
+    textAlign: 'center'
+  },
+  noFreeContainer: {
+    height: 100,
+    justifyContent: 'center'
+  },
+  noFreeText: {
+    fontSize: 15,
+    color: COLORS.darkGrey,
+    fontWeight: 'bold',
   }
 })

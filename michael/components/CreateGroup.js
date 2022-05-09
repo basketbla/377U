@@ -1,13 +1,13 @@
-import { StyleSheet, Text, View, Button, TextInput, FlatList, Pressable, Image} from 'react-native'
+import { StyleSheet, Text, View, Button, TextInput, FlatList, Pressable, Image, ActivityIndicator} from 'react-native'
 import React, {
   useEffect,
   useState,
   useRef
 } from 'react'
-import { COLORS } from '../utils/constants';
+import { COLORS, hash } from '../utils/constants';
 import { useHeaderHeight } from '@react-navigation/elements';
 import useKeyboardHeight from 'react-native-use-keyboard-height';
-import { getFriends, getUsers } from '../utils/firebase';
+import { addMessage, createGroup, getFriends, getGroup, getUsers } from '../utils/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { set } from 'firebase/database';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -44,7 +44,7 @@ export default function CreateGroup({ navigation }) {
   // Current fix makes it lag for a second, but whatever
   const keyboardHeight = useKeyboardHeight();
 
-  const { currentUser } = useAuth();
+  const { currentUser, userFirebaseDetails } = useAuth();
 
   const friendInputRef = useRef();
   const [friendsText, setFriendsText] = useState(''); 
@@ -53,6 +53,7 @@ export default function CreateGroup({ navigation }) {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [highlightLastSelected, setHighlightLastSelected] = useState(false);
   const [messageText, setMessageText] = useState('');
+  const [sendingMessage, setSendingMessage] = useState(false);
 
   // TODO: make the text input not shitty and then actually make da groups!
 
@@ -64,6 +65,7 @@ export default function CreateGroup({ navigation }) {
     let friends = await getFriends(currentUser.uid);
     let friendIds = Object.keys(friends.val());
     let users = await getUsers();
+
     users = Object.keys(users).map(id => {return {...users[id], id: id}});
     setAllFriends(users.filter(user => friendIds.includes(user.id)));
     setFriendsToDisplay(users.filter(user => friendIds.includes(user.id)));
@@ -98,6 +100,30 @@ export default function CreateGroup({ navigation }) {
     else {
       setHighlightLastSelected(true);
     }
+  }
+
+  const sendMessage = async () => {
+    // send messageText to whatever group selectedUsers is.
+    // If group doesn't exist, make a new group.
+
+    setSendingMessage(true);
+    let hashStr = '';
+    let userIds = selectedUsers.map(user => user.id);
+    userIds.push(currentUser.uid);
+    userIds.sort();
+    for (let id of userIds) {
+      hashStr += id;
+    }
+    let groupKey = hash(hashStr);
+    let groupSnapshot = await getGroup(groupKey);
+    if (groupSnapshot.exists()) {
+      await addMessage(groupKey, userFirebaseDetails, messageText);
+    }
+    else {
+      await createGroup(groupKey, selectedUsers, userFirebaseDetails, messageText);
+    }
+    setSendingMessage(false);
+    alert('then redirect or something')
   }
 
   return (
@@ -161,8 +187,13 @@ export default function CreateGroup({ navigation }) {
           // returnKeyType="send"
           // onSubmitEditing={() => alert('send a message!')}
         />
-        <Pressable style={{...styles.sendButton, backgroundColor: messageText === '' ? COLORS.lightGrey : COLORS.iosBlue}}>
-          <Ionicons name="arrow-up-outline" size={23} color='white'/>
+        <Pressable onPress={sendMessage} style={{...styles.sendButton, backgroundColor: (messageText === '' || selectedUsers.length === 0)  ? COLORS.lightGrey : COLORS.iosBlue}} disabled={(messageText === '' || selectedUsers.length === 0 || sendingMessage)}>
+          {
+            sendingMessage ?
+            <ActivityIndicator/>
+            :
+            <Ionicons name="arrow-up-outline" size={23} color='white'/>
+          }
         </Pressable>
       </View>
     </View>

@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getDatabase, ref as ref_db, set, get, child, remove } from "firebase/database";
+import { getDatabase, ref as ref_db, set, get, child, remove, push, update } from "firebase/database";
 import { getStorage, ref as ref_storage, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { DEFUALT_PROFILE_PIC } from "./constants";
 
@@ -103,6 +103,91 @@ export const getSentFriendRequests = (requesterId) => {
   return get(ref_db(database, `sentFriendRequests/${requesterId}`));
 }
 
+export const getGroup = (groupId) => {
+  return get(ref_db(database, `groups/${groupId}`));
+}
+
+export const createGroup = async (groupId, selectedUsers, currUser, message) => {
+
+  // Add group id to userGroups for each user in userIdList
+  const usersObj = {};
+  const updates = {};
+  let groupName = '';
+  for (const user of selectedUsers) {
+    usersObj[user.id] = true;
+    updates['/userGroups/' + user.id + '/' + groupId] = true;
+    if (groupName === '') {
+      groupName += user.name.substring(0, user.name.indexOf(' '));
+    }
+    else {
+      groupName += ', ' + user.name.substring(0, user.name.indexOf(' '));
+    }
+  }
+  // Not sure if this is the best place to do this
+  if (groupName.length > 18) {
+    groupName = groupName.substring(0, 18) + '...';
+  }
+  updates['/userGroups/' + currUser.uid + '/' + groupId] = true;
+  updates[`groups/${groupId}/users/`] = usersObj;
+  updates[`groups/${groupId}/name`] = groupName;
+  await update(ref_db(database), updates);
+
+  // await set(ref_db(database, `groups/${groupId}/users/`), usersObj);
+
+  await push(ref_db(database, `groups/${groupId}/messages`), {
+    text: message,
+    createdAt: JSON.stringify(new Date()),
+    user: {
+      _id: currUser.uid,
+      name: currUser.name,
+      avatar: currUser.profilePic,
+    },
+  });
+}
+
+export const addMessage = async (groupId, currUser, message) => {
+  await push(ref_db(database, `groups/${groupId}/messages`), {
+    text: message,
+    createdAt: JSON.stringify(new Date()),
+    user: {
+      _id: currUser.uid,
+      name: currUser.name,
+      avatar: currUser.profilePic,
+    },
+  });
+}
+
+// Takes in the giftedChat object
+export const addMessageByObj = (groupId, message) => {
+  // This leaves an _id on each message and I'm just gonna ignore it maybe? Idk
+  return push(ref_db(database, `groups/${groupId}/messages`), {
+    ...message,
+    createdAt: JSON.stringify(new Date())
+  });
+}
+
+export const getUserGroups = async (uid) => {
+  let groupIdSnapshot = await get(ref_db(database, `userGroups/${uid}`));
+  if (groupIdSnapshot.exists()) {
+    let groupIds = Object.keys(groupIdSnapshot.val());
+    let groups = [];
+    // This is slow but I don't know a better way
+    // Could store metadata inside of usergroups? But then would be hard to keep updated / get free users
+    // Could fetch all groups and then get the shiyt from there. This also feels bad
+
+    // No, definitely just add more metadata, cuz group has messages. Change this!!!
+    // TODO: add enough shiyt in metadata (like users) to display on home. 
+    // Or keep it like this and don't re-fetch group data when going to chat
+    for (let id of groupIds) {
+      let groupSnapshot = await get(ref_db(database, `groups/${id}`));
+      groups.push({...groupSnapshot.val(), id: id});
+    }
+    return groups
+  }
+  else {
+    return [];
+  }
+}
 // addFriendRequest('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');
 // addFriend('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');
 // removeFriend('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');
