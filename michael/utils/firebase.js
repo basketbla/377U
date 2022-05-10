@@ -112,22 +112,26 @@ export const createGroup = async (groupId, selectedUsers, currUser, message) => 
   // Add group id to userGroups for each user in userIdList
   const usersObj = {};
   const updates = {};
-  let groupName = '';
+  // let groupName = '';
   for (const user of selectedUsers) {
     usersObj[user.id] = true;
     updates['/userGroups/' + user.id + '/' + groupId] = true;
-    if (groupName === '') {
-      groupName += user.name.substring(0, user.name.indexOf(' '));
-    }
-    else {
-      groupName += ', ' + user.name.substring(0, user.name.indexOf(' '));
-    }
+    // if (groupName === '') {
+    //   groupName += user.name.substring(0, user.name.indexOf(' '));
+    // }
+    // else {
+    //   groupName += ', ' + user.name.substring(0, user.name.indexOf(' '));
+    // }
   }
   // Not sure if this is the best place to do this
-  if (groupName.length > 18) {
-    groupName = groupName.substring(0, 18) + '...';
-  }
+  // if (groupName.length > 18) {
+  //   groupName = groupName.substring(0, 18) + '...';
+  // }
+  usersObj[currUser.uid] = true;
   updates['/userGroups/' + currUser.uid + '/' + groupId] = true;
+  
+  // Leaving the group name stuff alone for now and just calling it 'new group'
+  let groupName = 'New Group'
   updates[`groups/${groupId}/users/`] = usersObj;
   updates[`groups/${groupId}/name`] = groupName;
   await update(ref_db(database), updates);
@@ -188,6 +192,13 @@ export const getUserGroups = async (uid) => {
     return [];
   }
 }
+
+export const updateGroupName = (groupId, newName) => {
+  return set(ref_db(database, `groups/${groupId}/name`), newName);
+}
+
+
+
 // addFriendRequest('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');
 // addFriend('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');
 // removeFriend('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');

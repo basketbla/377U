@@ -26,7 +26,8 @@ import AddProfilePic from './components/AddProfilePic';
 import SignUpWithPhone from './components/SignUpWithPhone';
 import AllUsers from './components/AllUsers';
 import CreateGroup from './components/CreateGroup';
-
+import ChatDetails from './components/ChatDetails';
+import EditName from './components/EditName';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -114,12 +115,12 @@ function LandingTab() {
         if (route.name === 'People') {
           iconName = 'people';
         } 
-        else if (route.name === 'Chat') {
-          iconName = 'chatbubbles';
-        }
         else if (route.name === 'Profile') {
           iconName = 'person';
         }
+        // else if (route.name === 'Chat') {
+        //   iconName = 'chatbubbles';
+        // }
 
         // You can return any component that you like here!
         return <Ionicons name={iconName} size={30} color={color}/>;
@@ -137,10 +138,10 @@ function LandingTab() {
         name="People" 
         component={PeopleNav}
       />
-      <Tab.Screen 
+      {/* <Tab.Screen 
         name="Chat" 
         component={Chat}
-      />
+      /> */}
       <Tab.Screen 
         name="Profile" 
         component={ProfileNav} 
@@ -171,6 +172,14 @@ function PeopleNav() {
           headerTitle: props => <Text style={{fontWeight: 'bold', fontSize: 20}}>Friends</Text>,
         }}
       />
+      {/* I think it's just easier to make my own header */}
+      <Stack.Screen name="Chat" component={Chat} options={{headerShown: false}}/>
+      <Stack.Screen name="ChatDetails" component={ChatDetails} options={{ title: 'Group details' }}/>
+      <Stack.Group screenOptions={{ presentation: 'modal', gestureEnabled: 'true' }}>
+        <Stack.Screen name="EditName" component={EditName} options={{ 
+          title: 'Edit Name',
+        }}/>
+      </Stack.Group>
     </Stack.Navigator>
   )
 }

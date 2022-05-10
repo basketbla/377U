@@ -55,7 +55,7 @@ export default function Username({ navigation }) {
       setUserFirebaseDetails({
         name: name,
         username: username,
-        phoneNumber: phoneNumber,
+        phoneNumber: currentUser.phoneNumber,
         profilePic: DEFUALT_PROFILE_PIC,
         uid: currentUser.uid
       })

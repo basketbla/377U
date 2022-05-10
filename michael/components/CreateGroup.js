@@ -122,8 +122,8 @@ export default function CreateGroup({ navigation }) {
     else {
       await createGroup(groupKey, selectedUsers, userFirebaseDetails, messageText);
     }
-    setSendingMessage(false);
-    alert('then redirect or something')
+    let group = (await getGroup(groupKey)).val();
+    navigation.navigate('Chat', {group: {...group, numFree: Object.keys(group.users).length, totalNum: Object.keys(group.users).length, id: groupKey}})
   }
 
   return (

@@ -8,7 +8,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { COLORS, DEFUALT_PROFILE_PIC } from '../utils/constants';
 import { getFriends, getUsers, getCurrentUser, getUserGroups } from '../utils/firebase';
 import { useAuth } from '../contexts/AuthContext'
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 
 const FreeNow = ({ user }) => (
   <Pressable style={styles.freeNow}>
@@ -42,6 +42,8 @@ const Group = ({ group }) => {
 
 export default function People({ navigation }) {
 
+  const isFocused = useIsFocused();
+
   const [search, setSearch] = useState('');
   const [temp, setTemp] = useState({});
   const [allGroups, setAllGroups] = useState([]);
@@ -49,12 +51,14 @@ export default function People({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [allFriends, setAllFriends] = useState([]);
   const [friendsToDisplay, setFriendsToDisplay] = useState([]);
-  const [friendsMap, setFriendsMap] = useState();
+  const [friendsMap, setFriendsMap] = useState({});
 
   const { currentUser, setUserFirebaseDetails } = useAuth();
 
   // Still just all friends, not free friends
   useEffect(async () => {
+
+    console.log('useeffect on people')
 
     // Setting userFirebaseDetails here too
     let userStuff = await getCurrentUser(currentUser.uid);
@@ -65,22 +69,23 @@ export default function People({ navigation }) {
     setGroupsToDisplay(userGroups.map(group => ({...group, numFree: Object.keys(group.users).length, totalNum: Object.keys(group.users).length})));
     // {name: 'All Friends', numFree: 5, totalNum: 10, id: '1'}
 
-
     let friends = await getFriends(currentUser.uid);
-    let friendIds = Object.keys(friends.val());
-    let users = await getUsers();
-    users = Object.keys(users).map(id => {return {...users[id], id: id}});
-    let allFriendsStart = users.filter(user => friendIds.includes(user.id));
-    let friendsMapStart = {};
-    for (let friend of allFriendsStart) {
-      friendsMapStart[friend.id] = friend;
+    if (friends.exists()) {
+      let friendIds = Object.keys(friends.val());
+      let users = await getUsers();
+      users = Object.keys(users).map(id => {return {...users[id], id: id}});
+      let allFriendsStart = users.filter(user => friendIds.includes(user.id));
+      let friendsMapStart = {};
+      for (let friend of allFriendsStart) {
+        friendsMapStart[friend.id] = friend;
+      }
+      setFriendsMap(friendsMapStart);
+      setAllFriends(allFriendsStart);
+      setFriendsToDisplay(allFriendsStart);
     }
-    setFriendsMap(friendsMapStart);
-    setAllFriends(allFriendsStart);
-    setFriendsToDisplay(allFriendsStart);
 
     setLoading(false);
-  }, [])
+  }, [isFocused])
 
   const handleSearch = text => {
     setSearch(text);
@@ -110,7 +115,7 @@ export default function People({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <Ionicons name={'people'} size={30} color={COLORS.darkGrey} onPress={() => navigation.navigate('FriendsTab')}/>
+        <Ionicons name={'person-add'} size={30} color={COLORS.darkGrey} onPress={() => navigation.navigate('FriendsTab')}/>
         <Pressable style={styles.addGroup} onPress={() => navigation.navigate('CreateGroup')}>
           {/* <Text style={styles.addText}>New group</Text> */}
           {/* <Ionicons name={'add'} size={30} color={COLORS.darkGrey}/> */}
