@@ -38,7 +38,7 @@ const User = ({ contact, selectedUsers, setSelectedUsers, setFriendsText }) => {
   );
 }
 
-export default function CreateGroup({ navigation }) {
+export default function CreateGroup({ navigation, route }) {
 
   // Keyboard avoiding didn't work when switching focus.
   // Current fix makes it lag for a second, but whatever
@@ -66,10 +66,14 @@ export default function CreateGroup({ navigation }) {
     let friendIds = Object.keys(friends.val());
     let users = await getUsers();
 
+    if (route.params.selected) {
+      setSelectedUsers(route.params.selected)
+    }
+
     users = Object.keys(users).map(id => {return {...users[id], id: id}});
     setAllFriends(users.filter(user => friendIds.includes(user.id)));
     setFriendsToDisplay(users.filter(user => friendIds.includes(user.id)));
-  }, [])
+  }, [route.params])
 
   const renderItem = ({item}) => {
     return <User contact={item} selectedUsers={selectedUsers} setSelectedUsers={setSelectedUsers} setFriendsText={setFriendsText}/>

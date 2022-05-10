@@ -120,7 +120,8 @@ export default function EditProfile({route, navigation}) {
       username: username,
       phoneNumber: userFirebaseDetails.phoneNumber,
       profilePic: image,
-      uid: currentUser.uid
+      uid: currentUser.uid,
+      isFree: userFirebaseDetails.isFree
     })
 
     // Need to check if this username is taken

@@ -34,7 +34,8 @@ export const saveUserDetails = async (userId, name, username, phoneNumber, profi
     name: name,
     username: username,
     phoneNumber: phoneNumber,
-    profilePic: profilePic
+    profilePic: profilePic,
+    isFree: true
   });
 }
 
@@ -197,7 +198,13 @@ export const updateGroupName = (groupId, newName) => {
   return set(ref_db(database, `groups/${groupId}/name`), newName);
 }
 
+export const setAvailability = (userId, availability) => {
+  return set(ref_db(database, `users/${userId}/isFree`), availability);
+}
 
+export const getAvailability = (userId) => {
+  return get(ref_db(database, `users/${userId}/isFree`));
+}
 
 // addFriendRequest('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');
 // addFriend('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');

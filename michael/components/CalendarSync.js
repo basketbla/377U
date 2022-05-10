@@ -56,7 +56,7 @@ export default function CalendarSync({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={() => console.log('do some calendar stuff')}>
+      <Pressable onPress={() => alert('do some calendar stuff')}>
         <Text>(The calendar syncing stuff is gonna go here)</Text>
       </Pressable>
       <Pressable style={styles.nextButton} onPress={() => setIsNew(false) }>

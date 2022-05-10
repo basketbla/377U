@@ -57,7 +57,8 @@ export default function Username({ navigation }) {
         username: username,
         phoneNumber: currentUser.phoneNumber,
         profilePic: DEFUALT_PROFILE_PIC,
-        uid: currentUser.uid
+        uid: currentUser.uid,
+        isFree: true
       })
       navigation.navigate('AddProfilePic')
     })

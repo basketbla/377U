@@ -40,9 +40,9 @@ export default function ChatDetails({ route, navigation }) {
         :
         <>
           {
-            Object.keys(group.users).map(id => {
+            Object.keys(group.users).filter(userId => allUsers[userId].isFree).map(id => {
               return (
-                <BlandUser contact={allUsers[id]}/>
+                <BlandUser contact={allUsers[id]} key={id}/>
               )
             })
           }
@@ -57,7 +57,7 @@ export default function ChatDetails({ route, navigation }) {
           {
             Object.keys(group.users).map(id => {
               return (
-                <BlandUser contact={allUsers[id]}/>
+                <BlandUser contact={allUsers[id]} key={id}/>
               )
             })
           }

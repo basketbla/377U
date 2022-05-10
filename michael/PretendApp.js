@@ -28,6 +28,7 @@ import AllUsers from './components/AllUsers';
 import CreateGroup from './components/CreateGroup';
 import ChatDetails from './components/ChatDetails';
 import EditName from './components/EditName';
+import AddCalendarInfo from './components/AddCalendarInfo';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();

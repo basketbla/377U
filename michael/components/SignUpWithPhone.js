@@ -169,21 +169,28 @@ export default function SignUpWithPhone() {
         <Text style={{...styles.errorText, display: phoneError ? 'flex' : 'none'}}>{phoneErrorMessage}</Text>
         {
           codeSent ? 
-          <Pressable style={secs > 0 ? styles.disabledNextButton : styles.nextButton} onPress={handleSendCode} disabled={secs > 0 || validating}>
-            {
-              validating ?
-              <ActivityIndicator/>
-              :
-              <>
-                {
-                  secs > 0 ?
-                  <Text style={styles.nextLabel}>Resend code in {secs}...</Text>
-                  :
-                  <Text style={styles.nextLabel}>Resend code</Text>
-                }
-              </>
-            }
-          </Pressable>
+          <>
+            <Pressable style={secs > 0 ? styles.disabledNextButton : styles.nextButton} onPress={handleSendCode} disabled={secs > 0 || validating}>
+              {
+                validating ?
+                <ActivityIndicator/>
+                :
+                <>
+                  {
+                    secs > 0 ?
+                    <Text style={styles.nextLabel}>Resend code in {secs}...</Text>
+                    :
+                    <Text style={styles.nextLabel}>Resend code</Text>
+                  }
+                </>
+              }
+            </Pressable>
+            <Pressable style={styles.tryDifferent} onPress={() => setCodeSent(false)}>
+              <Text style={styles.tryDifferentText}>
+                Try a different phone number
+              </Text>
+            </Pressable>
+          </>
           :
           <Pressable style={phoneNumber === '' ? styles.disabledNextButton : styles.nextButton} onPress={handleNext} disabled={phoneNumber === ''}>
             {
@@ -284,5 +291,11 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
     marginTop: 10,
+  },
+  tryDifferent: {
+    marginTop: 20,
+  },
+  tryDifferentText: {
+    color: COLORS.iosBlue
   }
 })

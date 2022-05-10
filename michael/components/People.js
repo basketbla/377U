@@ -5,24 +5,30 @@ import React, {
 } from 'react'
 import { colors, SearchBar } from 'react-native-elements';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { COLORS, DEFUALT_PROFILE_PIC } from '../utils/constants';
-import { getFriends, getUsers, getCurrentUser, getUserGroups } from '../utils/firebase';
+import { COLORS, DEFUALT_PROFILE_PIC, hash } from '../utils/constants';
+import { getFriends, getUsers, getCurrentUser, getUserGroups, getGroup } from '../utils/firebase';
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigation, useIsFocused } from '@react-navigation/native';
+import BlandUser from './BlandUser';
 
-const FreeNow = ({ user }) => (
-  <Pressable style={styles.freeNow}>
-    <Image
-      style={styles.profilePic}
-      source={{
-        uri: user.profilePic
-      }}
-    />
-    <Text style={styles.freeNowText} numberOfLines={1}>{user.name.indexOf(' ') === -1 ? user.name : user.name.substr(0, user.name.indexOf(' '))}</Text>
-  </Pressable>
-);
+const FreeNow = ({ user }) => {
 
-const Group = ({ group }) => {
+  const navigation = useNavigation();
+
+  return (
+    <Pressable style={styles.freeNow} onPress={() => navigation.navigate('CreateGroup', { selected: [user]})}>
+      <Image
+        style={styles.profilePic}
+        source={{
+          uri: user.profilePic
+        }}
+      />
+      <Text style={styles.freeNowText} numberOfLines={1}>{user.name.indexOf(' ') === -1 ? user.name : user.name.substr(0, user.name.indexOf(' '))}</Text>
+    </Pressable>
+  )
+};
+
+const Group = ({ group, allUsers }) => {
 
   const navigation = useNavigation();
 
@@ -52,6 +58,7 @@ export default function People({ navigation }) {
   const [allFriends, setAllFriends] = useState([]);
   const [friendsToDisplay, setFriendsToDisplay] = useState([]);
   const [friendsMap, setFriendsMap] = useState({});
+  const [allUsers, setAllUsers] = useState();
 
   const { currentUser, setUserFirebaseDetails } = useAuth();
 
@@ -60,25 +67,29 @@ export default function People({ navigation }) {
 
     console.log('useeffect on people')
 
+    // Need to make this just a globally known thing so I don't keep fetching
+    let users = await getUsers();
+    setAllUsers(users);
+
     // Setting userFirebaseDetails here too
     let userStuff = await getCurrentUser(currentUser.uid);
     setUserFirebaseDetails({...userStuff.val(), uid: currentUser.uid});
 
     let userGroups = await getUserGroups(currentUser.uid);
-    setAllGroups(userGroups.map(group => ({...group, numFree: Object.keys(group.users).length, totalNum: Object.keys(group.users).length})));
-    setGroupsToDisplay(userGroups.map(group => ({...group, numFree: Object.keys(group.users).length, totalNum: Object.keys(group.users).length})));
+    setAllGroups(userGroups.map(group => ({...group, numFree: Object.keys(group.users).reduce((previousValue, currUser) => (previousValue + users[currUser].isFree), 0), totalNum: Object.keys(group.users).length})));
+    setGroupsToDisplay(userGroups.map(group => ({...group, numFree: Object.keys(group.users).reduce((previousValue, currUser) => (previousValue + users[currUser].isFree), 0), totalNum: Object.keys(group.users).length})));
     // {name: 'All Friends', numFree: 5, totalNum: 10, id: '1'}
 
     let friends = await getFriends(currentUser.uid);
     if (friends.exists()) {
       let friendIds = Object.keys(friends.val());
-      let users = await getUsers();
       users = Object.keys(users).map(id => {return {...users[id], id: id}});
       let allFriendsStart = users.filter(user => friendIds.includes(user.id));
       let friendsMapStart = {};
       for (let friend of allFriendsStart) {
         friendsMapStart[friend.id] = friend;
       }
+      allFriendsStart = allFriendsStart.filter(friend => friend.isFree)
       setFriendsMap(friendsMapStart);
       setAllFriends(allFriendsStart);
       setFriendsToDisplay(allFriendsStart);
@@ -92,7 +103,7 @@ export default function People({ navigation }) {
     text = text.toLowerCase();
     let newFriends = allFriends.filter(item => (item.username.toLowerCase().includes(text) || item.name.toLowerCase().includes(text)));
     setFriendsToDisplay(newFriends);
-    let newGroups = allGroups.filter(item => Object.keys(item.users).find(id => { if (friendsMap[id].name.toLowerCase().includes(text) || friendsMap[id].username.toLowerCase().includes(text)) {return true}}));
+    let newGroups = allGroups.filter(item => Object.keys(item.users).find(id => { if (!friendsMap[id]) { return false }; if (friendsMap[id].name.toLowerCase().includes(text) || friendsMap[id].username.toLowerCase().includes(text)) {return true}}));
     setGroupsToDisplay(newGroups);
   }
 
