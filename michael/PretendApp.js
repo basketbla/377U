@@ -29,6 +29,7 @@ import CreateGroup from './components/CreateGroup';
 import ChatDetails from './components/ChatDetails';
 import EditName from './components/EditName';
 import CalendarSyncBackup from './components/CalendarSyncBackup';
+import ContactsPageNew from './components/ContactsPageNew';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -99,7 +100,7 @@ function OnboardingStack() {
         <Stack.Screen name="Username" component={Username} />
         <Stack.Screen name="AddProfilePic" component={AddProfilePic} />
         <Stack.Screen name="Onboarding" component={Onboarding} />
-        <Stack.Screen name="ContactsPage" component={ContactsPage} />
+        <Stack.Screen name="ContactsPage" component={ContactsPageNew} />
         <Stack.Screen name="CalendarSync" component={CalendarSyncBackup} />
       </Stack.Navigator>
     </NavigationContainer>

@@ -86,6 +86,10 @@ export default function AllUsers({ navigation }) {
         users = users.map(user => {return {...user, isFriend: false}})
       }
 
+      // Don't show the current user
+      users = users.filter(user => user.id !== currentUser.uid)
+
+
       setFriends(users);
       setFriendsToDisplay(users);
       setLoading(false);

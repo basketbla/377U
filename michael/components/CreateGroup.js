@@ -54,6 +54,7 @@ export default function CreateGroup({ navigation, route }) {
   const [highlightLastSelected, setHighlightLastSelected] = useState(false);
   const [messageText, setMessageText] = useState('');
   const [sendingMessage, setSendingMessage] = useState(false);
+  const [noFriends, setNoFriends] = useState(false);
 
   // TODO: make the text input not shitty and then actually make da groups!
 
@@ -63,10 +64,14 @@ export default function CreateGroup({ navigation, route }) {
     // fetch all friends
     // is there a better way than just getting all users and filtering based on that?
     let friends = await getFriends(currentUser.uid);
+    if (!friends.exists()) {
+      setNoFriends(true);
+      return
+    }
     let friendIds = Object.keys(friends.val());
     let users = await getUsers();
 
-    if (route.params.selected) {
+    if (route.params && route.params.selected) {
       setSelectedUsers(route.params.selected)
     }
 

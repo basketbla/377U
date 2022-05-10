@@ -16,6 +16,7 @@ import * as Contacts from 'expo-contacts';
 import { COLORS, DEFUALT_PROFILE_PIC, PROFILE_COLORS } from '../utils/constants';
 import { getUsers } from '../utils/firebase';
 import * as SMS from 'expo-sms';
+import ExistingContact from './ExistingContact';
 
 // Entry for contacts list
 const ContactEntry = ({ contact, type, profilePicsMap }) => (
@@ -188,7 +189,7 @@ export default function ContactsPage({ navigation }) {
 
   // For rendering contacts with accounts
   const renderExistingItem = ({item}) => {
-    return <ContactEntry contact={item} type="Add"/>
+    return <ExistingContact contact={item}/>
   };
 
    // For rendering contacts without accounts

@@ -55,7 +55,7 @@ export default function FriendRequest({ contact, currUser }) {
           {
             // Just truncating name but dang this is ugly
             // Yeah number of lines fixes this. Whatever.
-            contact.name.substring(0, 18) + (contact.name.length > 18 ? '...' : '')
+            contact.name ? contact.name.substring(0, 18) + (contact.name.length > 18 ? '...' : '') : ''
           }
         </Text>
         <Text style={styles.contactUsername}>
