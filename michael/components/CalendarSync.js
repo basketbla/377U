@@ -5,7 +5,7 @@ import { Text, View, Button, Platform, StyleSheet, Pressable, Alert} from 'react
 import * as Linking from 'expo-linking';
 import { COLORS } from '../utils/constants';
 import { useAuth } from '../contexts/AuthContext'
-import * as CalendarAvailability from "./addCalendarInfo.js";
+// import * as CalendarAvailability from "./addCalendarInfo.js";
 import * as Calendar from 'expo-calendar';
 
 // I put the notifications stuff in this component but it has nothing to
