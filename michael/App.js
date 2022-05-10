@@ -1,50 +1,15 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import React, { useState, useEffect, useRef } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { AuthProvider } from './contexts/AuthContext';
-import VerifyPhone from './components/VerifyPhone';
-import SendTexts from './components/SendTexts';
-import Username from './components/Username';
-import SignUp from './components/SignUp';
-import SignIn from './components/SignIn';
-import Onboarding from './components/Onboarding';
-import ContactsPage from './components/ContactsPage';
-import CalendarSync from './components/CalendarSync';
+import PretendApp from "./PretendApp";
+import { AuthProvider } from "./contexts/AuthContext";
+import { FriendsProvider } from "./contexts/FriendsContext";
 
-
-
-const Stack = createNativeStackNavigator();
-
+// PretendApp is replacing app so that I can use my auth context.
+// Is this bad? Probably.
 export default function App() {
 
 
   return (
     <AuthProvider>
-      {/* <PretendApp/> */}
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false, gestureEnabled: 'false'}}>
-          {/* <Stack.Screen name="Onboarding" component={Onboarding} /> */}
-          {/* <Stack.Screen name="ContactsPage" component={ContactsPage} /> */}
-          <Stack.Screen name="CalendarSync" component={CalendarSync} /> 
-          <Stack.Screen name="SignUp" component={SignUp}/>
-          <Stack.Screen name="SignIn" component={SignIn}/>
-          <Stack.Screen name="Username" component={Username} />
-          <Stack.Screen name="VerifyPhone" component={VerifyPhone} />
-          <Stack.Screen name="SendTexts" component={SendTexts} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <PretendApp/>
     </AuthProvider>
-  );
+  )
 }
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

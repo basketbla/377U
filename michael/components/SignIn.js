@@ -28,14 +28,12 @@ export default function SignIn() {
   const [validating, setValidating] = useState(false);
 
   const handleNext = () => {
+    Keyboard.dismiss();
     setError(false);
     setValidating(true);
 
     login(email, password).then(result => {
-      setValidating(false);
-
-      // Change this to the landing page
-      navigation.navigate('Username');
+      // setValidating(false);
     }).catch(error => {
       setValidating(false);
       switch (error.code) {
@@ -67,7 +65,7 @@ export default function SignIn() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <Text style={styles.logo}>Din Din</Text>
-        <Text style={styles.explainer}>Sign up to find shared freetime with friends</Text>
+        <Text style={styles.explainer}>Sign in to find shared freetime with friends</Text>
         <TextInput
           style={error ? styles.errorInput : styles.input}
           placeholder="Email address"

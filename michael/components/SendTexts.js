@@ -65,7 +65,7 @@ export default function SendTexts() {
           textContentType="telephoneNumber"
           autoFocus
           onChangeText={nums => setPhoneNumbers(nums)}
-          />
+        />
         <TextInput
           style={styles.numbersInput}
           multiline={true}

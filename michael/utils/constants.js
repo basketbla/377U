@@ -20,7 +20,11 @@ export const cleanNumber = (phoneNumber) => {
 
 export const COLORS = {
   grey: "#808080",
-  blue: "#4275ff"
+  blue: "#4275ff",
+  random: "#233D4D",
+  darkGrey: "#5e5e5e",
+  lightGrey: "#e8e8e8",
+  iosBlue: "#007AFF"
 }
 
 export const PROFILE_COLORS = [
@@ -36,3 +40,16 @@ export const PROFILE_COLORS = [
   "#F7DD72",
   "#4E6766"
 ]
+
+// Default profile image, can change the size if needed with =s100 (100 is the size)
+export const DEFUALT_PROFILE_PIC = 'https://lh3.googleusercontent.com/a/default-user';
+
+export const hash = (inputstr) => {
+  var hash = 0;
+  for (var i = 0; i < inputstr.length; i++) {
+      var code = inputstr.charCodeAt(i);
+      hash = ((hash<<5)-hash)+code;
+      hash = hash & hash; // Convert to 32bit integer
+  }
+  return hash;
+}
