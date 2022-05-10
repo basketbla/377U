@@ -5,7 +5,8 @@ import { Text, View, Button, Platform, StyleSheet, Pressable, Alert} from 'react
 import * as Linking from 'expo-linking';
 import { COLORS } from '../utils/constants';
 import { useAuth } from '../contexts/AuthContext'
-// import * as CalendarAvailability from "./addCalendarInfo.js";
+import * as CalendarAvailability from "./addCalendarInfo.js";
+import * as Calendar from 'expo-calendar';
 
 // I put the notifications stuff in this component but it has nothing to
 // do with calendar. I may clean it up later.
@@ -31,22 +32,17 @@ export default function CalendarSync({ navigation }) {
       if (status === 'granted') {
         const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
         console.log('Here are all your calendars:');
-        // console.log({ calendars });
+        console.log({ calendars });
         setCalendars(calendars);
 
         let nextDay = new Date();
-        console.log("today: ", Date.now())
-        
         nextDay.setDate(nextDay.getDate() + 1) //change for 31st
-        console.log("next: ", nextDay)
 
-        // console.log(calendars)
-        console.log("--------")
-        for (let i = 0; i< calendars.length; i++) {//let calendar in calendars) {
-          let calendar= calendars[i]
+        for (let i = 0; i< calendars.length; i++) {
+          let calendar= calendars[i];
           // console.log("CAL: ", {calendars[i]});
           let events = await Calendar.getEventsAsync([calendar.id], Date.now(), nextDay);
-          console.log("events for today ", calendar.title, ": ", {events})
+          console.log("events for today for", calendar.title, ": ", {events})
         }
 
       }
@@ -77,33 +73,6 @@ export default function CalendarSync({ navigation }) {
       };
     })();
   }, []);
-  // useEffect(async () => {
-    // Need to save this in some kind 
-    // registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
-
-    // notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-    //   setNotification(notification);
-    // });
-
-    // responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-    //   console.log(response);
-    // });
-
-    // await Notifications.scheduleNotificationAsync({
-    //   content: {
-    //     title: "Welcome to Din Din!",
-    //     body: 'Thanks for signing up for notifications :)',
-    //     data: { data: 'goes here' },
-    //   },
-    //   trigger: { seconds: 2 },
-    // });
-
-    // return () => {
-    //   Notifications.removeNotificationSubscription(notificationListener.current);
-    //   Notifications.removeNotificationSubscription(responseListener.current);
-    // };
-    
-  // }, []);
 
   return (
     <View style={styles.container}>
