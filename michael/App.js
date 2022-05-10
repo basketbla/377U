@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthProvider } from './contexts/AuthContext';
@@ -13,16 +14,20 @@ import ContactsPage from './components/ContactsPage';
 import CalendarSync from './components/CalendarSync';
 
 
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+
+
   return (
     <AuthProvider>
+      {/* <PretendApp/> */}
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false, gestureEnabled: 'false'}}>
-          <Stack.Screen name="Onboarding" component={Onboarding} />
-          <Stack.Screen name="ContactsPage" component={ContactsPage} />
-          <Stack.Screen name="CalendarSync" component={CalendarSync} />
+          {/* <Stack.Screen name="Onboarding" component={Onboarding} /> */}
+          {/* <Stack.Screen name="ContactsPage" component={ContactsPage} /> */}
+          <Stack.Screen name="CalendarSync" component={CalendarSync} /> 
           <Stack.Screen name="SignUp" component={SignUp}/>
           <Stack.Screen name="SignIn" component={SignIn}/>
           <Stack.Screen name="Username" component={Username} />
@@ -33,6 +38,7 @@ export default function App() {
     </AuthProvider>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
