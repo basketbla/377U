@@ -37,7 +37,7 @@ import ExistingContact from './ExistingContact';
 //           {
 //             // Just truncating name but dang this is ugly
 //             // Yeah number of lines fixes this. Whatever.
-//             contact.name.substring(0, 18) + (contact.name.length > 18 ? '...' : '')
+//             contact.name.substring(0, 16) + (contact.name.length > 16 ? '...' : '')
 //           }
 //         </Text>
 //         <Text style={styles.contactUsername}>
@@ -123,6 +123,8 @@ export default function AllUsers({ navigation }) {
         value={search}
         containerStyle={styles.search}
         platform="ios"
+        inputStyle={{backgroundColor: COLORS.lightGrey}}
+        inputContainerStyle={[{backgroundColor: COLORS.lightGrey},{ height: 40 }]}   
       />
       {
         friends.length === 0 ?
@@ -156,13 +158,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'white'
   },
   search: {
-    width: '100%',
+    //width: '95%',
+    marginLeft: 5,
+    marginRight: 5,
   },
   nextButton: {
     width: '80%',
-    backgroundColor: COLORS.blue,
+    backgroundColor: COLORS.yellow,
     height: 50,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: 'center', 
     justifyContent: 'center',
     marginBottom: 20,
@@ -179,7 +183,8 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   contactList: {
-    width: '100%',
+    //width: '100%',
+    marginLeft: 5,
   },
   contactName: {
     color: COLORS.grey,
@@ -232,21 +237,9 @@ const styles = StyleSheet.create({
   profilePicReal: {
     height: 50,
     width: 50,
-    borderRadius: 25,
+    borderRadius: 50,
     marginRight: 10,
     marginLeft: 10,
   },
-  acceptRequestButton: {
-    backgroundColor: COLORS.blue,
-    marginLeft: 'auto',
-    alignItems: 'center',
-    marginRight: 20,
-    borderRadius: 10,
-    padding: 10,
-    width: 100,
-  },
-  acceptRequestText: {
-    fontWeight: 'bold',
-    color: 'white'
-  }
+
 })

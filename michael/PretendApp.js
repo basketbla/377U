@@ -14,7 +14,7 @@ import Username from './components/Username';
 import SignUp from './components/SignUp';
 import SignIn from './components/SignIn';
 import Onboarding from './components/Onboarding';
-import ContactsPage from './components/ContactsPage';
+//import ContactsPage from './components/ContactsPage';
 import CalendarSync from './components/CalendarSync';
 import People from './components/People';
 import Chat from './components/Chat';
@@ -130,7 +130,7 @@ function LandingTab() {
         // You can return any component that you like here!
         return <Ionicons name={iconName} size={30} color={color}/>;
       },
-      // tabBarActiveTintColor: COLORS.blue,
+      // tabBarActiveTintColor: COLORS.yellow,
       // tabBarInactiveTintColor: COLORS.random,
       // tabBarStyle: {
       //   backgroundColor: COLORS.grey,

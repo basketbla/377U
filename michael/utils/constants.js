@@ -23,7 +23,8 @@ export const COLORS = {
   blue: "#4275ff",
   random: "#233D4D",
   darkGrey: "#5e5e5e",
-  lightGrey: "#e8e8e8",
+  medGrey: "#e8e8e8",
+  lightGrey: "#efeff0",
   iosBlue: "#007AFF",
   yellow: "#FDC93A"
 }

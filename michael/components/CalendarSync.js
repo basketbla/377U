@@ -279,9 +279,9 @@ const styles = StyleSheet.create({
   },
   nextButton: {
     width: '80%',
-    backgroundColor: COLORS.blue,
+    backgroundColor: COLORS.yellow,
     height: 50,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: 'center', 
     justifyContent: 'center',
     marginBottom: 20,

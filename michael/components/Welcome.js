@@ -26,7 +26,7 @@ export default function Welcome({navigation}) {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <Text style={styles.header}>Welcome to dindin!</Text>
+        <Text style={[styles.header,{paddingTop: '20%'}]}>Welcome to dindin!</Text>
         <Text style={styles.explainer}>Find shared time with your friends, without all the hassle.</Text>
         <Pressable style={styles.nextButton} onPress={() => navigation.navigate('SignUpWithPhone')}>
           <Text style={styles.nextLabel}>Get started</Text>
@@ -41,7 +41,6 @@ const styles = StyleSheet.create({
  container: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: '20%',
   },
   logo: {
     fontSize: 50,

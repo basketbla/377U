@@ -218,6 +218,8 @@ export default function ContactsPage({ navigation }) {
           value={search}
           containerStyle={styles.search}
           platform="ios"
+          inputStyle={{backgroundColor: COLORS.lightGrey}}
+          inputContainerStyle={[{backgroundColor: COLORS.lightGrey},{ height: 40 }]}   
         />
         <SectionList
           stickySectionHeadersEnabled={true}
@@ -264,14 +266,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'white'
   },
   search: {
-    width: '100%',
-    marginTop: 50,
+    //width: '95%',
+    marginLeft: 5,
+    marginRight: 5,
   },
   nextButton: {
     width: '80%',
-    backgroundColor: COLORS.blue,
+    backgroundColor: COLORS.yellow,
     height: 50,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: 'center', 
     justifyContent: 'center',
     marginBottom: 20,
@@ -287,8 +290,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 10
   },
-  contactList: {
-    width: '100%',
+ contactList: {
+    //width: '100%',
+    marginLeft: 5,
   },
   contactName: {
     color: COLORS.grey,
@@ -314,12 +318,13 @@ const styles = StyleSheet.create({
   },
   inviteButton: {
     marginLeft: 'auto',
+   // backgroundColor: COLORS.lightGrey,
     textAlign: 'center',
-    marginRight: 20,
+    marginRight: 15,
     borderRadius: 10,
     borderWidth: 1,
     padding: 10,
-    width: 100,
+    width: 70,
   },
   sectionHeader: {
     width: '100%',

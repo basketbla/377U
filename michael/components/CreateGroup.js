@@ -27,7 +27,7 @@ const User = ({ contact, selectedUsers, setSelectedUsers, setFriendsText }) => {
           {
             // Just truncating name but dang this is ugly
             // Yeah number of lines fixes this. Whatever.
-            contact.name.substring(0, 18) + (contact.name.length > 18 ? '...' : '')
+            contact.name.substring(0, 16) + (contact.name.length > 16 ? '...' : '')
           }
         </Text>
         <Text style={styles.contactUsername}>
@@ -228,9 +228,9 @@ const styles = StyleSheet.create({
   },
   nextButton: {
     width: '80%',
-    backgroundColor: COLORS.blue,
+    backgroundColor: COLORS.yellow,
     height: 50,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: 'center', 
     justifyContent: 'center',
     marginBottom: 20,
@@ -246,8 +246,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 10
   },
-  contactList: {
-    width: '100%',
+ contactList: {
+    //width: '100%',
+    marginLeft: 5,
   },
   contactName: {
     color: COLORS.grey,
@@ -305,7 +306,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   acceptRequestButton: {
-    backgroundColor: COLORS.blue,
+    backgroundColor: COLORS.yellow,
     marginLeft: 'auto',
     alignItems: 'center',
     marginRight: 20,
