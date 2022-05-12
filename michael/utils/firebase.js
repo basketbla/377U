@@ -49,6 +49,14 @@ export const getUsers = async () => {
   }
 }
 
+export const setAvailability = (userId, availability) => {
+  return set(ref_db(database, `users/${userId}/isFree`), availability);
+}
+
+export const getAvailability = (userId) => {
+  return get(ref_db(database, `users/${userId}/isFree`));
+}
+
 export const uploadImageToStorage = async (uri, uid) => {
   console.log('in upload!')
   console.log(uri)
@@ -198,13 +206,7 @@ export const updateGroupName = (groupId, newName) => {
   return set(ref_db(database, `groups/${groupId}/name`), newName);
 }
 
-export const setAvailability = (userId, availability) => {
-  return set(ref_db(database, `users/${userId}/isFree`), availability);
-}
 
-export const getAvailability = (userId) => {
-  return get(ref_db(database, `users/${userId}/isFree`));
-}
 
 // addFriendRequest('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');
 // addFriend('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');

@@ -90,6 +90,9 @@ export default function Chat({ navigation, route }) {
           <Ionicons name="information-circle-outline" size={30} color={COLORS.iosBlue}/>
         </Pressable>
       </View>
+      <Pressable onPress={() => navigation.navigate('GroupAvailability', { group: group })} style={styles.headerButtonRight}>
+          <Text>Availability</Text>
+      </Pressable>
       <GiftedChat
         // renderInputToolbar={props => customtInputToolbar(props)}
         bottomOffset={80} // This is probably bad but can't worry about right now

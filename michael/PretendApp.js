@@ -30,6 +30,7 @@ import ChatDetails from './components/ChatDetails';
 import EditName from './components/EditName';
 import CalendarSyncBackup from './components/CalendarSyncBackup';
 import ContactsPageNew from './components/ContactsPageNew';
+import GroupAvailability from './components/GroupAvailability';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -84,9 +85,9 @@ function SignInStack() {
       <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false, gestureEnabled: 'false'}}>
         <Stack.Screen name="SignUpWithPhone" component={SignUpWithPhone}/>
         <Stack.Screen name="SignIn" component={SignIn}/>
-        <Stack.Screen name="SignUp" component={SignUp}/>
-        {/* <Stack.Screen name="VerifyPhone" component={VerifyPhone} /> */}
-        {/* <Stack.Screen name="SendTexts" component={SendTexts} /> */}
+        <Stack.Screen name="SignUp" component={SignUp}/> 
+        <Stack.Screen name="VerifyPhone" component={VerifyPhone} />
+        <Stack.Screen name="SendTexts" component={SendTexts} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -101,7 +102,8 @@ function OnboardingStack() {
         <Stack.Screen name="AddProfilePic" component={AddProfilePic} />
         <Stack.Screen name="Onboarding" component={Onboarding} />
         <Stack.Screen name="ContactsPage" component={ContactsPageNew} />
-        <Stack.Screen name="CalendarSync" component={CalendarSyncBackup} />
+        {/* <Stack.Screen name="CalendarSyncBackup" component={CalendarSyncBackup} /> */}
+        <Stack.Screen name="CalendarSync" component={CalendarSync} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -177,6 +179,7 @@ function PeopleNav() {
       {/* I think it's just easier to make my own header */}
       <Stack.Screen name="Chat" component={Chat} options={{headerShown: false}}/>
       <Stack.Screen name="ChatDetails" component={ChatDetails} options={{ title: 'Group details' }}/>
+      <Stack.Screen name="GroupAvailability" component={GroupAvailability} options={{ title: 'Group Availability' }}/>
       <Stack.Group screenOptions={{ presentation: 'modal', gestureEnabled: 'true' }}>
         <Stack.Screen name="EditName" component={EditName} options={{ 
           title: 'Edit Name',

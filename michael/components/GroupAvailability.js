@@ -1,5 +1,4 @@
 import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
 import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, Button, Platform, StyleSheet, Pressable, Alert, ScrollView} from 'react-native';
 import * as Linking from 'expo-linking';
@@ -9,21 +8,8 @@ import { useAuth } from '../contexts/AuthContext'
 import * as Calendar from 'expo-calendar';
 import { getAvailability } from '../utils/firebase';
 
-// I put the notifications stuff in this component but it has nothing to
-// do with calendar. I may clean it up later.
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
-
-export default function CalendarSync({ navigation }) {
-  const [expoPushToken, setExpoPushToken] = useState('');
-  const [notification, setNotification] = useState(false);
-  const notificationListener = useRef();
-  const responseListener = useRef();
+export default function GroupAvailability({ route, navigation }) {
+  const { group } = route.params;
   const [calendars, setCalendars] = useState([]);
   const [freeSlots, setFreeSlots] = useState([]);
   const { setIsNew } = useAuth();
@@ -36,6 +22,15 @@ export default function CalendarSync({ navigation }) {
         
         let interval = 0; //DEFAULT 7, 0 for one day
         let meetingInterval = 1; //how many hours do you want to meet for? or: min amount of time for a slot to show up?
+        let earliestTime = 9; //earliest is 9 am 
+        let latestTime = 23; //last suggested time is 11pm 
+        /* 
+        for all users in group
+        get calendar of user
+        for all cals add id to findCalendar slots
+
+
+        */
         let freeSlots = await findCalendarSlots(interval, meetingInterval);
         setFreeSlots(freeSlots);
       }
@@ -43,30 +38,6 @@ export default function CalendarSync({ navigation }) {
         //tell users to enable cal permissions
       // }
 
-      // Need to save this in some kind 
-      registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
-
-      notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-        setNotification(notification);
-      });
-
-      responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-        console.log(response);
-      });
-
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "Welcome to Din Din!",
-          body: 'Thanks for signing up for notifications :)',
-          data: { data: 'goes here' },
-        },
-        trigger: { seconds: 2 },
-      });
-
-      return () => {
-        Notifications.removeNotificationSubscription(notificationListener.current);
-        Notifications.removeNotificationSubscription(responseListener.current);
-      };
     })();
   }, []);
 
@@ -186,7 +157,9 @@ export default function CalendarSync({ navigation }) {
                 temp.e.setHours(temp.e.getHours()+freeHours);
                 temp.s = new Date(free.startDate);
                 temp.s.setHours(temp.s.getHours()+freeHours-freeInterval);
-                if(temp.s.getHours() >= rootStart.getHours() && temp.e.getHours() <= rootEnd.getHours()) {
+
+                //TODO: add earliest and latets Time orientations here 
+                if(temp.s.getHours() >= rootStart.getHours() && temp.e.getHours() <= rootEnd.getHours()) { 
                     hourSlots.push({startDate:convertDate(temp.s), endDate: convertDate(temp.e)});
                     temp = {};
                 }
@@ -217,6 +190,7 @@ export default function CalendarSync({ navigation }) {
                     ) : null,
                   )}
         </ScrollView>
+        <Text> This is the Group Avail Place</Text>
   
     </View>
     
@@ -226,55 +200,6 @@ export default function CalendarSync({ navigation }) {
 function convertDate(date) {
   date = new Date(date);
   return date.toLocaleString();
-}
-
-
-async function schedulePushNotification() {
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "Welcome to Din Din!",
-      body: 'Thanks for signing up for notifications :)',
-      data: { data: 'goes here' },
-    },
-    trigger: { seconds: 2 },
-  });
-}
-
-async function registerForPushNotificationsAsync() {
-  let token;
-  if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-      Alert.alert(
-        "Enable Notifications",
-        "'Please go to settings and enable push notifications!'",
-        [
-          { text: "Settings", onPress: () => Linking.openURL('app-settings:')}
-        ]
-      );
-      return;
-    }
-    token = (await Notifications.getExpoPushTokenAsync()).data;
-    console.log(token);
-  } else {
-    alert('Must use physical device for Push Notifications');
-  }
-
-  if (Platform.OS === 'android') {
-    Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    });
-  }
-
-  return token;
 }
 
 
