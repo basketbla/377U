@@ -31,6 +31,7 @@ import EditName from './components/EditName';
 import CalendarSyncBackup from './components/CalendarSyncBackup';
 import ContactsPageNew from './components/ContactsPageNew';
 import GroupAvailability from './components/GroupAvailability';
+import AddCalendar from './components/AddCalendar';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -87,6 +88,7 @@ function SignInStack() {
         <Stack.Screen name="SignIn" component={SignIn}/>
         <Stack.Screen name="SignUp" component={SignUp}/> 
         <Stack.Screen name="VerifyPhone" component={VerifyPhone} />
+        {/* <Stack.Screen name="CalendarSync" component={CalendarSync} /> */}
         <Stack.Screen name="SendTexts" component={SendTexts} />
       </Stack.Navigator>
     </NavigationContainer>
@@ -103,54 +105,59 @@ function OnboardingStack() {
         <Stack.Screen name="Onboarding" component={Onboarding} />
         <Stack.Screen name="ContactsPage" component={ContactsPageNew} />
         {/* <Stack.Screen name="CalendarSyncBackup" component={CalendarSyncBackup} /> */}
-        <Stack.Screen name="CalendarSync" component={CalendarSync} />
+        <Stack.Screen name="AddCalendar" component={AddCalendar} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
 function LandingTab() {
+
   return (
-    <Tab.Navigator screenOptions={({ route }) => ({
-      headerShown: false,
-      tabBarIcon: ({ color }) => {
-        let iconName;
+    <>
+      <CalendarSync />
+      <Tab.Navigator screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarIcon: ({ color }) => {
+          let iconName;
 
-        if (route.name === 'People') {
-          iconName = 'people';
-        } 
-        else if (route.name === 'Profile') {
-          iconName = 'person';
-        }
-        // else if (route.name === 'Chat') {
-        //   iconName = 'chatbubbles';
-        // }
+          if (route.name === 'People') {
+            iconName = 'people';
+          } 
+          else if (route.name === 'Profile') {
+            iconName = 'person';
+          }
+          // else if (route.name === 'Chat') {
+          //   iconName = 'chatbubbles';
+          // }
 
-        // You can return any component that you like here!
-        return <Ionicons name={iconName} size={30} color={color}/>;
-      },
-      // tabBarActiveTintColor: COLORS.blue,
-      // tabBarInactiveTintColor: COLORS.random,
-      // tabBarStyle: {
-      //   backgroundColor: COLORS.grey,
-      //   paddingBottom: 0,
-      // },
-      // tabBarShowLabel: true,
-      })}
-    >
-      <Tab.Screen 
-        name="People" 
-        component={PeopleNav}
-      />
-      {/* <Tab.Screen 
-        name="Chat" 
-        component={Chat}
-      /> */}
-      <Tab.Screen 
-        name="Profile" 
-        component={ProfileNav} 
-      />
-    </Tab.Navigator>
+          // You can return any component that you like here!
+          return <Ionicons name={iconName} size={30} color={color}/>;
+        },
+        // tabBarActiveTintColor: COLORS.blue,
+        // tabBarInactiveTintColor: COLORS.random,
+        // tabBarStyle: {
+        //   backgroundColor: COLORS.grey,
+        //   paddingBottom: 0,
+        // },
+        // tabBarShowLabel: true,
+        })}
+      >
+        <Tab.Screen 
+          name="People" 
+          component={PeopleNav}
+        />
+        {/* <Tab.Screen 
+          name="Chat" 
+          component={Chat}
+        /> */}
+        <Tab.Screen 
+          name="Profile" 
+          component={ProfileNav} 
+        />
+      </Tab.Navigator>
+    </>
+
   )
 }
 

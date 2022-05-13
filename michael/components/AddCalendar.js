@@ -1,4 +1,5 @@
 import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
 import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, Button, Platform, StyleSheet, Pressable, Alert, ScrollView} from 'react-native';
 import * as Linking from 'expo-linking';
@@ -6,10 +7,24 @@ import { COLORS } from '../utils/constants';
 import { useAuth } from '../contexts/AuthContext'
 // import * as CalendarAvailability from "./addCalendarInfo.js";
 import * as Calendar from 'expo-calendar';
-import { getAvailability, getFBCalendar } from '../utils/firebase';
+import { getAvailability, setFBCalendar } from '../utils/firebase';
 
-export default function GroupAvailability({ route, navigation }) {
-  const { group } = route.params;
+// I put the notifications stuff in this component but it has nothing to
+// do with calendar. I may clean it up later.
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+export default function AddCalendar({ navigation }) {
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
+  const { currentUser } = useAuth();
   const [calendars, setCalendars] = useState([]);
   const [freeSlots, setFreeSlots] = useState([]);
   const { setIsNew } = useAuth();
@@ -19,12 +34,9 @@ export default function GroupAvailability({ route, navigation }) {
       //request permissions from calendar here
       const { status } = await Calendar.requestCalendarPermissionsAsync();
       if (status === 'granted') {
-        
+        //TODO: CHANGE TO 14!!
         let interval = 0; //DEFAULT 7, 0 for one day
         let meetingInterval = 1; //how many hours do you want to meet for? or: min amount of time for a slot to show up?
-        let earliestTime = 9; //earliest is 9 am 
-        let latestTime = 23; //last suggested time is 11pm 
-
         let freeSlots = await findCalendarSlots(interval, meetingInterval);
         setFreeSlots(freeSlots);
       }
@@ -32,6 +44,30 @@ export default function GroupAvailability({ route, navigation }) {
         //tell users to enable cal permissions
       // }
 
+      // Need to save this in some kind 
+      registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
+      notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+        setNotification(notification);
+      });
+
+      responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+        console.log(response);
+      });
+
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Welcome to Din Din!",
+          body: 'Thanks for signing up for notifications :)',
+          data: { data: 'goes here' },
+        },
+        trigger: { seconds: 2 },
+      });
+
+      return () => {
+        Notifications.removeNotificationSubscription(notificationListener.current);
+        Notifications.removeNotificationSubscription(responseListener.current);
+      };
     })();
   }, []);
 
@@ -49,21 +85,14 @@ export default function GroupAvailability({ route, navigation }) {
     //default will look into all events after 'tomorrow' to a week later
     endInterval.setHours(23, 59 , 59);
 
-    let events = await accessCalendars(startInterval, endInterval);
+    let events = await accessCalendar(startInterval, endInterval);
     return getAvailability(events, startInterval.toISOString(), endInterval.toISOString(), meetingInterval);
   }
 
-  async function accessCalendars(startInterval, endInterval) {
-    
+  async function accessCalendar(startInterval, endInterval) {
     const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
     // console.log('Here are all your calendars:');
     // console.log({ calendars });
-
-    console.log("Group: ", group.users);
-    for (let user in group.users.entries) {
-      console.log("user: ", user);
-    }
-
     setCalendars(calendars);
     
 
@@ -74,7 +103,7 @@ export default function GroupAvailability({ route, navigation }) {
       calIDArray.push(calendar.id);
     }
     let events = await Calendar.getEventsAsync(calIDArray, startInterval, endInterval);
-    // console.log("events for today: ", {events});
+    console.log("events for today: ", {events});
     retEvents = [];
     for (let i = 0; i < events.length; i++) {
       if (events[i].availability == "busy" && events[i].allDay == false) {
@@ -82,11 +111,12 @@ export default function GroupAvailability({ route, navigation }) {
           
           startDate: events[i].startDate,
           endDate: events[i].endDate,
-          timeZone: events[i].timeZone,
-
+        
+          //TODO: ONLY FOR DEBUGGING, REMOVE FOR PRIVACY
           calendarID: events[i].calendarId,
-          id:  events[i].id,
-          title: events[i].title
+          timeZone: events[i].timeZone,
+          id:  events[i].id, //remove??
+          title: events[i].title //REMOVE!!!!
         })
       }
     }
@@ -94,7 +124,8 @@ export default function GroupAvailability({ route, navigation }) {
     retEvents.sort(
       (objA, objB) => new Date(objA.startDate) - new Date(objB.startDate),
     );
-    console.log("RET: ", retEvents);
+    setFBCalendar(currentUser.uid, retEvents);
+    console.log("SIGN UP ADD CALENDAR RET: ", retEvents);
     return retEvents;
   }
 
@@ -158,9 +189,7 @@ export default function GroupAvailability({ route, navigation }) {
                 temp.e.setHours(temp.e.getHours()+freeHours);
                 temp.s = new Date(free.startDate);
                 temp.s.setHours(temp.s.getHours()+freeHours-freeInterval);
-
-                //TODO: add earliest and latets Time orientations here 
-                if(temp.s.getHours() >= rootStart.getHours() && temp.e.getHours() <= rootEnd.getHours()) { 
+                if(temp.s.getHours() >= rootStart.getHours() && temp.e.getHours() <= rootEnd.getHours()) {
                     hourSlots.push({startDate:convertDate(temp.s), endDate: convertDate(temp.e)});
                     temp = {};
                 }
@@ -191,7 +220,7 @@ export default function GroupAvailability({ route, navigation }) {
                     ) : null,
                   )}
         </ScrollView>
-        <Text> This is the Group Avail Place</Text>
+        <Text>ADD CALENDARS for sign UP</Text>
   
     </View>
     
@@ -201,6 +230,55 @@ export default function GroupAvailability({ route, navigation }) {
 function convertDate(date) {
   date = new Date(date);
   return date.toLocaleString();
+}
+
+
+async function schedulePushNotification() {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "Welcome to Din Din!",
+      body: 'Thanks for signing up for notifications :)',
+      data: { data: 'goes here' },
+    },
+    trigger: { seconds: 2 },
+  });
+}
+
+async function registerForPushNotificationsAsync() {
+  let token;
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      Alert.alert(
+        "Enable Notifications",
+        "'Please go to settings and enable push notifications!'",
+        [
+          { text: "Settings", onPress: () => Linking.openURL('app-settings:')}
+        ]
+      );
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log(token);
+  } else {
+    alert('Must use physical device for Push Notifications');
+  }
+
+  if (Platform.OS === 'android') {
+    Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
+  }
+
+  return token;
 }
 
 

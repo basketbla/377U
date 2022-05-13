@@ -7,23 +7,15 @@ import { COLORS } from '../utils/constants';
 import { useAuth } from '../contexts/AuthContext'
 // import * as CalendarAvailability from "./addCalendarInfo.js";
 import * as Calendar from 'expo-calendar';
-import { getAvailability } from '../utils/firebase';
+import { getAvailability, setFBCalendar } from '../utils/firebase';
 
-// I put the notifications stuff in this component but it has nothing to
-// do with calendar. I may clean it up later.
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
 
 export default function CalendarSync({ navigation }) {
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
+  const { currentUser } = useAuth();
   const [calendars, setCalendars] = useState([]);
   const [freeSlots, setFreeSlots] = useState([]);
   const { setIsNew } = useAuth();
@@ -44,29 +36,7 @@ export default function CalendarSync({ navigation }) {
       // }
 
       // Need to save this in some kind 
-      registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
 
-      notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-        setNotification(notification);
-      });
-
-      responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-        console.log(response);
-      });
-
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "Welcome to Din Din!",
-          body: 'Thanks for signing up for notifications :)',
-          data: { data: 'goes here' },
-        },
-        trigger: { seconds: 2 },
-      });
-
-      return () => {
-        Notifications.removeNotificationSubscription(notificationListener.current);
-        Notifications.removeNotificationSubscription(responseListener.current);
-      };
     })();
   }, []);
 
@@ -92,7 +62,7 @@ export default function CalendarSync({ navigation }) {
     const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
     // console.log('Here are all your calendars:');
     // console.log({ calendars });
-    setCalendars(calendars);
+    // setCalendars(calendars);
     
 
     let calIDArray = [];
@@ -102,7 +72,7 @@ export default function CalendarSync({ navigation }) {
       calIDArray.push(calendar.id);
     }
     let events = await Calendar.getEventsAsync(calIDArray, startInterval, endInterval);
-    console.log("events for today: ", {events});
+    // console.log("SYNC LOGIN events for today: ", {events});
     retEvents = [];
     for (let i = 0; i < events.length; i++) {
       if (events[i].availability == "busy" && events[i].allDay == false) {
@@ -110,11 +80,12 @@ export default function CalendarSync({ navigation }) {
           
           startDate: events[i].startDate,
           endDate: events[i].endDate,
-          timeZone: events[i].timeZone,
-
+        
+          //TODO: ONLY FOR DEBUGGING, REMOVE FOR PRIVACY
           calendarID: events[i].calendarId,
-          id:  events[i].id,
-          title: events[i].title
+          timeZone: events[i].timeZone,
+          id:  events[i].id, //remove??
+          title: events[i].title //REMOVE!!!!
         })
       }
     }
@@ -123,6 +94,9 @@ export default function CalendarSync({ navigation }) {
       (objA, objB) => new Date(objA.startDate) - new Date(objB.startDate),
     );
     console.log("RET: ", retEvents);
+    console.log("UID: ", currentUser.uid);
+    setFBCalendar(currentUser.uid, retEvents);
+    
     return retEvents;
   }
 
@@ -204,22 +178,11 @@ export default function CalendarSync({ navigation }) {
   
 
   return (
-    <View style={styles.container}>
-      <Text>Pick the calendars you wish to incorporate</Text>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        {calendars.map((calendar, i) =>
-                    
-                    calendar.allowsModifications ? (
-                        <Pressable key={i} style={[styles.defaultText]}>
-                          <Text>{calendar.title}</Text>
-                          
-                        </Pressable>
-                    ) : null,
-                  )}
-        </ScrollView>
-  
-    </View>
+    <>
+      {/* <Text>CALENDARSYNC signinnnnn</Text> */}
+    </>
     
+
   )
 }
 
@@ -240,42 +203,6 @@ async function schedulePushNotification() {
   });
 }
 
-async function registerForPushNotificationsAsync() {
-  let token;
-  if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-      Alert.alert(
-        "Enable Notifications",
-        "'Please go to settings and enable push notifications!'",
-        [
-          { text: "Settings", onPress: () => Linking.openURL('app-settings:')}
-        ]
-      );
-      return;
-    }
-    token = (await Notifications.getExpoPushTokenAsync()).data;
-    console.log(token);
-  } else {
-    alert('Must use physical device for Push Notifications');
-  }
-
-  if (Platform.OS === 'android') {
-    Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    });
-  }
-
-  return token;
-}
 
 
 const styles = StyleSheet.create({

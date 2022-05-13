@@ -46,7 +46,14 @@ export const getUsers = async () => {
   } 
   else {
     return [];
-  }
+  } 
+}
+export const setFBCalendar = (userId, calendar) => {
+  return set(ref_db(database, `users/${userId}/calendar`), calendar);
+}
+
+export const getFBCalendar = (userId) => {
+  return get(ref_db(database, `users/${userId}/calendar`));
 }
 
 export const setAvailability = (userId, availability) => {
