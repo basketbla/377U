@@ -8,8 +8,23 @@ import { onChildAdded, ref as ref_db} from "firebase/database";
 import { database } from '../utils/firebase';
 import { COLORS } from '../utils/constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function Chat({ navigation, route }) {
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
   
   const { group } = route.params;
   const { userFirebaseDetails } = useAuth();
@@ -22,6 +37,65 @@ export default function Chat({ navigation, route }) {
 
   const { chatname } = "hello, world"; //name of the chat group 
   // console.log(firebase.auth().currentUser);
+
+  useEffect(() => { //messaging
+    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      setNotification(notification);
+    });
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+    });
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
+
+  async function schedulePushNotification() {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "You've got mail! 📬",
+        body: 'Here is the notification body',
+        data: { data: 'goes here' },
+      },
+      trigger: { seconds: 2 },
+    });
+  }
+
+  async function registerForPushNotificationsAsync() {
+    let token;
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!');
+        return;
+      }
+      token = (await Notifications.getExpoPushTokenAsync()).data;
+      console.log(token);
+    } else {
+      alert('Must use physical device for Push Notifications');
+    }
+  
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+  
+    return token;
+  }
 
   useEffect(() => {
     // Kind of can't test this well right now. TODO: TEST WITH TWO PHONES
@@ -44,40 +118,16 @@ export default function Chat({ navigation, route }) {
         GiftedChat.append(previousMessages, newMessage)
       );
     })
-    // let unsubscribeFromNewSnapshots = db
-    //   .collection("Chats") //ideally firestore, not realtime db
-    //   .doc(chatname)
-    //   .onSnapshot((snapshot) => {
-    //     console.log("New Snapshot!");
-    //     let newMessages = snapshot.data().messages.map((singleMessage) => {
-    //       singleMessage.createdAt = singleMessage.createdAt.seconds * 1000;
-    //       return singleMessage;
-    //     });
-    //     setMessages(newMessages);
-    //   });
-
-    // return function cleanupBeforeUnmounting() {
-    //   unsubscribeFromNewSnapshots();
-    // };
     return unsubscribe;
   }, []);
 
   // firebase onsend or non-firebase onsend
-  const onSend = useCallback((messages = []) => {
+  //** Dvaid's changes added async to it
+  const onSend = useCallback(async (messages = []) => {
     addMessageByObj(group.id, messages[0]);
+    await schedulePushNotification()
   }, []);
 
-  // const onSend = useCallback((messages = []) => {
-  //   db.collection("Chats")
-  //     .doc(chatname)
-  //     .update({
-  //       // arrayUnion appends the message to the existing array
-  //       messages: firebase.firestore.FieldValue.arrayUnion(messages[0]),
-  //     });
-  //   setMessages((previousMessages) =>
-  //     GiftedChat.append(previousMessages, messages)
-  //   );
-  // }, []);
 
   return (
     <View style={styles.container}> 
