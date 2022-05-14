@@ -44,7 +44,7 @@ export default function ExistingContact({ contact }) {
         <Text style={styles.contactName}>
           {
             // Just truncating name but dang this is ugly
-            contact.name.substring(0, 18) + (contact.name.length > 18 ? '...' : '')
+            contact.name ? contact.name.substring(0, 18) + (contact.name.length > 18 ? '...' : '') : ''
           }
         </Text>
         <Text style={styles.contactUsername}>
@@ -83,13 +83,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'white'
   },
   search: {
-    width: '100%',
+    //width: '95%',
+    marginLeft: 5,
+    marginRight: 5,
   },
   nextButton: {
     width: '80%',
-    backgroundColor: COLORS.blue,
+    backgroundColor: COLORS.yellow,
     height: 50,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: 'center', 
     justifyContent: 'center',
     marginBottom: 20,
@@ -105,8 +107,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 10
   },
-  contactList: {
-    width: '100%',
+ contactList: {
+    //width: '100%',
+    marginLeft: 5,
   },
   contactName: {
     color: COLORS.grey,
@@ -130,15 +133,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
   },
-  inviteButton: {
-    marginLeft: 'auto',
-    textAlign: 'center',
-    marginRight: 20,
-    borderRadius: 10,
-    borderWidth: 1,
-    padding: 10,
-    width: 100,
-  },
+
   sectionHeader: {
     width: '100%',
     height: 30,
@@ -162,22 +157,22 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   acceptRequestButton: {
-    backgroundColor: COLORS.blue,
+    backgroundColor: COLORS.yellow,
     marginLeft: 'auto',
     alignItems: 'center',
-    marginRight: 20,
+    marginRight: 15,
     borderRadius: 10,
     padding: 10,
-    width: 100,
+    width: 70,
   },
   acceptRequestButtonDisabled: {
-    backgroundColor: COLORS.blue,
+    backgroundColor: COLORS.yellow,
     marginLeft: 'auto',
     alignItems: 'center',
-    marginRight: 20,
+    marginRight: 15,
     borderRadius: 10,
     padding: 10,
-    width: 100,
+    width: 70,
     opacity: 0.5,
   },
   acceptRequestText: {
@@ -194,28 +189,5 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     textAlign: 'center',
-  },
-  acceptRequestButton: {
-    backgroundColor: COLORS.blue,
-    marginLeft: 'auto',
-    alignItems: 'center',
-    marginRight: 20,
-    borderRadius: 10,
-    padding: 10,
-    width: 100,
-  },
-  acceptRequestButtonDisabled: {
-    backgroundColor: COLORS.blue,
-    marginLeft: 'auto',
-    alignItems: 'center',
-    marginRight: 20,
-    borderRadius: 10,
-    padding: 10,
-    width: 100,
-    opacity: 0.5,
-  },
-  acceptRequestText: {
-    fontWeight: 'bold',
-    color: 'white'
   },
 })

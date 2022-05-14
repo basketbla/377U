@@ -14,7 +14,7 @@ import Username from './components/Username';
 import SignUp from './components/SignUp';
 import SignIn from './components/SignIn';
 import Onboarding from './components/Onboarding';
-import ContactsPage from './components/ContactsPage';
+//import ContactsPage from './components/ContactsPage';
 import CalendarSync from './components/CalendarSync';
 import People from './components/People';
 import Chat from './components/Chat';
@@ -32,6 +32,8 @@ import CalendarSyncBackup from './components/CalendarSyncBackup';
 import ContactsPageNew from './components/ContactsPageNew';
 import GroupAvailability from './components/GroupAvailability';
 import AddCalendar from './components/AddCalendar';
+import Welcome from './components/Welcome';
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -84,6 +86,7 @@ function SignInStack() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false, gestureEnabled: 'false'}}>
+        <Stack.Screen name="Welcome" component={Welcome}/>
         <Stack.Screen name="SignUpWithPhone" component={SignUpWithPhone}/>
         <Stack.Screen name="SignIn" component={SignIn}/>
         <Stack.Screen name="SignUp" component={SignUp}/> 
@@ -158,6 +161,42 @@ function LandingTab() {
       </Tab.Navigator>
     </>
 
+
+        if (route.name === 'People') {
+          iconName = 'people';
+        } 
+        else if (route.name === 'Profile') {
+          iconName = 'person';
+        }
+        // else if (route.name === 'Chat') {
+        //   iconName = 'chatbubbles';
+        // }
+
+        // You can return any component that you like here!
+        return <Ionicons name={iconName} size={30} color={color}/>;
+      },
+      // tabBarActiveTintColor: COLORS.yellow,
+      // tabBarInactiveTintColor: COLORS.random,
+      // tabBarStyle: {
+      //   backgroundColor: COLORS.grey,
+      //   paddingBottom: 0,
+      // },
+      // tabBarShowLabel: true,
+      })}
+    >
+      <Tab.Screen 
+        name="People" 
+        component={PeopleNav}
+      />
+      {/* <Tab.Screen 
+        name="Chat" 
+        component={Chat}
+      /> */}
+      <Tab.Screen 
+        name="Profile" 
+        component={ProfileNav} 
+      />
+    </Tab.Navigator>
   )
 }
 

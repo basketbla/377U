@@ -288,6 +288,8 @@ export default function ContactsPageNew({ navigation }) {
           value={search}
           containerStyle={styles.search}
           platform="ios"
+          inputStyle={{backgroundColor: COLORS.lightGrey}}
+          inputContainerStyle={[{backgroundColor: COLORS.lightGrey},{ height: 40 }]}   
         />
         <SectionList
           stickySectionHeadersEnabled={true}
@@ -337,13 +339,15 @@ const styles = StyleSheet.create({
     paddingTop: 50
   },
   search: {
-    width: '100%',
+    //width: '95%',
+    marginLeft: 5,
+    marginRight: 5,
   },
   nextButton: {
     width: '80%',
-    backgroundColor: COLORS.blue,
+    backgroundColor: COLORS.yellow,
     height: 50,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: 'center', 
     justifyContent: 'center',
     marginBottom: 20,
@@ -357,10 +361,12 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     flexDirection: 'row',
-    marginTop: 10
+    marginTop: 10,
+    marginBottom: 5,
   },
-  contactList: {
-    width: '100%',
+ contactList: {
+    //width: '100%',
+    marginLeft: 5,
   },
   contactName: {
     color: COLORS.grey,
@@ -384,15 +390,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
   },
-  inviteButton: {
-    marginLeft: 'auto',
-    textAlign: 'center',
-    marginRight: 20,
-    borderRadius: 10,
-    borderWidth: 1,
-    padding: 10,
-    width: 100,
-  },
+
   sectionHeader: {
     width: '100%',
     height: 30,
@@ -415,29 +413,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginLeft: 10,
   },
-  acceptRequestButton: {
-    backgroundColor: COLORS.blue,
-    marginLeft: 'auto',
-    alignItems: 'center',
-    marginRight: 20,
-    borderRadius: 10,
-    padding: 10,
-    width: 100,
-  },
-  acceptRequestButtonDisabled: {
-    backgroundColor: COLORS.blue,
-    marginLeft: 'auto',
-    alignItems: 'center',
-    marginRight: 20,
-    borderRadius: 10,
-    padding: 10,
-    width: 100,
-    opacity: 0.5,
-  },
-  acceptRequestText: {
-    fontWeight: 'bold',
-    color: 'white'
-  },
+
   addButton: {
     marginLeft: 'auto',
     marginRight: 20,

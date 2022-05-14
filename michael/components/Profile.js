@@ -61,7 +61,7 @@ export default function Profile({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Pressable style={styles.clickableProfile} onPress={() => navigation.navigate('EditProfile', {userDetails: userDetails})}>
+      <Pressable style={[styles.clickableProfile,{paddingTop: '20%'}]} onPress={() => navigation.navigate('EditProfile', {userDetails: userDetails})}>
         <Image
           style={styles.profilePic}
           source={{
