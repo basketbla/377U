@@ -18,7 +18,7 @@ export default function Profile({ navigation }) {
   
   const [loading, setLoading] = useState(true);
   const [userDetails, setUserDetails] = useState();
-  const [isFree, setIsFree] = useState(true);
+  const [isFree, setIsFree] = useState();
 
   const handleChangeAvailability = async () => {
     let newAvailability = !isFree;

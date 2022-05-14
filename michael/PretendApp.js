@@ -86,7 +86,7 @@ function SignInStack() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false, gestureEnabled: 'false'}}>
-        <Stack.Screen name="Welcome" component={Welcome}/>
+        {/* <Stack.Screen name="Welcome" component={Welcome}/> */}
         <Stack.Screen name="SignUpWithPhone" component={SignUpWithPhone}/>
         <Stack.Screen name="SignIn" component={SignIn}/>
         <Stack.Screen name="SignUp" component={SignUp}/> 
@@ -108,7 +108,7 @@ function OnboardingStack() {
         <Stack.Screen name="Onboarding" component={Onboarding} />
         <Stack.Screen name="ContactsPage" component={ContactsPageNew} />
         {/* <Stack.Screen name="CalendarSyncBackup" component={CalendarSyncBackup} /> */}
-        <Stack.Screen name="AddCalendar" component={AddCalendar} />
+        {/* <Stack.Screen name="AddCalendar" component={AddCalendar} /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -118,7 +118,8 @@ function LandingTab() {
 
   return (
     <>
-      <CalendarSync />
+      <CalendarSync /> 
+      {/* <AddCalendar />  */}
       <Tab.Navigator screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ color }) => {
