@@ -9,7 +9,7 @@ import { useAuth } from '../contexts/AuthContext'
 import * as Calendar from 'expo-calendar';
 import { getAvailability, setFBCalendar } from '../utils/firebase';
 
-
+//use to update availiabitliy
 export default function CalendarSync({ navigation }) {
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState(false);
@@ -22,10 +22,11 @@ export default function CalendarSync({ navigation }) {
 
   useEffect(() => {
     (async () => {
+      
       //request permissions from calendar here
       const { status } = await Calendar.requestCalendarPermissionsAsync();
       if (status === 'granted') {
-        
+        console.log("calendarSync");
         let interval = 0; //DEFAULT 7, 0 for one day
         let meetingInterval = 1; //how many hours do you want to meet for? or: min amount of time for a slot to show up?
         let freeSlots = await findCalendarSlots(interval, meetingInterval);
@@ -82,6 +83,8 @@ export default function CalendarSync({ navigation }) {
           endDate: events[i].endDate,
         
           //TODO: ONLY FOR DEBUGGING, REMOVE FOR PRIVACY
+          userID: currentUser.uid,
+          username: currentUser.displayName,
           calendarID: events[i].calendarId,
           timeZone: events[i].timeZone,
           id:  events[i].id, //remove??
@@ -93,8 +96,8 @@ export default function CalendarSync({ navigation }) {
     retEvents.sort(
       (objA, objB) => new Date(objA.startDate) - new Date(objB.startDate),
     );
-    console.log("RET: ", retEvents);
-    console.log("UID: ", currentUser.uid);
+    console.log("RET SYNC: ", typeof retEvents, retEvents);
+    // console.log("UID: ", currentUser);
     setFBCalendar(currentUser.uid, retEvents);
     
     return retEvents;
@@ -146,7 +149,7 @@ export default function CalendarSync({ navigation }) {
     if (events.length == 0) {
         freeSlots.push({startDate: startInterval, endDate: endInterval});
     }
-    console.log("FREE: ", freeSlots);
+    // console.log("FREE: ", freeSlots);
 
     var temp = {}, hourSlots = [];
     //breaks down the total free slots into chunks based on the interval set (1, 2, 3, hours, etc)
@@ -172,7 +175,7 @@ export default function CalendarSync({ navigation }) {
     hourSlots.sort(
       (objA, objB) => new Date(objA.startDate) - new Date(objB.startDate),
     );
-    console.log("HOURS:" , hourSlots)
+    // console.log("HOURS:" , hourSlots)
     return hourSlots;
   }
   

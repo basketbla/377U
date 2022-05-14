@@ -52,9 +52,16 @@ export const setFBCalendar = (userId, calendar) => {
   return set(ref_db(database, `users/${userId}/calendar`), calendar);
 }
 
-export const getFBCalendar = (userId) => {
-  return get(ref_db(database, `users/${userId}/calendar`));
+export const getFBCalendar = async (userId) => {
+  let snapshot = await get(ref_db(database, `users/${userId}/calendar`));
+  if (snapshot.exists()) {
+    return snapshot.val();
+  } 
+  else {
+    return [];
+  } 
 }
+
 
 export const setAvailability = (userId, availability) => {
   return set(ref_db(database, `users/${userId}/isFree`), availability);

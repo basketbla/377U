@@ -13,21 +13,20 @@ export default function GroupAvailability({ route, navigation }) {
   const [calendars, setCalendars] = useState([]);
   const [freeSlots, setFreeSlots] = useState([]);
   const { setIsNew } = useAuth();
+  const [earliestTime, setEarliestTime] = useState(8); //earliest suggested time is 9am
+  const [latestTime, setLatestTime] = useState(23); //latest is 11pm
 
   useEffect(() => {
     (async () => {
-      //request permissions from calendar here
-      const { status } = await Calendar.requestCalendarPermissionsAsync();
-      if (status === 'granted') {
-        
-        let interval = 0; //DEFAULT 7, 0 for one day
-        let meetingInterval = 1; //how many hours do you want to meet for? or: min amount of time for a slot to show up?
-        let earliestTime = 9; //earliest is 9 am 
-        let latestTime = 23; //last suggested time is 11pm 
+      console.log("hi");
+      
+      let interval = 0; //DEFAULT 7, 0 for one day
+      let meetingInterval = 1; //how many hours do you want to meet for? or: min amount of time for a slot to show up?
 
-        let freeSlots = await findCalendarSlots(interval, meetingInterval);
-        setFreeSlots(freeSlots);
-      }
+      let freeSlots = await findCalendarSlots(interval, meetingInterval);
+      setFreeSlots(freeSlots);
+      
+      
       // } else {
         //tell users to enable cal permissions
       // }
@@ -35,11 +34,13 @@ export default function GroupAvailability({ route, navigation }) {
     })();
   }, []);
 
+  //PARAMS: {
+  // interval = 0; DEFAULT 7, 0 for one day
+  // meetingInterval = 1; how many hours do you want to meet for? or: min amount of time for a slot to show up?
+  // }
   //finds all slots of the amt of time given in meetingInterval, from tomorrow to tomorrow + interval days
   async function findCalendarSlots(interval, meetingInterval) {
-    // interval = 0; DEFAULT 7, 0 for one day
-    // meetingInterval = 1; how many hours do you want to meet for? or: min amount of time for a slot to show up?
-
+ 
     let startInterval = new Date();
     startInterval.setDate(startInterval.getDate() + 1); //starting 'tomorrow'
     startInterval.setHours(0, 0 , 0);
@@ -49,53 +50,29 @@ export default function GroupAvailability({ route, navigation }) {
     //default will look into all events after 'tomorrow' to a week later
     endInterval.setHours(23, 59 , 59);
 
-    let events = await accessCalendars(startInterval, endInterval);
+    let events = await accessCalendars();
     return getAvailability(events, startInterval.toISOString(), endInterval.toISOString(), meetingInterval);
   }
 
-  async function accessCalendars(startInterval, endInterval) {
+  async function accessCalendars() {
     
-    const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
-    // console.log('Here are all your calendars:');
-    // console.log({ calendars });
+    console.log("-----------------");
+    let events = [];
+    for (let user in group.users) {
+      let userEvents = await getFBCalendar(user);
+      if (userEvents == null) continue;
 
-    console.log("Group: ", group.users);
-    for (let user in group.users.entries) {
-      console.log("user: ", user);
+      events = events.concat(userEvents);
+      // console.log("FB CALENDAR OF ", user, " : ", userEvents);
     }
 
-    setCalendars(calendars);
-    
+    setCalendars(events);
 
-    let calIDArray = [];
-    for (let i = 0; i < calendars.length; i++) {
-      let calendar= calendars[i];
-      // console.log("CAL: ", calendar);
-      calIDArray.push(calendar.id);
-    }
-    let events = await Calendar.getEventsAsync(calIDArray, startInterval, endInterval);
-    // console.log("events for today: ", {events});
-    retEvents = [];
-    for (let i = 0; i < events.length; i++) {
-      if (events[i].availability == "busy" && events[i].allDay == false) {
-        retEvents.push({
-          
-          startDate: events[i].startDate,
-          endDate: events[i].endDate,
-          timeZone: events[i].timeZone,
-
-          calendarID: events[i].calendarId,
-          id:  events[i].id,
-          title: events[i].title
-        })
-      }
-    }
-
-    retEvents.sort(
+    events.sort(
       (objA, objB) => new Date(objA.startDate) - new Date(objB.startDate),
     );
-    console.log("RET: ", retEvents);
-    return retEvents;
+    console.log("RET: ", events);
+    return events;
   }
 
   async function getAvailability(events, startInterval, endInterval, freeInterval) {
@@ -109,35 +86,35 @@ export default function GroupAvailability({ route, navigation }) {
     let freeSlots = []; 
     
     events.forEach((event, index) => { //calculate free from busy times
-
-        if (index == 0 && startInterval < event.startDate) {
-            freeSlots.push({
-                startDate: startInterval, 
-                endDate: event.startDate,
-                start: convertDate(startInterval),
-                end: convertDate(event.startDate)
-              });
-        }
-        else if (index == 0) {
-            startInterval = event.endDate;
-        }
-        else if (events[index - 1].endDate < event.startDate) {
+      
+      if (index == 0 && startInterval < event.startDate) {
           freeSlots.push({
-            startDate: events[index - 1].endDate, 
-            endDate: event.startDate,
-            start: convertDate(events[index - 1].endDate),
-            end: convertDate(event.startDate)
-          });
-        }
+              startDate: startInterval, 
+              endDate: event.startDate,
+              start: convertDate(startInterval),
+              end: convertDate(event.startDate)
+            });
+      }
+      else if (index == 0) {
+          startInterval = event.endDate;
+      }
+      else if (events[index - 1].endDate < event.startDate) {
+        freeSlots.push({
+          startDate: events[index - 1].endDate, 
+          endDate: event.startDate,
+          start: convertDate(events[index - 1].endDate),
+          end: convertDate(event.startDate)
+        });
+      }
 
-        if (events.length == (index + 1) && event.endDate < endInterval) {
-          freeSlots.push({
-            startDate: event.endDate, 
-            endDate: endInterval,
-            start: convertDate(event.endDate),
-            end: convertDate(endInterval),
-          });
-        }
+      if (events.length == (index + 1) && event.endDate < endInterval) {
+        freeSlots.push({
+          startDate: event.endDate, 
+          endDate: endInterval,
+          start: convertDate(event.endDate),
+          end: convertDate(endInterval),
+        });
+      }
     });
 
 
@@ -145,13 +122,12 @@ export default function GroupAvailability({ route, navigation }) {
         freeSlots.push({startDate: startInterval, endDate: endInterval});
     }
     console.log("FREE: ", freeSlots);
-
     var temp = {}, hourSlots = [];
+
     //breaks down the total free slots into chunks based on the interval set (1, 2, 3, hours, etc)
     freeSlots.forEach(function(free, index) {
         let freeHours = new Date(free.endDate).getHours() - new Date(free.startDate).getHours();
         let freeStart = new Date(free.startDate);
-        let freeEnd = new Date(free.endDate);
         while( freeStart.getHours() + freeHours + freeInterval >= 0) { // 11 + 4 + 2 >= 0
             if( freeHours >= freeInterval ) {
                 temp.e = new Date(free.startDate);
@@ -161,8 +137,10 @@ export default function GroupAvailability({ route, navigation }) {
 
                 //TODO: add earliest and latets Time orientations here 
                 if(temp.s.getHours() >= rootStart.getHours() && temp.e.getHours() <= rootEnd.getHours()) { 
-                    hourSlots.push({startDate:convertDate(temp.s), endDate: convertDate(temp.e)});
-                    temp = {};
+                    if ((temp.s.getHours() >= earliestTime) && (temp.e.getHours() <= latestTime)) {
+                      hourSlots.push({startDate:convertDate(temp.s), endDate: convertDate(temp.e)});
+                      temp = {};
+                    }
                 }
                 //add another one for 11 to 11:59pm 
             }
@@ -179,18 +157,17 @@ export default function GroupAvailability({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text>Pick the calendars you wish to incorporate</Text>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        {calendars.map((calendar, i) =>
-                    
-                    calendar.allowsModifications ? (
-                        <Pressable key={i} style={[styles.defaultText]}>
-                          <Text>{calendar.title}</Text>
-                          
-                        </Pressable>
-                    ) : null,
-                  )}
-        </ScrollView>
+      <Text>Pick an available time for your group</Text>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          {freeSlots.map((slot, i) =>
+                       
+              <Pressable key={i} style={[styles.buttonText]}>
+                <Text>{slot.startDate} - {slot.endDate}</Text>
+                
+              </Pressable>
+                      
+            )}
+          </ScrollView>
         <Text> This is the Group Avail Place</Text>
   
     </View>
@@ -204,13 +181,15 @@ function convertDate(date) {
 }
 
 
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'space-around',
   },
-  nextButton: {
+  buttonText: {
     width: '80%',
     backgroundColor: COLORS.blue,
     height: 50,
