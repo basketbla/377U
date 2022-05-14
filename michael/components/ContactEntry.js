@@ -53,7 +53,7 @@ export default function ContactEntry({ contact }) {
         <Text style={styles.contactName}>
           {
             // Just truncating name but dang this is ugly
-            (contact.firstName + ' ' + (contact.lastName ? contact.lastName : '')).substring(0,20) + ((contact.firstName + ' ' + (contact.lastName ? contact.lastName : '')).length > 20 ? '...' : '')
+            (contact.firstName + ' ' + (contact.lastName ? contact.lastName : '')).substring(0,16) + ((contact.firstName + ' ' + (contact.lastName ? contact.lastName : '')).length > 16 ? '...' : '')
           }
         </Text>
       </View>
@@ -70,13 +70,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'white'
   },
   search: {
-    width: '100%',
+    //width: '95%',
+    marginLeft: 5,
+    marginRight: 5,
   },
   nextButton: {
     width: '80%',
-    backgroundColor: COLORS.blue,
+    backgroundColor: COLORS.yellow,
     height: 50,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: 'center', 
     justifyContent: 'center',
     marginBottom: 20,
@@ -92,8 +94,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 10
   },
-  contactList: {
-    width: '100%',
+ contactList: {
+    //width: '100%',
+    marginLeft: 5,
   },
   contactName: {
     color: COLORS.grey,
@@ -119,12 +122,13 @@ const styles = StyleSheet.create({
   },
   inviteButton: {
     marginLeft: 'auto',
+   // backgroundColor: COLORS.lightGrey,
     textAlign: 'center',
-    marginRight: 20,
+    marginRight: 15,
     borderRadius: 10,
     borderWidth: 1,
     padding: 10,
-    width: 100,
+    width: 70,
   },
   sectionHeader: {
     width: '100%',
@@ -148,29 +152,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginLeft: 10,
   },
-  acceptRequestButton: {
-    backgroundColor: COLORS.blue,
-    marginLeft: 'auto',
-    alignItems: 'center',
-    marginRight: 20,
-    borderRadius: 10,
-    padding: 10,
-    width: 100,
-  },
-  acceptRequestButtonDisabled: {
-    backgroundColor: COLORS.blue,
-    marginLeft: 'auto',
-    alignItems: 'center',
-    marginRight: 20,
-    borderRadius: 10,
-    padding: 10,
-    width: 100,
-    opacity: 0.5,
-  },
-  acceptRequestText: {
-    fontWeight: 'bold',
-    color: 'white'
-  },
+
   addButton: {
     marginLeft: 'auto',
     marginRight: 20,
