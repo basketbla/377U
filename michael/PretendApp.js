@@ -86,7 +86,7 @@ function SignInStack() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false, gestureEnabled: 'false'}}>
-        <Stack.Screen name="Welcome" component={Welcome}/>
+        {/* <Stack.Screen name="Welcome" component={Welcome}/> */}
         <Stack.Screen name="SignUpWithPhone" component={SignUpWithPhone}/>
         <Stack.Screen name="SignIn" component={SignIn}/>
         <Stack.Screen name="SignUp" component={SignUp}/> 
@@ -108,7 +108,7 @@ function OnboardingStack() {
         <Stack.Screen name="Onboarding" component={Onboarding} />
         <Stack.Screen name="ContactsPage" component={ContactsPageNew} />
         {/* <Stack.Screen name="CalendarSyncBackup" component={CalendarSyncBackup} /> */}
-        <Stack.Screen name="AddCalendar" component={AddCalendar} />
+        {/* <Stack.Screen name="AddCalendar" component={AddCalendar} /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -119,6 +119,7 @@ function LandingTab() {
   return (
     <>
       <CalendarSync /> 
+      {/* <AddCalendar />  */}
       <Tab.Navigator screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ color }) => {
@@ -162,41 +163,41 @@ function LandingTab() {
     </>
 
 
-        if (route.name === 'People') {
-          iconName = 'people';
-        } 
-        else if (route.name === 'Profile') {
-          iconName = 'person';
-        }
-        // else if (route.name === 'Chat') {
-        //   iconName = 'chatbubbles';
-        // }
+    //     if (route.name === 'People') {
+    //       iconName = 'people';
+    //     } 
+    //     else if (route.name === 'Profile') {
+    //       iconName = 'person';
+    //     }
+    //     // else if (route.name === 'Chat') {
+    //     //   iconName = 'chatbubbles';
+    //     // }
 
-        // You can return any component that you like here!
-        return <Ionicons name={iconName} size={30} color={color}/>;
-      },
-      // tabBarActiveTintColor: COLORS.yellow,
-      // tabBarInactiveTintColor: COLORS.random,
-      // tabBarStyle: {
-      //   backgroundColor: COLORS.grey,
-      //   paddingBottom: 0,
-      // },
-      // tabBarShowLabel: true,
-      })}
-    >
-      <Tab.Screen 
-        name="People" 
-        component={PeopleNav}
-      />
-      {/* <Tab.Screen 
-        name="Chat" 
-        component={Chat}
-      /> */}
-      <Tab.Screen 
-        name="Profile" 
-        component={ProfileNav} 
-      />
-    </Tab.Navigator>
+    //     // You can return any component that you like here!
+    //     return <Ionicons name={iconName} size={30} color={color}/>;
+    //   },
+    //   // tabBarActiveTintColor: COLORS.yellow,
+    //   // tabBarInactiveTintColor: COLORS.random,
+    //   // tabBarStyle: {
+    //   //   backgroundColor: COLORS.grey,
+    //   //   paddingBottom: 0,
+    //   // },
+    //   // tabBarShowLabel: true,
+    //   })}
+    // >
+    //   <Tab.Screen 
+    //     name="People" 
+    //     component={PeopleNav}
+    //   />
+    //   {/* <Tab.Screen 
+    //     name="Chat" 
+    //     component={Chat}
+    //   /> */}
+    //   <Tab.Screen 
+    //     name="Profile" 
+    //     component={ProfileNav} 
+    //   />
+    // </Tab.Navigator>
   )
 }
 

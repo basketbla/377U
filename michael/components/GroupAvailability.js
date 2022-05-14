@@ -6,12 +6,13 @@ import { COLORS } from '../utils/constants';
 import { useAuth } from '../contexts/AuthContext'
 // import * as CalendarAvailability from "./addCalendarInfo.js";
 import * as Calendar from 'expo-calendar';
-import { getAvailability, getFBCalendar } from '../utils/firebase';
+import { getAvailability, getCalEvents} from '../utils/firebase';
 
 export default function GroupAvailability({ route, navigation }) {
   const { group } = route.params;
   const [calendars, setCalendars] = useState([]);
   const [freeSlots, setFreeSlots] = useState([]);
+  const [suggestedSlots, setSuggestedSlots] = useState([]);
   const { setIsNew } = useAuth();
   const [earliestTime, setEarliestTime] = useState(8); //earliest suggested time is 9am
   const [latestTime, setLatestTime] = useState(23); //latest is 11pm
@@ -24,7 +25,9 @@ export default function GroupAvailability({ route, navigation }) {
       let meetingInterval = 1; //how many hours do you want to meet for? or: min amount of time for a slot to show up?
 
       let freeSlots = await findCalendarSlots(interval, meetingInterval);
+      
       setFreeSlots(freeSlots);
+      setSuggestedSlots(pickFreeSlots(freeSlots));
       
       
       // } else {
@@ -59,7 +62,7 @@ export default function GroupAvailability({ route, navigation }) {
     console.log("-----------------");
     let events = [];
     for (let user in group.users) {
-      let userEvents = await getFBCalendar(user);
+      let userEvents = await getCalEvents(user);
       if (userEvents == null) continue;
 
       events = events.concat(userEvents);
@@ -71,7 +74,7 @@ export default function GroupAvailability({ route, navigation }) {
     events.sort(
       (objA, objB) => new Date(objA.startDate) - new Date(objB.startDate),
     );
-    console.log("RET: ", events);
+    // console.log("RET: ", events);
     return events;
   }
 
@@ -135,7 +138,6 @@ export default function GroupAvailability({ route, navigation }) {
                 temp.s = new Date(free.startDate);
                 temp.s.setHours(temp.s.getHours()+freeHours-freeInterval);
 
-                //TODO: add earliest and latets Time orientations here 
                 if(temp.s.getHours() >= rootStart.getHours() && temp.e.getHours() <= rootEnd.getHours()) { 
                     if ((temp.s.getHours() >= earliestTime) && (temp.e.getHours() <= latestTime)) {
                       hourSlots.push({startDate:convertDate(temp.s), endDate: convertDate(temp.e)});
@@ -152,24 +154,36 @@ export default function GroupAvailability({ route, navigation }) {
     );
     console.log("HOURS:" , hourSlots)
     return hourSlots;
-  }
-  
+  } 
 
   return (
     <View style={styles.container}>
-      <Text>Pick an available time for your group</Text>
+      <Text>Pick a time! According to your calendars, you are all free during these times!</Text>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          {freeSlots.map((slot, i) =>
+          {suggestedSlots.map((slot, i) =>
                        
               <Pressable key={i} style={[styles.buttonText]}>
-                <Text>{slot.startDate} - {slot.endDate}</Text>
+                <Text>{beautifyDate(slot.startDate, true)} - {beautifyDate(slot.endDate, false)}</Text>
                 
               </Pressable>
                       
             )}
-          </ScrollView>
-        <Text> This is the Group Avail Place</Text>
-  
+          </ScrollView>  
+          <Pressable
+            on> 
+            <Text>All Available Times: </Text>
+          </Pressable>
+
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          {freeSlots.map((slot, i) =>
+                       
+              <Pressable key={i} style={[styles.buttonText]}>
+                <Text>{beautifyDate(slot.startDate, true)} - {beautifyDate(slot.endDate, false)}</Text>
+                
+              </Pressable>
+                      
+            )}
+          </ScrollView>  
     </View>
     
   )
@@ -178,6 +192,18 @@ export default function GroupAvailability({ route, navigation }) {
 function convertDate(date) {
   date = new Date(date);
   return date.toLocaleString();
+}
+
+function pickFreeSlots(freeSlots) {
+  // let free = [];
+  // for (let i = 0; i < 3; i++ ) {
+  //   const random = Math.floor(Math.random() * freeSlots.length);
+
+  // }
+  const shuffled = freeSlots.sort(() => 0.5 - Math.random());
+  // Get sub-array of first n elements after shuffled
+  return shuffled.slice(0, 3);
+
 }
 
 
@@ -204,3 +230,34 @@ const styles = StyleSheet.create({
     color: 'white'
   },
 })
+
+
+function beautifyDate(date, isStart) {
+  date = new Date(date);
+  let min = date.getMinutes();
+  if (min < 10) {
+    min.toString();
+    min = "0" + min;
+  }
+
+  let hour = date.getHours();
+  let m = "AM";
+  if (hour == 12) {
+    m = "PM";
+  } else if (hour > 12) 
+  {
+    hour -= 12;
+    m = "PM";
+  }
+
+  if (!isStart) {
+    return hour + ":" + min + " " + m;
+  }
+  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul","Aug", "Sep", "Oct", "Nov", "Dec"];
+  
+  const day = date.getDay();
+  const month = date.getMonth();
+  
+  return days[day] + ", " + months[month] + " " + date.getDate() + " " + hour + ":" + min + " " + m;
+}
