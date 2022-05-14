@@ -44,7 +44,7 @@ export default function ExistingContact({ contact }) {
         <Text style={styles.contactName}>
           {
             // Just truncating name but dang this is ugly
-            contact.name.substring(0, 16) + (contact.name.length > 16 ? '...' : '')
+            contact.name ? contact.name.substring(0, 18) + (contact.name.length > 18 ? '...' : '') : ''
           }
         </Text>
         <Text style={styles.contactUsername}>

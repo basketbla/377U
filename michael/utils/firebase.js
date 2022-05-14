@@ -46,7 +46,29 @@ export const getUsers = async () => {
   } 
   else {
     return [];
-  }
+  } 
+}
+export const setFBCalendar = (userId, calendar) => {
+  return set(ref_db(database, `users/${userId}/calendar`), calendar);
+}
+
+export const getFBCalendar = async (userId) => {
+  let snapshot = await get(ref_db(database, `users/${userId}/calendar`));
+  if (snapshot.exists()) {
+    return snapshot.val();
+  } 
+  else {
+    return [];
+  } 
+}
+
+
+export const setAvailability = (userId, availability) => {
+  return set(ref_db(database, `users/${userId}/isFree`), availability);
+}
+
+export const getAvailability = (userId) => {
+  return get(ref_db(database, `users/${userId}/isFree`));
 }
 
 export const uploadImageToStorage = async (uri, uid) => {
@@ -198,13 +220,7 @@ export const updateGroupName = (groupId, newName) => {
   return set(ref_db(database, `groups/${groupId}/name`), newName);
 }
 
-export const setAvailability = (userId, availability) => {
-  return set(ref_db(database, `users/${userId}/isFree`), availability);
-}
 
-export const getAvailability = (userId) => {
-  return get(ref_db(database, `users/${userId}/isFree`));
-}
 
 // addFriendRequest('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');
 // addFriend('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');
