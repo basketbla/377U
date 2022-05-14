@@ -14,7 +14,7 @@ import Username from './components/Username';
 import SignUp from './components/SignUp';
 import SignIn from './components/SignIn';
 import Onboarding from './components/Onboarding';
-import ContactsPage from './components/ContactsPage';
+//import ContactsPage from './components/ContactsPage';
 import CalendarSync from './components/CalendarSync';
 import People from './components/People';
 import Chat from './components/Chat';
@@ -30,6 +30,8 @@ import ChatDetails from './components/ChatDetails';
 import EditName from './components/EditName';
 import CalendarSyncBackup from './components/CalendarSyncBackup';
 import ContactsPageNew from './components/ContactsPageNew';
+import Welcome from './components/Welcome';
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -82,6 +84,7 @@ function SignInStack() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false, gestureEnabled: 'false'}}>
+        <Stack.Screen name="Welcome" component={Welcome}/>
         <Stack.Screen name="SignUpWithPhone" component={SignUpWithPhone}/>
         <Stack.Screen name="SignIn" component={SignIn}/>
         <Stack.Screen name="SignUp" component={SignUp}/>
@@ -127,7 +130,7 @@ function LandingTab() {
         // You can return any component that you like here!
         return <Ionicons name={iconName} size={30} color={color}/>;
       },
-      // tabBarActiveTintColor: COLORS.blue,
+      // tabBarActiveTintColor: COLORS.yellow,
       // tabBarInactiveTintColor: COLORS.random,
       // tabBarStyle: {
       //   backgroundColor: COLORS.grey,

@@ -139,7 +139,9 @@ export default function People({ navigation }) {
         value={search}
         containerStyle={styles.search}
         platform="ios"
-      />
+        inputStyle={{backgroundColor: COLORS.lightGrey}}
+        inputContainerStyle={[{backgroundColor: COLORS.lightGrey},{ height: 40 }]}      
+        />
       <Text style={styles.freeLabel}>Free Now</Text>
       {
         friendsToDisplay.length === 0 ?
@@ -182,7 +184,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white'
   },
   search: {
-    width: '100%',
+    // width: '95%',
+    marginLeft: 5,
+    marginRight: 5,
   },
   topBar: {
     marginTop: 50,
@@ -203,14 +207,14 @@ const styles = StyleSheet.create({
   },
   freeLabel: {
     marginRight: 'auto',
-    marginLeft: 20,
+    marginLeft: 15,
     fontWeight: 'bold',
     fontSize: 20,
     marginBottom: 5,
   },
   freeNow: {
     alignItems: 'center',
-    marginLeft: 20,
+    marginLeft: 15,
     width: 70,
   },
   freeNowList: {

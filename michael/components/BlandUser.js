@@ -55,13 +55,15 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   search: {
-    width: '100%',
+    //width: '95%',
+    marginLeft: 5,
+    marginRight: 5,
   },
   nextButton: {
     width: '80%',
-    backgroundColor: COLORS.blue,
+    backgroundColor: COLORS.yellow,
     height: 50,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: 'center', 
     justifyContent: 'center',
     marginBottom: 20,
@@ -77,8 +79,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 10
   },
-  contactList: {
-    width: '100%',
+ contactList: {
+    //width: '100%',
+    marginLeft: 5,
   },
   contactName: {
     color: COLORS.grey,
@@ -136,7 +139,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   acceptRequestButton: {
-    backgroundColor: COLORS.blue,
+    backgroundColor: COLORS.yellow,
     marginLeft: 'auto',
     alignItems: 'center',
     marginRight: 20,
