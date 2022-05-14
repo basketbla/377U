@@ -70,7 +70,7 @@ export default function FriendRequest({ contact, currUser }) {
           <>
           {
             accepted ? 
-            <Text style={styles.acceptRequestText}>Accepted!</Text>
+            <Text style={styles.acceptRequestText}>Added!</Text>  
             :
             <Text style={styles.acceptRequestText}>Accept</Text>
           }
@@ -169,7 +169,7 @@ acceptRequestButton: {
     marginRight: 15,
     borderRadius: 10,
     padding: 10,
-    width: 70,
+    width: 80,
   },
   acceptRequestButtonDisabled: {
     backgroundColor: COLORS.yellow,
@@ -178,7 +178,7 @@ acceptRequestButton: {
     marginRight: 15,
     borderRadius: 10,
     padding: 10,
-    width: 70,
+    width: 80,
     opacity: 0.5,
   },
   acceptRequestText: {

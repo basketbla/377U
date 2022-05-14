@@ -130,12 +130,13 @@ function LandingTab() {
         // You can return any component that you like here!
         return <Ionicons name={iconName} size={30} color={color}/>;
       },
-      // tabBarActiveTintColor: COLORS.yellow,
+      tabBarActiveTintColor: COLORS.yellow,
       // tabBarInactiveTintColor: COLORS.random,
-      // tabBarStyle: {
-      //   backgroundColor: COLORS.grey,
-      //   paddingBottom: 0,
-      // },
+      tabBarStyle: {
+        paddingTop: 10,
+        paddingBottom: 10,
+        height: 60
+      },
       // tabBarShowLabel: true,
       })}
     >
@@ -178,7 +179,7 @@ function PeopleNav() {
         }}
       />
       {/* I think it's just easier to make my own header */}
-      <Stack.Screen name="Chat" component={Chat} options={{headerShown: false}}/>
+      <Stack.Screen name="Chat" component={Chat}/>
       <Stack.Screen name="ChatDetails" component={ChatDetails} options={{ title: 'Group details' }}/>
       <Stack.Group screenOptions={{ presentation: 'modal', gestureEnabled: 'true' }}>
         <Stack.Screen name="EditName" component={EditName} options={{ 

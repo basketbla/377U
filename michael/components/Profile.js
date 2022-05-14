@@ -78,7 +78,7 @@ export default function Profile({ navigation }) {
           }
         </Text>
         <Switch
-          trackColor={{ false: "#767577", true: COLORS.iosBlue }}
+          trackColor={{ false: "#767577", true: COLORS.yellow }}
           thumbColor={"#f4f3f4"}
           ios_backgroundColor="#3e3e3e"
           onValueChange={handleChangeAvailability}

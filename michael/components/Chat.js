@@ -16,13 +16,15 @@ export default function Chat({ navigation, route }) {
   // const [messages, setMessages] = useState(Object.keys(group.messages).map(id => ({...group.messages[id], _id: id, createdAt: JSON.parse(group.messages[id].createdAt)})));
   const [messages, setMessages] = useState([]);
 
+
+
+
   // useEffect(async () => {
   //   console.log(group)
   // }, [])
 
   const { chatname } = "hello, world"; //name of the chat group 
   // console.log(firebase.auth().currentUser);
-
   useEffect(() => {
     // Kind of can't test this well right now. TODO: TEST WITH TWO PHONES
     const unsubscribe = onChildAdded(ref_db(database, `groups/${group.id}/messages`), (snapshot, previousMessages) => {
@@ -59,7 +61,16 @@ export default function Chat({ navigation, route }) {
     // return function cleanupBeforeUnmounting() {
     //   unsubscribeFromNewSnapshots();
     // };
-    return unsubscribe;
+
+
+navigation.setOptions({ headerTitle: route.params.group.name, headerRight: () => (
+            <Pressable onPress={() => navigation.navigate('ChatDetails', { group: group })} style={styles.headerButtonRight}>
+          <Ionicons name="information-circle" size={30} color={COLORS.yellow}/>
+        </Pressable>
+          ), });
+
+
+    return [unsubscribe, route.params.group.name];
   }, []);
 
   // firebase onsend or non-firebase onsend
@@ -79,17 +90,19 @@ export default function Chat({ navigation, route }) {
   //   );
   // }, []);
 
+
+ // <View style={styles.header}>
+ //        <Pressable style={styles.headerButtonLeft} onPress={() => navigation.goBack()}>
+ //          <Text style={styles.backButtonText}>{'< Back'}</Text>
+ //        </Pressable>
+ //        <Text style={styles.headerTitle} numberOfLines={1}>{route.params.group.name}</Text>
+ //        <Pressable onPress={() => navigation.navigate('ChatDetails', { group: group })} style={styles.headerButtonRight}>
+ //          <Ionicons name="information-circle-outline" size={30} color={COLORS.yellow}/>
+ //        </Pressable>
+ //      </View>
+
   return (
     <View style={styles.container}> 
-      <View style={styles.header}>
-        <Pressable style={styles.headerButtonLeft} onPress={() => navigation.goBack()}>
-          <Text style={styles.backButtonText}>{'< back'}</Text>
-        </Pressable>
-        <Text style={styles.headerTitle} numberOfLines={1}>{route.params.group.name}</Text>
-        <Pressable onPress={() => navigation.navigate('ChatDetails', { group: group })} style={styles.headerButtonRight}>
-          <Ionicons name="information-circle-outline" size={30} color={COLORS.iosBlue}/>
-        </Pressable>
-      </View>
       <GiftedChat
         // renderInputToolbar={props => customtInputToolbar(props)}
         bottomOffset={80} // This is probably bad but can't worry about right now
@@ -124,21 +137,21 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontWeight: 'bold',
-    fontSize: 22,
-    maxWidth: '55%',
+    fontSize: 20,
+    maxWidth: '70%',
   },
   backButtonText: {
     color: COLORS.iosBlue,
-    fontSize: 20,
+    fontSize: 15,
   },
   headerButtonLeft: {
-    width: 100,
+    width: 60,
     paddingLeft: 10
   },
   headerButtonRight: {
-    width: 100,
+    width: 60,
     alignItems: 'flex-end',
-    paddingRight: 20
+    //paddingRight: 5,
   }
 })
 

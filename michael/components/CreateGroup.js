@@ -138,7 +138,7 @@ export default function CreateGroup({ navigation, route }) {
   return (
     <View style={{...styles.container, paddingBottom: keyboardHeight}}>
       {/* What the hell? goes behind thing when focused?? */}
-      <Text style={styles.header}>Send a Message</Text>
+      <Text style={styles.header}>Message</Text>
       <View style={styles.friendInputContainer}>
         {
           selectedUsers.map(user => {
@@ -171,7 +171,7 @@ export default function CreateGroup({ navigation, route }) {
         />
       </View>
       <View style={styles.cancelButton}>
-        <Button title="cancel" onPress={() => navigation.goBack()}/>
+        <Button title="Cancel" onPress={() => navigation.goBack()}/>
       </View>
       <View style={{flexGrow: 1, width: '100%'}}>
         {
@@ -196,7 +196,7 @@ export default function CreateGroup({ navigation, route }) {
           // returnKeyType="send"
           // onSubmitEditing={() => alert('send a message!')}
         />
-        <Pressable onPress={sendMessage} style={{...styles.sendButton, backgroundColor: (messageText === '' || selectedUsers.length === 0)  ? COLORS.lightGrey : COLORS.iosBlue}} disabled={(messageText === '' || selectedUsers.length === 0 || sendingMessage)}>
+        <Pressable onPress={sendMessage} style={{...styles.sendButton, backgroundColor: (messageText === '' || selectedUsers.length === 0)  ? COLORS.lightGrey : COLORS.yellow}} disabled={(messageText === '' || selectedUsers.length === 0 || sendingMessage)}>
           {
             sendingMessage ?
             <ActivityIndicator/>
@@ -213,17 +213,18 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     alignItems: 'center',
-    flex: 1
+    flex: 1,
+    backgroundColor: 'white'
   },
   header: {
     color: 'black',
     fontWeight: 'bold',
-    fontSize: 25,
+    fontSize: 20,
     marginTop: 20,
   },
   cancelButton: {
     position: 'absolute',
-    top: 15,
+    marginTop: 13,
     right: 10,
   },
   nextButton: {
@@ -272,17 +273,17 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
   },
-  removeButton: {
-    marginLeft: 'auto',
-    marginRight: 20,
-    padding: 10,
-    width: 100,
-  },
-  removeButtonText: {
-    textAlign: 'right',
-    fontWeight: 'bold',
-    color: COLORS.darkGrey
-  },
+  // removeButton: {
+  //   marginLeft: 'auto',
+  //   marginRight: 20,
+  //   padding: 10,
+  //   width: 100,
+  // },
+  // removeButtonText: {
+  //   textAlign: 'right',
+  //   fontWeight: 'bold',
+  //   color: COLORS.darkGrey
+  // },
   sectionHeader: {
     width: '100%',
     height: 30,
@@ -337,44 +338,53 @@ const styles = StyleSheet.create({
     paddingBottom: 3
   },
   selectedUser: {
-    backgroundColor: COLORS.lightGrey,
-    padding: 4,
-    borderRadius: 3,
-    margin: 2
+    backgroundColor: COLORS.yellow,
+    padding: 6,
+    paddingLeft:8,
+    paddingRight:8,
+    borderRadius: 7,
+    margin: 3
   },
   selectedUserText: {
-    color: COLORS.iosBlue,
+    color: 'white',
+    fontWeight: 'bold',
   },
   selectedUserHighlight: {
-    backgroundColor: COLORS.iosBlue,
-    padding: 4,
-    borderRadius: 3,
-    margin: 2
+    backgroundColor: COLORS.darkGrey,
+    padding: 6,
+    paddingLeft:8,
+    paddingRight:8,
+    borderRadius: 7,
+    margin: 3
   },
   selectedUserTextHighlight: {
     color: 'white',
+    fontWeight: 'bold',
+
   },
   otherInput: {
-    width: '95%',
-    borderWidth: 1,
-    borderColor: 'lightgrey',
-    borderRadius: 20,
+    width: '83%',
+    //borderWidth: 1,
+    //borderColor: 'lightgrey',
+    // borderRadius: 20,
+    //justifyContent: 'left',
     marginTop: 10,
     marginBottom: 5,
     maxHeight: 200,
-    paddingLeft: 10,
-    paddingBottom: 10,
-    paddingTop: 10,
-    paddingRight: 40,
+    paddingLeft: 15,
+    paddingBottom: 8,
+    //paddingTop: 12,
+    //paddingRight: 40,
     fontSize: 16,
     // height: 50,
-    // borderTopWidth: 1,
     // borderBottomWidth: 1,
-    // borderColor: 'lightgrey',
-    // paddingLeft: 10
   },
   messageInputContainer: {
+    //alignItems: 'center',
     width: '100%',
+    borderTopWidth: 1,
+    borderColor: 'lightgrey',
+
   },
   sendButton: {
     width: 30,
@@ -383,7 +393,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
-    right: 25,
-    bottom: 10 // Don't love this. Should change.
+    right: 15,
+    bottom: 8 // Don't love this. Should change.
   },
 })

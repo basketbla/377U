@@ -20,7 +20,6 @@ export default function Onboarding({ navigation }) {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <Text style={styles.logo}>Din Din</Text>
         <Text style={styles.explainer}>For the best experience on this app:</Text>
         <View>
           <Text style={styles.entry}>1. Access Contacts</Text>
@@ -50,9 +49,11 @@ const styles = StyleSheet.create({
   explainer: {
     color: COLORS.grey,
     fontWeight: 'bold',
-    fontSize: 20,
+    fontSize: 25,
     marginTop: 20,
     marginBottom: 20,
+    marginLeft: 10,
+    marginRight: 10,
   },
   entry: {
     color: 'black',

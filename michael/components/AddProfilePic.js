@@ -134,7 +134,7 @@ export default function AddProfilePic({navigation}) {
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text style={styles.header}>Add Profile Picture</Text>
+        <Text style={styles.header}>Add a Profile Picture</Text>
         <ActivityIndicator/>
       </View>
     )
@@ -301,9 +301,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   header: {
+    marginTop: 20,
     fontWeight: 'bold',
-    fontSize: 30,
+    fontSize: 25,
     marginBottom: '20%',
+    color: COLORS.grey,
   },
   nextButton: {
     width: '80%',

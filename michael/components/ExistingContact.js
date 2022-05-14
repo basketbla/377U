@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
     borderRadius: 10,
     padding: 10,
-    width: 70,
+    width: 80,
   },
   acceptRequestButtonDisabled: {
     backgroundColor: COLORS.yellow,
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
     borderRadius: 10,
     padding: 10,
-    width: 70,
+    width: 80,
     opacity: 0.5,
   },
   acceptRequestText: {

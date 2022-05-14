@@ -74,7 +74,6 @@ export default function Username({ navigation }) {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <Text style={styles.logo}>Din Din</Text>
         <Text style={styles.explainer}>Please enter your full name and username</Text>
         <TextInput
           style={nameError ? styles.errorInput : styles.input}

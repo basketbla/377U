@@ -125,6 +125,10 @@ export default function SignUpWithPhone() {
     }
   }
 
+
+          // <Text style={styles.logo}>Din Din</Text>
+
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
@@ -133,8 +137,7 @@ export default function SignUpWithPhone() {
           firebaseConfig={app.options}
           attemptInvisibleVerification
         />
-        <Text style={styles.logo}>Din Din</Text>
-        <Text style={styles.explainer}>Sign up to find shared freetime with friends</Text>
+        <Text style={styles.explainer}>Create an account with your phone number</Text>
         {
           codeSent ?
           <>
@@ -185,11 +188,11 @@ export default function SignUpWithPhone() {
                 </>
               }
             </Pressable>
-            <Pressable style={styles.tryDifferent} onPress={() => setCodeSent(false)}>
+            {/*<Pressable style={styles.tryDifferent} onPress={() => setCodeSent(false)}>
               <Text style={styles.tryDifferentText}>
                 Try a different phone number
               </Text>
-            </Pressable>
+            </Pressable>*/}
           </>
           :
           <Pressable style={phoneNumber === '' ? styles.disabledNextButton : styles.nextButton} onPress={handleNext} disabled={phoneNumber === ''}>
@@ -218,14 +221,16 @@ const styles = StyleSheet.create({
   },
   explainer: {
     color: COLORS.grey,
+    textAlign: 'center', 
+    fontSize: 25,
     fontWeight: 'bold',
-    marginTop: 20,
-    marginBottom: 50,
+    marginTop: 90,
+    marginBottom: 40,
+    margin:15
   },
   enterCodeText: {
     color: 'black',
     fontWeight: 'bold',
-    marginTop: 20,
   },
   bottomBanner: {
     position: 'absolute',

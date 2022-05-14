@@ -126,11 +126,11 @@ export default function People({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <Ionicons name={'person-add'} size={30} color={COLORS.darkGrey} onPress={() => navigation.navigate('FriendsTab')}/>
+        <Ionicons name={'person-add'} size={30} style={{ marginLeft: 5, marginTop:2 }} color={COLORS.yellow} onPress={() => navigation.navigate('FriendsTab')}/>
         <Pressable style={styles.addGroup} onPress={() => navigation.navigate('CreateGroup')}>
           {/* <Text style={styles.addText}>New group</Text> */}
-          {/* <Ionicons name={'add'} size={30} color={COLORS.darkGrey}/> */}
-          <Ionicons name="create-outline" size={30} color={COLORS.darkGrey} />
+          {/* <Ionicons name={'add'} size={30} color={COLORS.yellow}/> */}
+          <Ionicons name="create" style={{ marginRight: 2 }} size={32} color={COLORS.yellow} />
         </Pressable>
       </View>
       <SearchBar
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   topBar: {
-    marginTop: 50,
+    marginTop: 32,
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
@@ -197,8 +197,8 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   addGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    // flexDirection: 'row',
+    // alignItems: 'center',
   },
   addText: {
     color: COLORS.darkGrey,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     fontWeight: 'bold',
     fontSize: 20,
-    marginBottom: 5,
+    marginBottom: 10,
   },
   freeNow: {
     alignItems: 'center',
@@ -221,6 +221,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 100,
     flexGrow: 0,
+    marginBottom: 10,
   },
   freeNowContainer: {
     paddingRight: 20,
@@ -232,6 +233,7 @@ const styles = StyleSheet.create({
   },
   freeNowText: {
     fontWeight: 'bold',
+    color: COLORS.darkGrey,
     marginTop: 5,
   },
   groupList: {
@@ -239,13 +241,13 @@ const styles = StyleSheet.create({
   },
   groupEntry: {
     width: '100%',
-    height: 80,
+    height: 70,
     borderTopWidth: 1,
     borderTopColor: COLORS.grey,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingLeft: 20,
+    paddingLeft: 15,
     paddingRight: 40,
   },
   groupListContainer: {
@@ -254,7 +256,7 @@ const styles = StyleSheet.create({
   },
   groupEntryName: {
     fontWeight: 'bold',
-    fontSize: 25,
+    fontSize: 20,
     color: COLORS.darkGrey
   },
   groupEntryFree: {
