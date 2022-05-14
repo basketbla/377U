@@ -115,7 +115,7 @@ function LandingTab() {
 
   return (
     <>
-      <CalendarSync />
+      <CalendarSync /> 
       <Tab.Navigator screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ color }) => {
