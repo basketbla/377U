@@ -162,41 +162,41 @@ function LandingTab() {
     </>
 
 
-        if (route.name === 'People') {
-          iconName = 'people';
-        } 
-        else if (route.name === 'Profile') {
-          iconName = 'person';
-        }
-        // else if (route.name === 'Chat') {
-        //   iconName = 'chatbubbles';
-        // }
+    //     if (route.name === 'People') {
+    //       iconName = 'people';
+    //     } 
+    //     else if (route.name === 'Profile') {
+    //       iconName = 'person';
+    //     }
+    //     // else if (route.name === 'Chat') {
+    //     //   iconName = 'chatbubbles';
+    //     // }
 
-        // You can return any component that you like here!
-        return <Ionicons name={iconName} size={30} color={color}/>;
-      },
-      // tabBarActiveTintColor: COLORS.yellow,
-      // tabBarInactiveTintColor: COLORS.random,
-      // tabBarStyle: {
-      //   backgroundColor: COLORS.grey,
-      //   paddingBottom: 0,
-      // },
-      // tabBarShowLabel: true,
-      })}
-    >
-      <Tab.Screen 
-        name="People" 
-        component={PeopleNav}
-      />
-      {/* <Tab.Screen 
-        name="Chat" 
-        component={Chat}
-      /> */}
-      <Tab.Screen 
-        name="Profile" 
-        component={ProfileNav} 
-      />
-    </Tab.Navigator>
+    //     // You can return any component that you like here!
+    //     return <Ionicons name={iconName} size={30} color={color}/>;
+    //   },
+    //   // tabBarActiveTintColor: COLORS.yellow,
+    //   // tabBarInactiveTintColor: COLORS.random,
+    //   // tabBarStyle: {
+    //   //   backgroundColor: COLORS.grey,
+    //   //   paddingBottom: 0,
+    //   // },
+    //   // tabBarShowLabel: true,
+    //   })}
+    // >
+    //   <Tab.Screen 
+    //     name="People" 
+    //     component={PeopleNav}
+    //   />
+    //   {/* <Tab.Screen 
+    //     name="Chat" 
+    //     component={Chat}
+    //   /> */}
+    //   <Tab.Screen 
+    //     name="Profile" 
+    //     component={ProfileNav} 
+    //   />
+    // </Tab.Navigator>
   )
 }
 
