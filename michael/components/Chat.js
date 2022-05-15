@@ -21,6 +21,7 @@ Notifications.setNotificationHandler({
 });
 
 export default function Chat({ navigation, route }) {
+
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
@@ -55,14 +56,35 @@ export default function Chat({ navigation, route }) {
     };
   }, []);
 
-  async function schedulePushNotification() {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "You've got mail! 📬",
-        body: 'Here is the notification body',
-        data: { data: 'goes here' },
+  // async function schedulePushNotification() {
+  //   await Notifications.scheduleNotificationAsync({
+  //     content: {
+  //       title: "You've got mail! 📬",
+  //       body: 'Here is the notification body',
+  //       data: { data: 'goes here' },
+  //     },
+  //     trigger: { seconds: 2 },
+  //   });
+  // }
+
+  // Can use this function below, OR use Expo's Push Notification Tool-> https://expo.dev/notifications
+  async function sendPushNotification(expoPushToken) {
+    const message = {
+      to: expoPushToken,
+      sound: 'default',
+      title: 'Original Title',
+      body: 'And here is the body!',
+      data: { someData: 'goes here' },
+    };
+
+    await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-encoding': 'gzip, deflate',
+        'Content-Type': 'application/json',
       },
-      trigger: { seconds: 2 },
+      body: JSON.stringify(message),
     });
   }
 
@@ -125,7 +147,7 @@ export default function Chat({ navigation, route }) {
   //** Dvaid's changes added async to it
   const onSend = useCallback(async (messages = []) => {
     addMessageByObj(group.id, messages[0]);
-    await schedulePushNotification()
+    await sendPushNotification(expoPushToken)
   }, []);
 
 
