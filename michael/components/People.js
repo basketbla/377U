@@ -111,9 +111,16 @@ export default function People({ navigation }) {
     <FreeNow user={item}/>
   );
 
-  const renderGroups = ({ item }) => (
-    <Group group={item}/>
-  );
+  const renderGroups = ({ item }) => {
+    if (Object.keys(item.users).length === 2) {
+      return (
+        <Group group={{...item, name: allUsers[Object.keys(item.users).filter(id => id !== currentUser.uid)].name}}/>
+      )
+    }
+    return (
+      <Group group={item}/>
+    )
+  }
 
   if (loading) {
     return (
@@ -160,21 +167,21 @@ export default function People({ navigation }) {
         />
       }
       <View style={styles.groupContainer}>
-      <Text style={styles.groupLabel}>Conversations</Text>
-      {
-        groupsToDisplay.length === 0 ?
-        <Text style={styles.noFriendsText}>{search.length === 0 ? "Create a group chat with the button in the top-right!" : "No groups with matching user                "}</Text> //need space for formatting
-        :
-        <FlatList
-          // data={[{name: 'All Friends', numFree: 5, totalNum: 10, id: '1'}, {name: 'Roommates', numFree: 3, totalNum: 5, id: '2'}, {name: 'Foodies', numFree: 2, totalNum: 6, id: '3'}]}
-          data={groupsToDisplay}
-          renderItem={renderGroups}
-          keyExtractor={item => item.id}
-          style={styles.groupList}
-          contentContainerStyle={styles.groupListContainer}
-        />
-      }
-          </View>
+        <Text style={styles.groupLabel}>Conversations</Text>
+        {
+          groupsToDisplay.length === 0 ?
+          <Text style={styles.noFriendsText}>{search.length === 0 ? "Create a group chat with the button in the top-right!" : "No groups with matching user                "}</Text> //need space for formatting
+          :
+          <FlatList
+            // data={[{name: 'All Friends', numFree: 5, totalNum: 10, id: '1'}, {name: 'Roommates', numFree: 3, totalNum: 5, id: '2'}, {name: 'Foodies', numFree: 2, totalNum: 6, id: '3'}]}
+            data={groupsToDisplay}
+            renderItem={renderGroups}
+            keyExtractor={item => item.id}
+            style={styles.groupList}
+            contentContainerStyle={styles.groupListContainer}
+          />
+        }
+      </View>
     </View>
   )
 }
@@ -187,9 +194,10 @@ const styles = StyleSheet.create({
   },
   groupContainer: {
     width: '100%',
+    flexGrow: 1,
        // backgroundColor: COLORS.yellow,
     //maxHeight: '68%',
-        maxHeight: 242,
+    // maxHeight: 242,
 
   },
   search: {
@@ -265,7 +273,7 @@ const styles = StyleSheet.create({
   },
   groupList: {
     width: '100%',
-    flexGrow: 0,
+    flexGrow: 1,
   },
   groupEntry: {
     width: '100%',
@@ -280,9 +288,9 @@ const styles = StyleSheet.create({
   },
 
   groupListContainer: {
+    flexGrow: 0,
     borderBottomColor: COLORS.lightGrey,
     borderBottomWidth: 1,
-    flexGrow: 0,
   },
   groupEntryName: {
     fontWeight: 'bold',

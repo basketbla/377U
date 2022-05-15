@@ -27,9 +27,14 @@ export default function ChatDetails({ route, navigation }) {
       <Text style={styles.groupName}>
           {group.name}
       </Text>
-      <Pressable onPress={() => navigation.navigate('EditName', {group: group})}>
-        <Text style={styles.editNameText}>Edit group name</Text>
-      </Pressable>
+      {
+        Object.keys(group.users).length === 2 ?
+        <></>
+        :
+        <Pressable onPress={() => navigation.navigate('EditName', {group: group})}>
+          <Text style={styles.editNameText}>Edit group name</Text>
+        </Pressable>
+      }
       <Text style={styles.detailText}>Free now</Text>
       {
         loading ?
