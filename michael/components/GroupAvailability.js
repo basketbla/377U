@@ -159,7 +159,7 @@ export default function GroupAvailability({ route, navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>Your whole group is free during these times, according to your Google Calendars.</Text>
-      <Text style={styles.detailText}>Suggested Times</Text>
+      {/*<Text style={styles.detailText}>Suggested Times</Text>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           {suggestedSlots.map((slot, i) =>
                        
@@ -173,7 +173,7 @@ export default function GroupAvailability({ route, navigation }) {
           <Pressable
             on> 
             <Text style={styles.detailText}>All Available Times: </Text>
-          </Pressable>
+          </Pressable>*/}
 
           <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           {freeSlots.map((slot, i) =>
@@ -216,13 +216,14 @@ const styles = StyleSheet.create({
     //alignItems: 'center',
     //justifyContent: 'space-around',
     backgroundColor: 'white',
-    paddingLeft: 15,
-    paddingRight: 15,
+    paddingLeft: 18,
+    paddingRight: 18,
   },
    headerText: {
-    marginTop:15,
+    marginTop:20,
     color: COLORS.darkGrey,
     fontSize:14,
+    marginBottom:10,
 
  },
     detailText: {
@@ -236,13 +237,14 @@ const styles = StyleSheet.create({
  
   buttonText: {
     backgroundColor: COLORS.yellow,
-    height: 40,
+    height: 50,
     alignItems: 'center', 
     justifyContent: 'center',
-    marginTop: 10,
+    marginTop: 15,
     paddingLeft:8,
     paddingRight:8,
     borderRadius: 10,
+    fontSize: 20,
   },
   nextLabel: {
     fontWeight: 'bold',
