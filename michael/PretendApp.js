@@ -143,7 +143,7 @@ function LandingTab() {
       tabBarStyle: {
         paddingTop: 10,
         paddingBottom: 10,
-        height: 60
+        height: '10%'
       },
         })}
       >

@@ -155,10 +155,11 @@ export default function People({ navigation }) {
           keyExtractor={item => item.username}
           horizontal={true}
           style={styles.freeNowList}
-          contentContainerStyle={styles.freeNowContainer}
+          //contentContainerStyle={styles.freeNowContainer}
           showsHorizontalScrollIndicator={false}
         />
       }
+      <View style={styles.groupContainer}>
       <Text style={styles.groupLabel}>Conversations</Text>
       {
         groupsToDisplay.length === 0 ?
@@ -173,6 +174,7 @@ export default function People({ navigation }) {
           contentContainerStyle={styles.groupListContainer}
         />
       }
+          </View>
     </View>
   )
 }
@@ -183,19 +185,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'white'
   },
+  groupContainer: {
+    width: '100%',
+       // backgroundColor: COLORS.yellow,
+    //maxHeight: '68%',
+        maxHeight: 242,
+
+  },
   search: {
     // width: '95%',
     marginLeft: 5,
     marginRight: 5,
+
   },
   topBar: {
-    marginTop: 32,
+    marginTop: '10%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
     paddingLeft: 10,
     paddingRight: 10,
   },
+
   addGroup: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -219,6 +230,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 20,
     marginBottom: 10,
+   // paddingTop: 3,
+
+
   },
   freeNow: {
     alignItems: 'center',
@@ -228,12 +242,15 @@ const styles = StyleSheet.create({
   freeNowList: {
     width: '100%',
     flexGrow: 0,
+    marginTop: 3,
     marginBottom: 10,
-
+   // height: 120,
+    paddingRight: 40,
   },
   freeNowContainer: {
-    paddingRight: 20,
-    height: 100,
+   // paddingRight: 20,
+    height: '19%',
+    width: '100%',
 
   },
   profilePic: {
@@ -248,7 +265,7 @@ const styles = StyleSheet.create({
   },
   groupList: {
     width: '100%',
-
+    flexGrow: 0,
   },
   groupEntry: {
     width: '100%',
@@ -265,6 +282,7 @@ const styles = StyleSheet.create({
   groupListContainer: {
     borderBottomColor: COLORS.lightGrey,
     borderBottomWidth: 1,
+    flexGrow: 0,
   },
   groupEntryName: {
     fontWeight: 'bold',
@@ -298,19 +316,22 @@ const styles = StyleSheet.create({
     paddingLeft:15,
     paddingRight:15,
     textAlign: 'left',
+
   },
   noFreeContainer: {
-    height: 80,
+    //height: 120,
     width: '100%',
-
+        flexGrow: 0,
   },
   noFreeText: {
     fontSize: 18,
     color: COLORS.darkGrey,
     //fontWeight: 'bold',
     marginTop: 2,
+    marginBottom: 20,
     textAlign: 'left',
     paddingLeft:15,
     paddingRight:15,
+        flexGrow: 0,
   }
 })

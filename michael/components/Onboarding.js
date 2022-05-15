@@ -20,12 +20,12 @@ export default function Onboarding({ navigation }) {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <Text style={styles.explainer}>To get the most out of this app:</Text>
+        <Text style={styles.explainer}>Almost there! To get the most out of this app:</Text>
         <View style={{width: '85%'}}>
           <Text style={styles.entry}>1. Access Contacts</Text>
-          <Text style={styles.entryLittle}>To add your friends!</Text>
+          <Text style={styles.entryLittle}>To add your friends</Text>
           <Text style={styles.entry}>2. Enable Notifications</Text>
-          <Text style={styles.entryLittle}>So your friends can reach you.</Text>
+          <Text style={styles.entryLittle}>So your friends can reach you</Text>
           <Text style={styles.entry}>3. Sync with Google Calendar</Text>
           <Text style={styles.entryLittle}>So your friends know when you might be free :)</Text>
         </View>
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     width: '85%',
     color: COLORS.grey,
     fontWeight: 'bold',
-    fontSize: 25,
+    fontSize: 24,
     marginTop: '20%',
     marginBottom: 20,
     // marginLeft: 20,

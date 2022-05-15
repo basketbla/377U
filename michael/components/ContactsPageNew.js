@@ -283,7 +283,7 @@ export default function ContactsPageNew({ navigation }) {
     return (
       <View style={styles.container}>
       <View style={{paddingLeft: 15, paddingRight: 15, width: '100%'}}>
-        <Text style={styles.header}>Add and invite your friends :)</Text>
+        <Text style={styles.header}>Add and invite your friends</Text>
         </View>
         <SearchBar
           placeholder="Search Contacts"
