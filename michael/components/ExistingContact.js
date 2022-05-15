@@ -44,7 +44,7 @@ export default function ExistingContact({ contact }) {
         <Text style={styles.contactName}>
           {
             // Just truncating name but dang this is ugly
-            contact.name.substring(0, 16) + (contact.name.length > 16 ? '...' : '')
+            contact.name ? contact.name.substring(0, 18) + (contact.name.length > 18 ? '...' : '') : ''
           }
         </Text>
         <Text style={styles.contactUsername}>
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
     borderRadius: 10,
     padding: 10,
-    width: 70,
+    width: 80,
   },
   acceptRequestButtonDisabled: {
     backgroundColor: COLORS.yellow,
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
     borderRadius: 10,
     padding: 10,
-    width: 70,
+    width: 80,
     opacity: 0.5,
   },
   acceptRequestText: {

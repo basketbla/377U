@@ -21,7 +21,7 @@ export default function BlandUser({ contact }) {
           {
             // Just truncating name but dang this is ugly
             // Yeah number of lines fixes this. Whatever.
-            contact.name.substring(0, 16) + (contact.name.length > 16 ? '...' : '')
+            contact.name ? contact.name.substring(0, 18) + (contact.name.length > 18 ? '...' : '') : ''
           }
         </Text>
         <Text style={styles.contactUsername}>
@@ -105,17 +105,17 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
   },
-  removeButton: {
-    marginLeft: 'auto',
-    marginRight: 20,
-    padding: 10,
-    width: 100,
-  },
-  removeButtonText: {
-    textAlign: 'right',
-    fontWeight: 'bold',
-    color: COLORS.darkGrey
-  },
+  // removeButton: {
+  //   marginLeft: 'auto',
+  //   marginRight: 20,
+  //   padding: 10,
+  //   width: 100,
+  // },
+  // removeButtonText: {
+  //   textAlign: 'right',
+  //   fontWeight: 'bold',
+  //   color: COLORS.darkGrey
+  // },
   sectionHeader: {
     width: '100%',
     height: 30,

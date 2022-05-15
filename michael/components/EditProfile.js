@@ -274,6 +274,7 @@ const styles = StyleSheet.create({
     marginRight: 'auto',
     marginLeft: '10%',
     marginBottom: -15,
+    marginTop: 10,
     fontWeight: 'bold'
   },
   cameraIcon: {

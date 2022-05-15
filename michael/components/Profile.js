@@ -18,7 +18,7 @@ export default function Profile({ navigation }) {
   
   const [loading, setLoading] = useState(true);
   const [userDetails, setUserDetails] = useState();
-  const [isFree, setIsFree] = useState(true);
+  const [isFree, setIsFree] = useState();
 
   const handleChangeAvailability = async () => {
     let newAvailability = !isFree;
@@ -71,20 +71,20 @@ export default function Profile({ navigation }) {
         <Text style={styles.name}>{userDetails.name}</Text>
         <Text style={styles.username}>{`@${userDetails.username}`}</Text>
       </Pressable>
-      <View style={styles.freeButtonContainer}>
+{/*      <View style={styles.freeButtonContainer}>
         <Text style={styles.freeButtonLabel}>
           {
             isFree ? "Available" : "Unavailable"
           }
         </Text>
         <Switch
-          trackColor={{ false: "#767577", true: COLORS.iosBlue }}
+          trackColor={{ false: "#767577", true: COLORS.yellow }}
           thumbColor={"#f4f3f4"}
           ios_backgroundColor="#3e3e3e"
           onValueChange={handleChangeAvailability}
           value={isFree}
         />
-      </View>
+      </View>*/}
       <Button title="Sign Out" onPress={confirmSignOut}/>
     </View>
   )
@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'white',
   },
   clickableProfile: {
     alignItems: 'center', 

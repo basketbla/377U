@@ -30,6 +30,8 @@ import ChatDetails from './components/ChatDetails';
 import EditName from './components/EditName';
 import CalendarSyncBackup from './components/CalendarSyncBackup';
 import ContactsPageNew from './components/ContactsPageNew';
+import GroupAvailability from './components/GroupAvailability';
+import AddCalendar from './components/AddCalendar';
 import Welcome from './components/Welcome';
 
 
@@ -84,12 +86,13 @@ function SignInStack() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false, gestureEnabled: 'false'}}>
-        <Stack.Screen name="Welcome" component={Welcome}/>
+        <Stack.Screen name="Welcome" component={Welcome}/> 
         <Stack.Screen name="SignUpWithPhone" component={SignUpWithPhone}/>
         <Stack.Screen name="SignIn" component={SignIn}/>
-        <Stack.Screen name="SignUp" component={SignUp}/>
-        {/* <Stack.Screen name="VerifyPhone" component={VerifyPhone} /> */}
-        {/* <Stack.Screen name="SendTexts" component={SendTexts} /> */}
+        <Stack.Screen name="SignUp" component={SignUp}/> 
+        <Stack.Screen name="VerifyPhone" component={VerifyPhone} />
+        {/* <Stack.Screen name="CalendarSync" component={CalendarSync} /> */}
+        <Stack.Screen name="SendTexts" component={SendTexts} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -104,54 +107,97 @@ function OnboardingStack() {
         <Stack.Screen name="AddProfilePic" component={AddProfilePic} />
         <Stack.Screen name="Onboarding" component={Onboarding} />
         <Stack.Screen name="ContactsPage" component={ContactsPageNew} />
-        <Stack.Screen name="CalendarSync" component={CalendarSyncBackup} />
+        {/* <Stack.Screen name="CalendarSyncBackup" component={CalendarSyncBackup} /> */}
+        {/* <Stack.Screen name="AddCalendar" component={AddCalendar} /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
 function LandingTab() {
+
   return (
-    <Tab.Navigator screenOptions={({ route }) => ({
-      headerShown: false,
-      tabBarIcon: ({ color }) => {
-        let iconName;
+    <>
+      <CalendarSync /> 
+      {/* <AddCalendar />  */}
+      <Tab.Navigator screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarIcon: ({ color }) => {
+          let iconName;
 
-        if (route.name === 'People') {
-          iconName = 'people';
-        } 
-        else if (route.name === 'Profile') {
-          iconName = 'person';
-        }
-        // else if (route.name === 'Chat') {
-        //   iconName = 'chatbubbles';
-        // }
+          if (route.name === 'People') {
+            iconName = 'people';
+          } 
+          else if (route.name === 'Profile') {
+            iconName = 'person';
+          }
+          // else if (route.name === 'Chat') {
+          //   iconName = 'chatbubbles';
+          // }
 
-        // You can return any component that you like here!
-        return <Ionicons name={iconName} size={30} color={color}/>;
-      },
-      // tabBarActiveTintColor: COLORS.yellow,
+          // You can return any component that you like here!
+          return <Ionicons name={iconName} size={30} color={color}/>;
+        },
+        tabBarActiveTintColor: COLORS.yellow,
       // tabBarInactiveTintColor: COLORS.random,
-      // tabBarStyle: {
-      //   backgroundColor: COLORS.grey,
-      //   paddingBottom: 0,
-      // },
-      // tabBarShowLabel: true,
-      })}
-    >
-      <Tab.Screen 
-        name="People" 
-        component={PeopleNav}
-      />
-      {/* <Tab.Screen 
-        name="Chat" 
-        component={Chat}
-      /> */}
-      <Tab.Screen 
-        name="Profile" 
-        component={ProfileNav} 
-      />
-    </Tab.Navigator>
+      tabBarStyle: {
+        paddingTop: 10,
+        paddingBottom: 10,
+        height: '10%'
+      },
+        })}
+      >
+        <Tab.Screen 
+          name="People" 
+          component={PeopleNav}
+        />
+        {/* <Tab.Screen 
+          name="Chat" 
+          component={Chat}
+        /> */}
+        <Tab.Screen 
+          name="Profile" 
+          component={ProfileNav} 
+        />
+      </Tab.Navigator>
+    </>
+
+
+    //     if (route.name === 'People') {
+    //       iconName = 'people';
+    //     } 
+    //     else if (route.name === 'Profile') {
+    //       iconName = 'person';
+    //     }
+    //     // else if (route.name === 'Chat') {
+    //     //   iconName = 'chatbubbles';
+    //     // }
+
+    //     // You can return any component that you like here!
+    //     return <Ionicons name={iconName} size={30} color={color}/>;
+    //   },
+    //   // tabBarActiveTintColor: COLORS.yellow,
+    //   // tabBarInactiveTintColor: COLORS.random,
+    //   // tabBarStyle: {
+    //   //   backgroundColor: COLORS.grey,
+    //   //   paddingBottom: 0,
+    //   // },
+    //   // tabBarShowLabel: true,
+    //   })}
+    // >
+    //   <Tab.Screen 
+    //     name="People" 
+    //     component={PeopleNav}
+    //   />
+    //   {/* <Tab.Screen 
+    //     name="Chat" 
+    //     component={Chat}
+    //   /> */}
+    //   <Tab.Screen 
+    //     name="Profile" 
+    //     component={ProfileNav} 
+    //   />
+    // </Tab.Navigator>
   )
 }
 
@@ -161,7 +207,7 @@ function ProfileNav() {
       <Stack.Screen name="ProfileMain" component={Profile} options={{ headerShown: false }}/>
       <Stack.Screen name="EditProfile" component={EditProfile} 
         options={{
-          headerTitle: props => <Text>Edit Profile</Text>,
+          headerTitle: props => <Text style={{fontWeight: 'bold', fontSize: 20}}>Edit Profile</Text>,
         }}
       />
     </Stack.Navigator>
@@ -178,8 +224,9 @@ function PeopleNav() {
         }}
       />
       {/* I think it's just easier to make my own header */}
-      <Stack.Screen name="Chat" component={Chat} options={{headerShown: false}}/>
+      <Stack.Screen name="Chat" component={Chat}/>
       <Stack.Screen name="ChatDetails" component={ChatDetails} options={{ title: 'Group details' }}/>
+      <Stack.Screen name="GroupAvailability" component={GroupAvailability} options={{ title: 'Group Availability' }}/>
       <Stack.Group screenOptions={{ presentation: 'modal', gestureEnabled: 'true' }}>
         <Stack.Screen name="EditName" component={EditName} options={{ 
           title: 'Edit Name',

@@ -46,7 +46,58 @@ export const getUsers = async () => {
   } 
   else {
     return [];
+  } 
+}
+export const setCalEvents= (userId, events) => {
+  return set(ref_db(database, `users/${userId}/events`), events);
+}
+
+export const getCalEvents= async (userId) => {
+  let snapshot = await get(ref_db(database, `users/${userId}/events`));
+  if (snapshot.exists()) {
+    return snapshot.val();
+  } 
+  else {
+    return [];
+  } 
+}
+
+export const setChosenCalendars = (userId, calendarIDs) => {
+  return set(ref_db(database, `users/${userId}/calendars`), calendarIDs);
+}
+
+export const getChosenCalendars = async (userId) => {
+  let snapshot = await get(ref_db(database, `users/${userId}/calendars`));
+  if (snapshot.exists()) {
+    return snapshot.val();
+  } 
+  else {
+    return [];
+  } 
+}
+
+
+export const setAvailability = (userId, availability) => {
+  return set(ref_db(database, `users/${userId}/isFree`), availability);
+}
+
+export const getAvailability = (userId) => {
+  return get(ref_db(database, `users/${userId}/isFree`));
+}
+
+//this is the jankiest shit ive ever written but i cannot figure this out sldkfjsldkfj
+export const setDBEventListener = async (flag) => {
+  return set(ref_db(database, `dbFlag/temp`), flag);
+}
+
+export const getDBEventListener = async () => {
+  let snapshot = await get(ref_db(database, `dbFlag/temp`));
+  if (snapshot.exists()) {
+    return snapshot.val();
+  } else {
+    return []
   }
+  
 }
 
 export const uploadImageToStorage = async (uri, uid) => {
@@ -198,13 +249,7 @@ export const updateGroupName = (groupId, newName) => {
   return set(ref_db(database, `groups/${groupId}/name`), newName);
 }
 
-export const setAvailability = (userId, availability) => {
-  return set(ref_db(database, `users/${userId}/isFree`), availability);
-}
 
-export const getAvailability = (userId) => {
-  return get(ref_db(database, `users/${userId}/isFree`));
-}
 
 // addFriendRequest('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');
 // addFriend('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');

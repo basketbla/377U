@@ -318,13 +318,16 @@ const styles = StyleSheet.create({
   },
   inviteButton: {
     marginLeft: 'auto',
-   // backgroundColor: COLORS.lightGrey,
+    backgroundColor: '#8F8D8F',
+    overflow: 'hidden',
     textAlign: 'center',
     marginRight: 15,
     borderRadius: 10,
-    borderWidth: 1,
+    //borderWidth: 1,
     padding: 10,
-    width: 70,
+    width: 80,
+    fontWeight: 'bold',
+    color: 'white'
   },
   sectionHeader: {
     width: '100%',

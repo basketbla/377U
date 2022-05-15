@@ -74,7 +74,6 @@ export default function Username({ navigation }) {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <Text style={styles.logo}>Din Din</Text>
         <Text style={styles.explainer}>Please enter your full name and username</Text>
         <TextInput
           style={nameError ? styles.errorInput : styles.input}
@@ -115,9 +114,12 @@ const styles = StyleSheet.create({
   },
   explainer: {
     color: COLORS.grey,
+    textAlign: 'center', 
+    fontSize: 25,
     fontWeight: 'bold',
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: '20%',
+    marginBottom: '5%',
+    margin:20
   },
   bottomBanner: {
     position: 'absolute',
@@ -139,13 +141,13 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '80%',
-    backgroundColor: '#ededed',
+    backgroundColor: 'white',
     height: 50,
     paddingLeft: 20,
     borderRadius: 10,
     borderWidth: 0.5,
     borderColor: '#cfcfcf',
-    marginTop: 20,
+    marginTop: 10,
   },
   errorInput: {
     width: '80%',

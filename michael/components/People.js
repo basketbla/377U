@@ -126,11 +126,11 @@ export default function People({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <Ionicons name={'person-add'} size={30} color={COLORS.darkGrey} onPress={() => navigation.navigate('FriendsTab')}/>
+        <Ionicons name={'person-add'} size={30} style={{ marginLeft: 5, marginTop:2 }} color={COLORS.yellow} onPress={() => navigation.navigate('FriendsTab')}/>
         <Pressable style={styles.addGroup} onPress={() => navigation.navigate('CreateGroup')}>
           {/* <Text style={styles.addText}>New group</Text> */}
-          {/* <Ionicons name={'add'} size={30} color={COLORS.darkGrey}/> */}
-          <Ionicons name="create-outline" size={30} color={COLORS.darkGrey} />
+          {/* <Ionicons name={'add'} size={30} color={COLORS.yellow}/> */}
+          <Ionicons name="create" style={{ marginRight: 2 }} size={32} color={COLORS.yellow} />
         </Pressable>
       </View>
       <SearchBar
@@ -146,7 +146,7 @@ export default function People({ navigation }) {
       {
         friendsToDisplay.length === 0 ?
         <View style={styles.noFreeContainer}>
-          <Text style={styles.noFreeText}>{search.length === 0 ? "No one is free right now :(" : "No matching users are free"}</Text>
+          <Text style={styles.noFreeText}>{search.length === 0 ? "No one is free right now..." : "No matching users are free"}</Text>
         </View>
         :
         <FlatList
@@ -155,14 +155,15 @@ export default function People({ navigation }) {
           keyExtractor={item => item.username}
           horizontal={true}
           style={styles.freeNowList}
-          contentContainerStyle={styles.freeNowContainer}
+          //contentContainerStyle={styles.freeNowContainer}
           showsHorizontalScrollIndicator={false}
         />
       }
-      <Text style={styles.freeLabel}>Conversations</Text>
+      <View style={styles.groupContainer}>
+      <Text style={styles.groupLabel}>Conversations</Text>
       {
         groupsToDisplay.length === 0 ?
-        <Text style={styles.noFriendsText}>{search.length === 0 ? "You don't have any groups right now..." : "No groups with matching user"}</Text>
+        <Text style={styles.noFriendsText}>{search.length === 0 ? "Create a group chat with the button in the top-right!" : "No groups with matching user                "}</Text> //need space for formatting
         :
         <FlatList
           // data={[{name: 'All Friends', numFree: 5, totalNum: 10, id: '1'}, {name: 'Roommates', numFree: 3, totalNum: 5, id: '2'}, {name: 'Foodies', numFree: 2, totalNum: 6, id: '3'}]}
@@ -173,6 +174,7 @@ export default function People({ navigation }) {
           contentContainerStyle={styles.groupListContainer}
         />
       }
+          </View>
     </View>
   )
 }
@@ -183,19 +185,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'white'
   },
+  groupContainer: {
+    width: '100%',
+       // backgroundColor: COLORS.yellow,
+    //maxHeight: '68%',
+        maxHeight: 242,
+
+  },
   search: {
     // width: '95%',
     marginLeft: 5,
     marginRight: 5,
+
   },
   topBar: {
-    marginTop: 50,
+    marginTop: '10%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
     paddingLeft: 10,
     paddingRight: 10,
   },
+
   addGroup: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -210,7 +221,18 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     fontWeight: 'bold',
     fontSize: 20,
-    marginBottom: 5,
+    marginBottom: 10,
+
+  },
+  groupLabel: {
+    marginRight: 'auto',
+    marginLeft: 15,
+    fontWeight: 'bold',
+    fontSize: 20,
+    marginBottom: 10,
+   // paddingTop: 3,
+
+
   },
   freeNow: {
     alignItems: 'center',
@@ -219,11 +241,17 @@ const styles = StyleSheet.create({
   },
   freeNowList: {
     width: '100%',
-    height: 100,
     flexGrow: 0,
+    marginTop: 3,
+    marginBottom: 10,
+   // height: 120,
+    paddingRight: 40,
   },
   freeNowContainer: {
-    paddingRight: 20,
+   // paddingRight: 20,
+    height: '19%',
+    width: '100%',
+
   },
   profilePic: {
     width: 60,
@@ -232,29 +260,33 @@ const styles = StyleSheet.create({
   },
   freeNowText: {
     fontWeight: 'bold',
+    color: COLORS.darkGrey,
     marginTop: 5,
   },
   groupList: {
     width: '100%',
+    flexGrow: 0,
   },
   groupEntry: {
     width: '100%',
-    height: 80,
+    height: 70,
     borderTopWidth: 1,
-    borderTopColor: COLORS.grey,
+    borderTopColor: COLORS.lightGrey,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingLeft: 20,
+    paddingLeft: 15,
     paddingRight: 40,
   },
+
   groupListContainer: {
-    borderBottomColor: COLORS.grey,
+    borderBottomColor: COLORS.lightGrey,
     borderBottomWidth: 1,
+    flexGrow: 0,
   },
   groupEntryName: {
     fontWeight: 'bold',
-    fontSize: 25,
+    fontSize: 20,
     color: COLORS.darkGrey
   },
   groupEntryFree: {
@@ -262,6 +294,7 @@ const styles = StyleSheet.create({
     color: COLORS.darkGrey
   },
   groupEntryTextContainer: {
+
   },
   contactButton: {
     borderWidth: 1,
@@ -275,20 +308,30 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   noFriendsText: {
-    fontSize: 20,
+    justifyContent: 'center',
+    fontSize: 18,
     color: COLORS.darkGrey,
-    fontWeight: 'bold',
-    marginTop: 30,
-    width: '80%',
-    textAlign: 'center'
+    //fontWeight: 'bold',
+    marginTop: 2,
+    paddingLeft:15,
+    paddingRight:15,
+    textAlign: 'left',
+
   },
   noFreeContainer: {
-    height: 100,
-    justifyContent: 'center'
+    //height: 120,
+    width: '100%',
+        flexGrow: 0,
   },
   noFreeText: {
-    fontSize: 15,
+    fontSize: 18,
     color: COLORS.darkGrey,
-    fontWeight: 'bold',
+    //fontWeight: 'bold',
+    marginTop: 2,
+    marginBottom: 20,
+    textAlign: 'left',
+    paddingLeft:15,
+    paddingRight:15,
+        flexGrow: 0,
   }
 })

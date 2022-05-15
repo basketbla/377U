@@ -56,7 +56,7 @@ const User = ({ contact, handleRemoveFriend }) => {
           {
             // Just truncating name but dang this is ugly
             // Yeah number of lines fixes this. Whatever.
-            contact.name.substring(0, 16) + (contact.name.length > 16 ? '...' : '')
+            contact.name ? contact.name.substring(0, 18) + (contact.name.length > 18 ? '...' : '') : ''
           }
         </Text>
         <Text style={styles.contactUsername}>
@@ -138,7 +138,7 @@ export default function OldFriends({ navigation }) {
       />
       {
         friends.length === 0 ?
-        <Text style={{flex: 1, fontSize: 20, color: COLORS.darkGrey}}>You have no friends :(</Text>
+        <Text style={{marginTop: 10, flex: 1, fontSize: 18, color: COLORS.darkGrey}}>You have no friends yet :(</Text>
         :
         <>
           {

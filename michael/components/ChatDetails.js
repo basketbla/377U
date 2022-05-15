@@ -24,16 +24,13 @@ export default function ChatDetails({ route, navigation }) {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1 }}>
-      <Text style={styles.detailText}>
-        Group name: 
-        <Text style={styles.groupName}>
-          {' ' + group.name}
-        </Text>
+      <Text style={styles.groupName}>
+          {group.name}
       </Text>
       <Pressable onPress={() => navigation.navigate('EditName', {group: group})}>
         <Text style={styles.editNameText}>Edit group name</Text>
       </Pressable>
-      <Text style={styles.detailText}>Free now:</Text>
+      <Text style={styles.detailText}>Free now</Text>
       {
         loading ?
         <ActivityIndicator/>
@@ -48,7 +45,7 @@ export default function ChatDetails({ route, navigation }) {
           }
         </>
       }
-      <Text style={styles.detailText}>Group members:</Text>
+      <Text style={styles.detailText}>Group members</Text>
       {
         loading ?
         <ActivityIndicator/>
@@ -72,22 +69,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
-    paddingLeft: 5
+    paddingLeft: 15
   },
   detailText: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: COLORS.grey,
-    marginTop: 20,
+    color: COLORS.black,
+    marginTop: 25,
+    marginBottom: 1,
   },
   groupName: {
+    marginTop: 20,
     fontSize: 20,
     fontWeight: 'bold',
     color: 'black',
   },
   editNameText: {
     color: COLORS.iosBlue,
-    fontSize: 15,
+    fontSize: 13,
     marginTop: 10
   },
   search: {
@@ -141,17 +140,17 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
   },
-  removeButton: {
-    marginLeft: 'auto',
-    marginRight: 20,
-    padding: 10,
-    width: 100,
-  },
-  removeButtonText: {
-    textAlign: 'right',
-    fontWeight: 'bold',
-    color: COLORS.darkGrey
-  },
+  // removeButton: {
+  //   marginLeft: 'auto',
+  //   marginRight: 20,
+  //   padding: 10,
+  //   width: 100,
+  // },
+  // removeButtonText: {
+  //   textAlign: 'right',
+  //   fontWeight: 'bold',
+  //   color: COLORS.darkGrey
+  // },
   sectionHeader: {
     width: '100%',
     height: 30,

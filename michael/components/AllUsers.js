@@ -208,17 +208,17 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
   },
-  removeButton: {
-    marginLeft: 'auto',
-    marginRight: 20,
-    padding: 10,
-    width: 100,
-  },
-  removeButtonText: {
-    textAlign: 'right',
-    fontWeight: 'bold',
-    color: COLORS.darkGrey
-  },
+  // removeButton: {
+  //   marginLeft: 'auto',
+  //   marginRight: 20,
+  //   padding: 10,
+  //   width: 100,
+  // },
+  // removeButtonText: {
+  //   textAlign: 'right',
+  //   fontWeight: 'bold',
+  //   color: COLORS.darkGrey
+  // },
   sectionHeader: {
     width: '100%',
     height: 30,

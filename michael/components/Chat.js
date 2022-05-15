@@ -42,7 +42,6 @@ export default function Chat({ navigation, route }) {
   // };
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState(false);
-  // console.log('i get here')
   console.log(expoPushToken)
   const notificationListener = useRef();
   const responseListener = useRef();
@@ -52,6 +51,9 @@ export default function Chat({ navigation, route }) {
   // const [messages, setMessages] = useState(Object.keys(group.messages).map(id => ({...group.messages[id], _id: id, createdAt: JSON.parse(group.messages[id].createdAt)})));
   const [messages, setMessages] = useState([]);
 
+
+
+
   // useEffect(async () => {
   //   console.log(group)
   // }, [])
@@ -59,22 +61,17 @@ export default function Chat({ navigation, route }) {
   const { chatname } = "hello, world"; //name of the chat group 
   // console.log(firebase.auth().currentUser);
 
-  useEffect(() => { //messaging
-    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
 
-    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-      setNotification(notification);
-    });
+  // useEffect(() => { //messaging
+  //   registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
 
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log(response);
-    });
+  //   notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+  //     setNotification(notification);
+  //   });
 
-    return () => {
-      Notifications.removeNotificationSubscription(notificationListener.current);
-      Notifications.removeNotificationSubscription(responseListener.current);
-    };
-  }, []);
+  //   responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+  //     console.log(response);
+  //   });
 
   // Can use this function below, OR use Expo's Push Notification Tool-> https://expo.dev/notifications
   async function sendPushNotification(expoPushToken) {
@@ -101,7 +98,8 @@ export default function Chat({ navigation, route }) {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "You got a message on Din Din! 📬",
-        body: 'Here is the notification body ', messageBody,
+//         body: 'Here is the notification body ', messageBody,
+        body: 'Check the notification! '
         data: { data: messageBody },
       },
       trigger: { seconds: 2 },
@@ -129,18 +127,19 @@ export default function Chat({ navigation, route }) {
     } else {
       alert('Must use physical device for Push Notifications');
     }
+
   
-    if (Platform.OS === 'android') {
-      Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#FF231F7C',
-      });
-    }
+  //   if (Platform.OS === 'android') {
+  //     Notifications.setNotificationChannelAsync('default', {
+  //       name: 'default',
+  //       importance: Notifications.AndroidImportance.MAX,
+  //       vibrationPattern: [0, 250, 250, 250],
+  //       lightColor: '#FF231F7C',
+  //     });
+  //   }
   
-    return token;
-  }
+  //   return token;
+  // }
 
   // async function schedulePushNotification() {
   //   await Notifications.scheduleNotificationAsync({
@@ -174,7 +173,41 @@ export default function Chat({ navigation, route }) {
         GiftedChat.append(previousMessages, newMessage)
       );
     })
-    return unsubscribe;
+    // let unsubscribeFromNewSnapshots = db
+    //   .collection("Chats") //ideally firestore, not realtime db
+    //   .doc(chatname)
+    //   .onSnapshot((snapshot) => {
+    //     console.log("New Snapshot!");
+    //     let newMessages = snapshot.data().messages.map((singleMessage) => {
+    //       singleMessage.createdAt = singleMessage.createdAt.seconds * 1000;
+    //       return singleMessage;
+    //     });
+    //     setMessages(newMessages);
+    //   });
+
+    // return function cleanupBeforeUnmounting() {
+    //   unsubscribeFromNewSnapshots();
+    // };
+
+
+navigation.setOptions({ headerTitle: route.params.group.name, headerRight: () => (
+      <View style={{flexDirection: 'row'}} > 
+
+    
+      <Pressable onPress={() => navigation.navigate('ChatDetails', { group: group })} style={styles.headerButtonRight}>
+          <Ionicons name="information-circle" size={30} color={COLORS.yellow}/>
+        </Pressable>
+
+       <Pressable onPress={() => navigation.navigate('GroupAvailability', { group: group })} style={styles.headerButtonRight}>
+          <Ionicons name="calendar" size={30} color={COLORS.yellow}/>
+      </Pressable>
+          </View> 
+
+
+          ), });
+
+
+    return [unsubscribe, route.params.group.name];
   }, []);
 
   // firebase onsend or non-firebase onsend
@@ -190,17 +223,31 @@ export default function Chat({ navigation, route }) {
   }, []);
 
 
+ function renderSend(props) {
+    return (
+      <Send {...props}>
+        <View style={styles.sendButton}>
+            <Ionicons name="arrow-up-outline" size={23} color='white'/>
+        </View>
+      </Send>
+    );
+  }
+
+ // <View style={styles.header}>
+ //        <Pressable style={styles.headerButtonLeft} onPress={() => navigation.goBack()}>
+ //          <Text style={styles.backButtonText}>{'< Back'}</Text>
+ //        </Pressable>
+ //        <Text style={styles.headerTitle} numberOfLines={1}>{route.params.group.name}</Text>
+ //        <Pressable onPress={() => navigation.navigate('ChatDetails', { group: group })} style={styles.headerButtonRight}>
+ //          <Ionicons name="information-circle-outline" size={30} color={COLORS.yellow}/>
+ //        </Pressable>
+ //      </View>
+
   return (
     <View style={styles.container}> 
-      <View style={styles.header}>
-        <Pressable style={styles.headerButtonLeft} onPress={() => navigation.goBack()}>
-          <Text style={styles.backButtonText}>{'< back'}</Text>
-        </Pressable>
-        <Text style={styles.headerTitle} numberOfLines={1}>{route.params.group.name}</Text>
-        <Pressable onPress={() => navigation.navigate('ChatDetails', { group: group })} style={styles.headerButtonRight}>
-          <Ionicons name="information-circle-outline" size={30} color={COLORS.iosBlue}/>
-        </Pressable>
-      </View>
+      {/*<Pressable onPress={() => navigation.navigate('GroupAvailability', { group: group })} style={styles.header}>
+          <Text style={styles.headerTitle}>See when everyone's free</Text>
+      </Pressable>*/}
       <GiftedChat
         // renderInputToolbar={props => customtInputToolbar(props)}
         bottomOffset={80} // This is probably bad but can't worry about right now
@@ -214,6 +261,9 @@ export default function Chat({ navigation, route }) {
         inverted={true}
         showUserAvatar={true}
         renderUsernameOnMessage={true}
+        alwaysShowSend
+        placeholder="Send a message!"
+        renderSend={renderSend}
       />
     </View>
   );
@@ -222,35 +272,47 @@ export default function Chat({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fcfcfc'
+    backgroundColor: '#fcfcfc',
   },
   header: {
     width: '100%',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    height: '15%',
-    backgroundColor: 'white',
-    paddingTop: '10%', // Feels kind of bad,
-    flexDirection: 'row'
+   // justifyContent: 'center',
+    height: 40,
+    backgroundColor: COLORS.yellow,
+   // paddingTop: '10%', // Feels kind of bad,
   },
   headerTitle: {
     fontWeight: 'bold',
-    fontSize: 22,
-    maxWidth: '55%',
+    fontSize: 15,
+    alignItems: 'center',
+    color: 'white',
+    padding:10,
   },
   backButtonText: {
     color: COLORS.iosBlue,
-    fontSize: 20,
+    fontSize: 15,
   },
   headerButtonLeft: {
-    width: 100,
+    width: 60,
     paddingLeft: 10
   },
   headerButtonRight: {
-    width: 100,
+    width: 40,
     alignItems: 'flex-end',
-    paddingRight: 20
-  }
+    //paddingRight: 5,
+  },
+   sendButton: {
+    backgroundColor: COLORS.yellow,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    right: 15,
+    bottom: 8 // Don't love this. Should change.
+  },
 })
 
 // const customtInputToolbar = props => {

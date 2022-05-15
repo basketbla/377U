@@ -20,9 +20,11 @@ export const cleanNumber = (phoneNumber) => {
 
 export const COLORS = {
   grey: "#808080",
-  blue: "#4275ff",
+  //blue: "#4275ff",
+  blue: "#FDC93A",
   random: "#233D4D",
-  darkGrey: "#5e5e5e",
+  darkGrey: "#8F8D8F",
+  //darkGrey: "#5e5e5e",
   medGrey: "#e8e8e8",
   lightGrey: "#efeff0",
   iosBlue: "#007AFF",
