@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, Pressable } from 'react-native'
-import React, { useState, useCallback, useEffect } from "react";
+import { StyleSheet, Text, View, Pressable, Platform } from 'react-native'
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { GiftedChat, InputToolbar } from "react-native-gifted-chat";
 import firebase from "@firebase/app";
 import { addMessageByObj, getCurrentUser, getGroup } from '../utils/firebase';
@@ -21,9 +21,10 @@ Notifications.setNotificationHandler({
 });
 
 export default function Chat({ navigation, route }) {
-
   const [expoPushToken, setExpoPushToken] = useState('');
-  const [notification, setNotification] = useState(false);
+  // const [notification, setNotification] = useState(false);
+  // console.log('i get here')
+  console.log(expoPushToken)
   const notificationListener = useRef();
   const responseListener = useRef();
   
@@ -56,24 +57,13 @@ export default function Chat({ navigation, route }) {
     };
   }, []);
 
-  // async function schedulePushNotification() {
-  //   await Notifications.scheduleNotificationAsync({
-  //     content: {
-  //       title: "You've got mail! 📬",
-  //       body: 'Here is the notification body',
-  //       data: { data: 'goes here' },
-  //     },
-  //     trigger: { seconds: 2 },
-  //   });
-  // }
-
   // Can use this function below, OR use Expo's Push Notification Tool-> https://expo.dev/notifications
   async function sendPushNotification(expoPushToken) {
     const message = {
       to: expoPushToken,
       sound: 'default',
-      title: 'Original Title',
-      body: 'And here is the body!',
+      title: 'You got a message on Din Din!',
+      body: 'Someone requested you to go on an adventure',
       data: { someData: 'goes here' },
     };
 
@@ -88,6 +78,7 @@ export default function Chat({ navigation, route }) {
     });
   }
 
+  //how to make sure you have the right credentials to get notifications
   async function registerForPushNotificationsAsync() {
     let token;
     if (Device.isDevice) {
@@ -103,6 +94,7 @@ export default function Chat({ navigation, route }) {
       }
       token = (await Notifications.getExpoPushTokenAsync()).data;
       console.log(token);
+      this.setState({ expoPushToken: token });
     } else {
       alert('Must use physical device for Push Notifications');
     }
@@ -118,6 +110,17 @@ export default function Chat({ navigation, route }) {
   
     return token;
   }
+
+  // async function schedulePushNotification() {
+  //   await Notifications.scheduleNotificationAsync({
+  //     content: {
+  //       title: "You've got mail! 📬",
+  //       body: 'Here is the notification body',
+  //       data: { data: 'goes here' },
+  //     },
+  //     trigger: { seconds: 2 },
+  //   });
+  // }
 
   useEffect(() => {
     // Kind of can't test this well right now. TODO: TEST WITH TWO PHONES
