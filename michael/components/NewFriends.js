@@ -389,12 +389,13 @@ const styles = StyleSheet.create({
 
   sectionHeader: {
     width: '100%',
-    height: 30,
+    height: 35,
     backgroundColor: 'white',
     color: 'black',
     fontWeight: 'bold',
     fontSize: 20,
     marginLeft: 10,
+    paddingTop: 7,
   },
   deniedText: {
     color: COLORS.grey,

@@ -146,7 +146,7 @@ export default function People({ navigation }) {
       {
         friendsToDisplay.length === 0 ?
         <View style={styles.noFreeContainer}>
-          <Text style={styles.noFreeText}>{search.length === 0 ? "No one is free right now :(" : "No matching users are free"}</Text>
+          <Text style={styles.noFreeText}>{search.length === 0 ? "No one is free right now..." : "No matching users are free"}</Text>
         </View>
         :
         <FlatList
@@ -162,7 +162,7 @@ export default function People({ navigation }) {
       <Text style={styles.groupLabel}>Conversations</Text>
       {
         groupsToDisplay.length === 0 ?
-        <Text style={styles.noFriendsText}>{search.length === 0 ? "You don't have any groups right now..." : "No groups with matching user"}</Text>
+        <Text style={styles.noFriendsText}>{search.length === 0 ? "Create a group chat with the button in the top-right!" : "No groups with matching user                "}</Text> //need space for formatting
         :
         <FlatList
           // data={[{name: 'All Friends', numFree: 5, totalNum: 10, id: '1'}, {name: 'Roommates', numFree: 3, totalNum: 5, id: '2'}, {name: 'Foodies', numFree: 2, totalNum: 6, id: '3'}]}
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
   },
   freeNowContainer: {
     paddingRight: 20,
-    height: 120,
+    height: 100,
 
   },
   profilePic: {
@@ -248,6 +248,7 @@ const styles = StyleSheet.create({
   },
   groupList: {
     width: '100%',
+
   },
   groupEntry: {
     width: '100%',
@@ -255,7 +256,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: COLORS.lightGrey,
     flexDirection: 'row',
- //   justifyContent: 'space-between',
+    justifyContent: 'space-between',
     alignItems: 'center',
     paddingLeft: 15,
     paddingRight: 40,
@@ -275,6 +276,7 @@ const styles = StyleSheet.create({
     color: COLORS.darkGrey
   },
   groupEntryTextContainer: {
+
   },
   contactButton: {
     borderWidth: 1,
@@ -288,20 +290,27 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   noFriendsText: {
-    fontSize: 20,
+    justifyContent: 'center',
+    fontSize: 18,
     color: COLORS.darkGrey,
-    fontWeight: 'bold',
-    marginTop: 30,
-    width: '80%',
-    textAlign: 'center'
+    //fontWeight: 'bold',
+    marginTop: 2,
+    paddingLeft:15,
+    paddingRight:15,
+    textAlign: 'left',
   },
   noFreeContainer: {
-    height: 125,
-    justifyContent: 'center'
+    height: 80,
+    width: '100%',
+
   },
   noFreeText: {
-    fontSize: 15,
+    fontSize: 18,
     color: COLORS.darkGrey,
-    fontWeight: 'bold',
+    //fontWeight: 'bold',
+    marginTop: 2,
+    textAlign: 'left',
+    paddingLeft:15,
+    paddingRight:15,
   }
 })

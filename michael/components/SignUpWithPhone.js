@@ -137,7 +137,7 @@ export default function SignUpWithPhone() {
           firebaseConfig={app.options}
           attemptInvisibleVerification
         />
-        <Text style={styles.explainer}>Create an account with your phone number</Text>
+        <Text style={styles.explainer}>Sign-in with your phone number</Text>
         {
           codeSent ?
           <>
@@ -213,7 +213,8 @@ export default function SignUpWithPhone() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center'
+    alignItems: 'center',
+    //backgroundColor: 'white'
   },
   logo: {
     fontSize: 50,
@@ -226,7 +227,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 90,
     marginBottom: 40,
-    margin:15
+    margin:25
   },
   enterCodeText: {
     color: 'black',

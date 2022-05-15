@@ -168,16 +168,17 @@ export default function CalendarSync({ navigation }) {
     
     return retEvents;
   }
+    return null;
 
-  
 
+{/*
   return (
     <>
       <Text>CALENDARSYNC signinnnnn</Text>
     </>
-    
+      )*/}
 
-  )
+
 }
 
 function convertDate(date) {

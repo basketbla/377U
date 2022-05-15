@@ -138,7 +138,7 @@ export default function OldFriends({ navigation }) {
       />
       {
         friends.length === 0 ?
-        <Text style={{flex: 1, fontSize: 20, color: COLORS.darkGrey}}>You have no friends :(</Text>
+        <Text style={{marginTop: 10, flex: 1, fontSize: 18, color: COLORS.darkGrey}}>You have no friends yet :(</Text>
         :
         <>
           {

@@ -92,7 +92,7 @@ export default function AddProfilePic({navigation}) {
   const confirmPhoto = (uri) => {
     Alert.alert(
       "Confirm Photo",
-      "Is this photo good or do you want to select a different one?",
+      "Do you want to save this photo?",
       [
         { text: "Cancel", onPress: () => setImage(DEFUALT_PROFILE_PIC), style: "cancel" },
         {
@@ -170,7 +170,7 @@ export default function AddProfilePic({navigation}) {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <Text style={styles.header}>Add Profile Picture</Text>
+        <Text style={styles.header}>Add a Profile Picture</Text>
         <Pressable style={{position: 'relative'}} onPress={photoAlert}>
           <Image
             style={styles.profilePic}
@@ -194,8 +194,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: 'white',
-    paddingTop: '20%'
+    //backgroundColor: 'white',
   },
   profilePic: {
     width: 200,
@@ -301,11 +300,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   header: {
-    marginTop: 20,
-    fontWeight: 'bold',
-    fontSize: 25,
-    marginBottom: '20%',
     color: COLORS.grey,
+    textAlign: 'center', 
+    fontSize: 25,
+    fontWeight: 'bold',
+    marginTop: '20%',
+    marginBottom: '5%',
+    margin:20
   },
   nextButton: {
     width: '80%',

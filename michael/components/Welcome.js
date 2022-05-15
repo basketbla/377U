@@ -6,7 +6,8 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   ActivityIndicator,
-  Pressable
+  Pressable,
+  Image,
 } from 'react-native'
 import React, {
   useState,
@@ -19,6 +20,8 @@ import { useAuth } from '../contexts/AuthContext';
 import PhoneInput from "react-native-phone-number-input";
 import { FirebaseRecaptchaVerifierModal, FirebaseRecaptchaBanner } from 'expo-firebase-recaptcha';
 import { PhoneAuthProvider, signInWithCredential } from 'firebase/auth';
+import { initializeApp } from 'firebase/app'; //validate yourself
+
 import { app, auth } from '../utils/firebase';
 
 export default function Welcome({navigation}) {
@@ -26,7 +29,13 @@ export default function Welcome({navigation}) {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <Text style={[styles.header,{paddingTop: '20%'}]}>Welcome to dindin!</Text>
+        <Image
+          style={{marginTop: '20%', marginBottom: '10%', width: '90%', height: '45%'}}
+          source={{
+            uri: 'https://firebasestorage.googleapis.com/v0/b/michael-b65b3.appspot.com/o/welcomeCoffee.png?alt=media&token=b91e39ea-53b2-4202-a3c6-ad78cbdc953a' 
+          }}
+        />
+        <Text style={[styles.header,{paddingTop: '2%'}]}>Welcome to dindin!</Text>
         <Text style={styles.explainer}>Find shared time with your friends, without all the hassle.</Text>
         <Pressable style={styles.nextButton} onPress={() => navigation.navigate('SignUpWithPhone')}>
           <Text style={styles.nextLabel}>Get started</Text>
@@ -41,26 +50,24 @@ const styles = StyleSheet.create({
  container: {
     flex: 1,
     alignItems: 'center',
+    backgroundColor: 'white',
   },
-  logo: {
-    fontSize: 50,
-    marginTop: 100,
-  },
+
    header: {
     fontWeight: 'bold',
     fontSize: 30,
-    marginBottom: '5%',
+    marginBottom: 7,
     alignItems: 'center', 
     justifyContent: 'center',
+    //color: COLORS.darkGrey,
   },
   explainer: {
     color: COLORS.grey,
     fontWeight: 'bold',
-    marginTop: 20,
-    marginBottom: 50,
+    marginBottom: 20,
     textAlign: 'center', 
-    width: '80%', 
-    fontSize: 14,
+    width: '90%', 
+    fontSize: 15,
   },
   nextButton: {
     width: '80%',
@@ -69,7 +76,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center', 
     justifyContent: 'center',
-    marginTop: 20,
+    marginTop: 10,
   },
   disabledNextButton: {
     width: '80%',

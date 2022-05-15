@@ -205,7 +205,7 @@ export default function ContactsPageNew({ navigation }) {
       setAllExistingAccounts(existingAccounts);
       setAllOtherContacts(otherContacts);
       setAllFriendRequests(friendRequests);
-      setSectionData([{title: `Friend Requests (${friendRequests.length})`, data: friendRequests, renderItem: renderFriendRequest}, {title: `Contacts on Din Din (${existingAccounts.length})`, data: existingAccounts, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
+      setSectionData([{title: `Friend Requests (${friendRequests.length})`, data: friendRequests, renderItem: renderFriendRequest}, {title: `Contacts on dindin (${existingAccounts.length})`, data: existingAccounts, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
       
       setContactStatus(status);
     }
@@ -268,7 +268,7 @@ export default function ContactsPageNew({ navigation }) {
 
     // change this to actually get friend requests
     let friendRequests = allFriendRequests.filter(item => (item.name.toLowerCase().includes(text) || item.username.toLowerCase().includes(text)));
-    setSectionData([{title: `Friend Requests(${friendRequests.length})`, data: friendRequests, renderItem: renderFriendRequest }, {title: `Contacts on Din Din (${existing.length})`, data: existing, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
+    setSectionData([{title: `Friend Requests(${friendRequests.length})`, data: friendRequests, renderItem: renderFriendRequest }, {title: `Contacts on dindin (${existing.length})`, data: existing, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
   }
 
   if (pageLoading) {
@@ -282,6 +282,9 @@ export default function ContactsPageNew({ navigation }) {
   if (contactStatus === 'granted') {
     return (
       <View style={styles.container}>
+      <View style={{paddingLeft: 15, paddingRight: 15, width: '100%'}}>
+        <Text style={styles.header}>Add and invite your friends :)</Text>
+        </View>
         <SearchBar
           placeholder="Search Contacts"
           onChangeText={handleSearch}
@@ -336,7 +339,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
-    paddingTop: 50
+    paddingTop: '15%',
+  },
+   header: {
+    color: 'grey',
+    fontWeight: 'bold',
+    fontSize: 20,
   },
   search: {
     //width: '95%',
@@ -351,7 +359,7 @@ const styles = StyleSheet.create({
     alignItems: 'center', 
     justifyContent: 'center',
     marginBottom: 20,
-    marginTop: 10,
+    marginTop: 15,
   },
   nextLabel: {
     fontWeight: 'bold',
@@ -391,15 +399,19 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 
-  sectionHeader: {
+
+
+    sectionHeader: {
     width: '100%',
-    height: 30,
+    height: 35,
     backgroundColor: 'white',
     color: 'black',
     fontWeight: 'bold',
     fontSize: 20,
     marginLeft: 10,
+    paddingTop: 7,
   },
+
   deniedText: {
     color: COLORS.grey,
     fontWeight: 'bold',
