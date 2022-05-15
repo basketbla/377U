@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Pressable } from 'react-native'
 import React, { useState, useCallback, useEffect } from "react";
-import { GiftedChat, InputToolbar } from "react-native-gifted-chat";
+import { GiftedChat, InputToolbar, Send } from "react-native-gifted-chat";
 import firebase from "@firebase/app";
 import { addMessageByObj, getCurrentUser, getGroup } from '../utils/firebase';
 import { useAuth } from '../contexts/AuthContext';
@@ -23,8 +23,8 @@ Notifications.setNotificationHandler({
 export default function Chat({ navigation, route }) {
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState(false);
-  const notificationListener = useRef();
-  const responseListener = useRef();
+  // const notificationListener = useRef();
+  // const responseListener = useRef();
   
   const { group } = route.params;
   const { userFirebaseDetails } = useAuth();
@@ -41,64 +41,65 @@ export default function Chat({ navigation, route }) {
   const { chatname } = "hello, world"; //name of the chat group 
   // console.log(firebase.auth().currentUser);
 
-  useEffect(() => { //messaging
-    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
 
-    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-      setNotification(notification);
-    });
+  // useEffect(() => { //messaging
+  //   registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
 
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log(response);
-    });
+  //   notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+  //     setNotification(notification);
+  //   });
 
-    return () => {
-      Notifications.removeNotificationSubscription(notificationListener.current);
-      Notifications.removeNotificationSubscription(responseListener.current);
-    };
-  }, []);
+  //   responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+  //     console.log(response);
+  //   });
 
-  async function schedulePushNotification() {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "You've got mail! 📬",
-        body: 'Here is the notification body',
-        data: { data: 'goes here' },
-      },
-      trigger: { seconds: 2 },
-    });
-  }
+  //   return () => {
+  //     Notifications.removeNotificationSubscription(notificationListener.current);
+  //     Notifications.removeNotificationSubscription(responseListener.current);
+  //   };
+  // }, []);
 
-  async function registerForPushNotificationsAsync() {
-    let token;
-    if (Device.isDevice) {
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-      if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-      if (finalStatus !== 'granted') {
-        alert('Failed to get push token for push notification!');
-        return;
-      }
-      token = (await Notifications.getExpoPushTokenAsync()).data;
-      console.log(token);
-    } else {
-      alert('Must use physical device for Push Notifications');
-    }
+  // async function schedulePushNotification() {
+  //   await Notifications.scheduleNotificationAsync({
+  //     content: {
+  //       title: "You've got mail! 📬",
+  //       body: 'Here is the notification body',
+  //       data: { data: 'goes here' },
+  //     },
+  //     trigger: { seconds: 2 },
+  //   });
+  // }
+
+  // async function registerForPushNotificationsAsync() {
+  //   let token;
+  //   if (Device.isDevice) {
+  //     const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  //     let finalStatus = existingStatus;
+  //     if (existingStatus !== 'granted') {
+  //       const { status } = await Notifications.requestPermissionsAsync();
+  //       finalStatus = status;
+  //     }
+  //     if (finalStatus !== 'granted') {
+  //       alert('Failed to get push token for push notification!');
+  //       return;
+  //     }
+  //     token = (await Notifications.getExpoPushTokenAsync()).data;
+  //     console.log(token);
+  //   } else {
+  //     alert('Must use physical device for Push Notifications');
+  //   }
   
-    if (Platform.OS === 'android') {
-      Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#FF231F7C',
-      });
-    }
+  //   if (Platform.OS === 'android') {
+  //     Notifications.setNotificationChannelAsync('default', {
+  //       name: 'default',
+  //       importance: Notifications.AndroidImportance.MAX,
+  //       vibrationPattern: [0, 250, 250, 250],
+  //       lightColor: '#FF231F7C',
+  //     });
+  //   }
   
-    return token;
-  }
+  //   return token;
+  // }
 
   useEffect(() => {
     // Kind of can't test this well right now. TODO: TEST WITH TWO PHONES
@@ -139,14 +140,23 @@ export default function Chat({ navigation, route }) {
 
 
 navigation.setOptions({ headerTitle: route.params.group.name, headerRight: () => (
-            <Pressable onPress={() => navigation.navigate('ChatDetails', { group: group })} style={styles.headerButtonRight}>
+      <View style={{flexDirection: 'row'}} > 
+
+    
+      <Pressable onPress={() => navigation.navigate('ChatDetails', { group: group })} style={styles.headerButtonRight}>
           <Ionicons name="information-circle" size={30} color={COLORS.yellow}/>
         </Pressable>
+
+       <Pressable onPress={() => navigation.navigate('GroupAvailability', { group: group })} style={styles.headerButtonRight}>
+          <Ionicons name="calendar" size={30} color={COLORS.yellow}/>
+      </Pressable>
+          </View> 
+
+
           ), });
 
 
     return [unsubscribe, route.params.group.name];
-
   }, []);
 
   // firebase onsend or non-firebase onsend
@@ -157,6 +167,15 @@ navigation.setOptions({ headerTitle: route.params.group.name, headerRight: () =>
   }, []);
 
 
+ function renderSend(props) {
+    return (
+      <Send {...props}>
+        <View style={styles.sendButton}>
+            <Ionicons name="arrow-up-outline" size={23} color='white'/>
+        </View>
+      </Send>
+    );
+  }
 
  // <View style={styles.header}>
  //        <Pressable style={styles.headerButtonLeft} onPress={() => navigation.goBack()}>
@@ -170,12 +189,9 @@ navigation.setOptions({ headerTitle: route.params.group.name, headerRight: () =>
 
   return (
     <View style={styles.container}> 
-
-      <Pressable onPress={() => navigation.navigate('GroupAvailability', { group: group })} style={styles.headerButtonRight}>
-          <Text>Availability</Text>
-      </Pressable>
-
-
+      {/*<Pressable onPress={() => navigation.navigate('GroupAvailability', { group: group })} style={styles.header}>
+          <Text style={styles.headerTitle}>See when everyone's free</Text>
+      </Pressable>*/}
       <GiftedChat
         // renderInputToolbar={props => customtInputToolbar(props)}
         bottomOffset={80} // This is probably bad but can't worry about right now
@@ -189,6 +205,9 @@ navigation.setOptions({ headerTitle: route.params.group.name, headerRight: () =>
         inverted={true}
         showUserAvatar={true}
         renderUsernameOnMessage={true}
+        alwaysShowSend
+        placeholder="Send a message!"
+        renderSend={renderSend}
       />
     </View>
   );
@@ -197,21 +216,22 @@ navigation.setOptions({ headerTitle: route.params.group.name, headerRight: () =>
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fcfcfc'
+    backgroundColor: '#fcfcfc',
   },
   header: {
     width: '100%',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    height: '15%',
-    backgroundColor: 'white',
-    paddingTop: '10%', // Feels kind of bad,
-    flexDirection: 'row'
+   // justifyContent: 'center',
+    height: 40,
+    backgroundColor: COLORS.yellow,
+   // paddingTop: '10%', // Feels kind of bad,
   },
   headerTitle: {
     fontWeight: 'bold',
-    fontSize: 20,
-    maxWidth: '70%',
+    fontSize: 15,
+    alignItems: 'center',
+    color: 'white',
+    padding:10,
   },
   backButtonText: {
     color: COLORS.iosBlue,
@@ -222,10 +242,21 @@ const styles = StyleSheet.create({
     paddingLeft: 10
   },
   headerButtonRight: {
-    width: 60,
+    width: 40,
     alignItems: 'flex-end',
     //paddingRight: 5,
-  }
+  },
+   sendButton: {
+    backgroundColor: COLORS.yellow,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    right: 15,
+    bottom: 8 // Don't love this. Should change.
+  },
 })
 
 // const customtInputToolbar = props => {

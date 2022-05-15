@@ -394,6 +394,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'absolute',
     right: 15,
-    bottom: 8 // Don't love this. Should change.
+    bottom: 8, // Don't love this. Should change.
   },
 })

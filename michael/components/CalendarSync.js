@@ -43,7 +43,7 @@ export default function CalendarSync({ navigation }) {
       const { status } = await Calendar.requestCalendarPermissionsAsync();
       if (status === 'granted') {
         
-        let interval = 0; //DEFAULT 7, 0 for one day
+        let interval = 7; //DEFAULT 7, 0 for one day
         let freeSlots = await findEvents(interval);
 
       }

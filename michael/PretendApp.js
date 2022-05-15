@@ -207,7 +207,7 @@ function ProfileNav() {
       <Stack.Screen name="ProfileMain" component={Profile} options={{ headerShown: false }}/>
       <Stack.Screen name="EditProfile" component={EditProfile} 
         options={{
-          headerTitle: props => <Text>Edit Profile</Text>,
+          headerTitle: props => <Text style={{fontWeight: 'bold', fontSize: 20}}>Edit Profile</Text>,
         }}
       />
     </Stack.Navigator>

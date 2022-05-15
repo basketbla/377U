@@ -24,7 +24,7 @@ export default function AddCalendar({ navigation }) {
       const { status } = await Calendar.requestCalendarPermissionsAsync();
       if (status === 'granted') {
         //TODO: CHANGE TO 14!!
-        let interval = 0; //DEFAULT 7, 0 for one day
+        let interval = 7; //DEFAULT 7, 0 for one day
         let meetingInterval = 1; //how many hours do you want to meet for? or: min amount of time for a slot to show up?
         let events = await accessCalendars();
       }

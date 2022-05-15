@@ -71,7 +71,7 @@ export default function Profile({ navigation }) {
         <Text style={styles.name}>{userDetails.name}</Text>
         <Text style={styles.username}>{`@${userDetails.username}`}</Text>
       </Pressable>
-      <View style={styles.freeButtonContainer}>
+{/*      <View style={styles.freeButtonContainer}>
         <Text style={styles.freeButtonLabel}>
           {
             isFree ? "Available" : "Unavailable"
@@ -84,7 +84,7 @@ export default function Profile({ navigation }) {
           onValueChange={handleChangeAvailability}
           value={isFree}
         />
-      </View>
+      </View>*/}
       <Button title="Sign Out" onPress={confirmSignOut}/>
     </View>
   )
@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'white',
   },
   clickableProfile: {
     alignItems: 'center', 

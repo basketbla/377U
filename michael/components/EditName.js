@@ -17,7 +17,7 @@ export default function EditName({ navigation, route }) {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
-        <Button onPress={() => navigation.goBack()} title="cancel" />
+        <Button onPress={() => navigation.goBack()} title="Cancel" />
       ),
       headerRight: () => (
         <Button onPress={async () => {

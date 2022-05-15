@@ -158,12 +158,13 @@ export default function GroupAvailability({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text>Pick a time! According to your calendars, you are all free during these times!</Text>
+      <Text style={styles.headerText}>Your whole group is free during these times, according to your Google Calendars.</Text>
+      <Text style={styles.detailText}>Suggested Times</Text>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           {suggestedSlots.map((slot, i) =>
                        
               <Pressable key={i} style={[styles.buttonText]}>
-                <Text>{beautifyDate(slot.startDate, true)} - {beautifyDate(slot.endDate, false)}</Text>
+                <Text>{beautifyDate(slot.startDate, slot.endDate)}</Text>
                 
               </Pressable>
                       
@@ -171,14 +172,14 @@ export default function GroupAvailability({ route, navigation }) {
           </ScrollView>  
           <Pressable
             on> 
-            <Text>All Available Times: </Text>
+            <Text style={styles.detailText}>All Available Times: </Text>
           </Pressable>
 
           <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           {freeSlots.map((slot, i) =>
                        
               <Pressable key={i} style={[styles.buttonText]}>
-                <Text>{beautifyDate(slot.startDate, true)} - {beautifyDate(slot.endDate, false)}</Text>
+                <Text>{beautifyDate(slot.startDate, slot.endDate)}</Text>
                 
               </Pressable>
                       
@@ -212,18 +213,36 @@ function pickFreeSlots(freeSlots) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'space-around',
+    //alignItems: 'center',
+    //justifyContent: 'space-around',
+    backgroundColor: 'white',
+    paddingLeft: 15,
+    paddingRight: 15,
   },
+   headerText: {
+    marginTop:15,
+    color: COLORS.darkGrey,
+    fontSize:14,
+
+ },
+    detailText: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: COLORS.black,
+    marginTop: 25,
+    marginBottom: 1,
+  },
+
+ 
   buttonText: {
-    width: '80%',
-    backgroundColor: COLORS.blue,
-    height: 50,
-    borderRadius: 5,
+    backgroundColor: COLORS.yellow,
+    height: 40,
     alignItems: 'center', 
     justifyContent: 'center',
-    marginBottom: 20,
     marginTop: 10,
+    paddingLeft:8,
+    paddingRight:8,
+    borderRadius: 10,
   },
   nextLabel: {
     fontWeight: 'bold',
@@ -232,32 +251,48 @@ const styles = StyleSheet.create({
 })
 
 
-function beautifyDate(date, isStart) {
-  date = new Date(date);
-  let min = date.getMinutes();
-  if (min < 10) {
-    min.toString();
-    min = "0" + min;
+function beautifyDate(start, end) {
+  start = new Date(start);
+  let minStart = start.getMinutes();
+  if (minStart < 10) {
+    minStart.toString();
+    minStart = "0" + minStart;
   }
 
-  let hour = date.getHours();
-  let m = "AM";
-  if (hour == 12) {
-    m = "PM";
-  } else if (hour > 12) 
+  let hourStart = start.getHours();
+  let mStart = "AM";
+  if (hourStart == 12) {
+    mStart = "PM";
+  } else if (hourStart > 12) 
   {
-    hour -= 12;
-    m = "PM";
+    hourStart -= 12;
+    mStart = "PM";
   }
 
-  if (!isStart) {
-    return hour + ":" + min + " " + m;
+
+  end = new Date(end);
+
+  let minEnd = end.getMinutes();
+  if (minEnd < 10) {
+    minEnd.toString();
+    minEnd = "0" + minEnd;
   }
+
+  let hourEnd = end.getHours();
+  let mEnd = "AM";
+  if (hourEnd == 12) {
+    mEnd = "PM";
+  } else if (hourEnd > 12) 
+  {
+    hourEnd -= 12;
+    mEnd = "PM";
+  }
+
   const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul","Aug", "Sep", "Oct", "Nov", "Dec"];
   
-  const day = date.getDay();
-  const month = date.getMonth();
+  const day = start.getDay();
+  const month = start.getMonth();
   
-  return days[day] + ", " + months[month] + " " + date.getDate() + " " + hour + ":" + min + " " + m;
+  return days[day] + ", " + months[month] + " " + start.getDate() + " " + hourStart + ":" + minStart + " " + mStart + " - " + hourEnd + ":" + minEnd + " " + mEnd;
 }

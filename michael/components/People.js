@@ -159,7 +159,7 @@ export default function People({ navigation }) {
           showsHorizontalScrollIndicator={false}
         />
       }
-      <Text style={styles.freeLabel}>Conversations</Text>
+      <Text style={styles.groupLabel}>Conversations</Text>
       {
         groupsToDisplay.length === 0 ?
         <Text style={styles.noFriendsText}>{search.length === 0 ? "You don't have any groups right now..." : "No groups with matching user"}</Text>
@@ -197,8 +197,8 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   addGroup: {
-    // flexDirection: 'row',
-    // alignItems: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   addText: {
     color: COLORS.darkGrey,
@@ -206,6 +206,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   freeLabel: {
+    marginRight: 'auto',
+    marginLeft: 15,
+    fontWeight: 'bold',
+    fontSize: 20,
+    marginBottom: 10,
+
+  },
+  groupLabel: {
     marginRight: 'auto',
     marginLeft: 15,
     fontWeight: 'bold',
@@ -219,12 +227,14 @@ const styles = StyleSheet.create({
   },
   freeNowList: {
     width: '100%',
-    height: 100,
     flexGrow: 0,
     marginBottom: 10,
+
   },
   freeNowContainer: {
     paddingRight: 20,
+    height: 120,
+
   },
   profilePic: {
     width: 60,
@@ -243,15 +253,16 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 70,
     borderTopWidth: 1,
-    borderTopColor: COLORS.grey,
+    borderTopColor: COLORS.lightGrey,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+ //   justifyContent: 'space-between',
     alignItems: 'center',
     paddingLeft: 15,
     paddingRight: 40,
   },
+
   groupListContainer: {
-    borderBottomColor: COLORS.grey,
+    borderBottomColor: COLORS.lightGrey,
     borderBottomWidth: 1,
   },
   groupEntryName: {
@@ -285,7 +296,7 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   noFreeContainer: {
-    height: 100,
+    height: 125,
     justifyContent: 'center'
   },
   noFreeText: {
