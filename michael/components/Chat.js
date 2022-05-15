@@ -97,12 +97,12 @@ export default function Chat({ navigation, route }) {
     });
   }
 
-  async function schedulePushNotification() {
+  async function schedulePushNotification(messageBody) {
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: "You've got mail! 📬",
-        body: 'Here is the notification body',
-        data: { data: 'goes here' },
+        title: "You got a message on Din Din! 📬",
+        body: 'Here is the notification body ', messageBody,
+        data: { data: messageBody },
       },
       trigger: { seconds: 2 },
     });
@@ -178,12 +178,14 @@ export default function Chat({ navigation, route }) {
   }, []);
 
   // firebase onsend or non-firebase onsend
-  //** Dvaid's changes added async to it
+  //** David's changes added async to it
   const onSend = useCallback(async (messages = []) => {
     addMessageByObj(group.id, messages[0]);
     console.log('message reached here1 ', expoPushToken)
     // await sendPushNotification(expoPushToken)
+    let messageBody = messages[0]
     schedulePushNotification()
+    // await schedulePushNotification(messageBody)
     console.log('message reached here2 ', expoPushToken)
   }, []);
 
