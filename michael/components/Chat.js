@@ -21,8 +21,27 @@ Notifications.setNotificationHandler({
 });
 
 export default function Chat({ navigation, route }) {
+  // state = {
+  //   notification: {},
+  // };
+
+  // // componentDidMount() {
+  //   registerForPushNotificationsAsync();
+
+  //   Notifications.addNotificationReceivedListener(this._handleNotification);
+    
+  //   Notifications.addNotificationResponseReceivedListener(this._handleNotificationResponse);
+  // }
+
+  // _handleNotification = notification => {
+  //   this.setState({ notification: notification });
+  // };
+
+  // _handleNotificationResponse = response => {
+  //   console.log(response);
+  // };
   const [expoPushToken, setExpoPushToken] = useState('');
-  // const [notification, setNotification] = useState(false);
+  const [notification, setNotification] = useState(false);
   // console.log('i get here')
   console.log(expoPushToken)
   const notificationListener = useRef();
@@ -78,6 +97,17 @@ export default function Chat({ navigation, route }) {
     });
   }
 
+  async function schedulePushNotification() {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "You've got mail! 📬",
+        body: 'Here is the notification body',
+        data: { data: 'goes here' },
+      },
+      trigger: { seconds: 2 },
+    });
+  }
+
   //how to make sure you have the right credentials to get notifications
   async function registerForPushNotificationsAsync() {
     let token;
@@ -93,7 +123,8 @@ export default function Chat({ navigation, route }) {
         return;
       }
       token = (await Notifications.getExpoPushTokenAsync()).data;
-      console.log(token);
+      console.log('this is token ', token);
+      console.log(expoPushToken)
       this.setState({ expoPushToken: token });
     } else {
       alert('Must use physical device for Push Notifications');
@@ -150,7 +181,10 @@ export default function Chat({ navigation, route }) {
   //** Dvaid's changes added async to it
   const onSend = useCallback(async (messages = []) => {
     addMessageByObj(group.id, messages[0]);
-    await sendPushNotification(expoPushToken)
+    console.log('message reached here1 ', expoPushToken)
+    // await sendPushNotification(expoPushToken)
+    schedulePushNotification()
+    console.log('message reached here2 ', expoPushToken)
   }, []);
 
 
