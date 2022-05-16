@@ -21,7 +21,7 @@ export default function GroupAvailability({ route, navigation }) {
     (async () => {
       console.log("hi");
       
-      let interval = 0; //DEFAULT 7, 0 for one day
+      let interval = 7; //DEFAULT 7, 0 for one day
       let meetingInterval = 1; //how many hours do you want to meet for? or: min amount of time for a slot to show up?
 
       let freeSlots = await findCalendarSlots(interval, meetingInterval);
@@ -46,15 +46,18 @@ export default function GroupAvailability({ route, navigation }) {
   async function findCalendarSlots(interval, meetingInterval) {
  
     let startInterval = new Date();
+
     startInterval.setDate(startInterval.getDate() + 1); //starting 'tomorrow'
-    startInterval.setHours(0, 0 , 0);
+    startInterval.setHours(earliestTime, 0 , 0); //at 8am
+    //startInterval.setHours(startInterval.getHours() + 1, 0 , 0); //starting at the next hour
 
     let endInterval = new Date();  
     endInterval.setDate(startInterval.getDate() + interval); 
     //default will look into all events after 'tomorrow' to a week later
-    endInterval.setHours(23, 59 , 59);
+    endInterval.setHours(latestTime, 0 , 0);
 
     let events = await accessCalendars();
+
     return getAvailability(events, startInterval.toISOString(), endInterval.toISOString(), meetingInterval);
   }
 
@@ -68,6 +71,7 @@ export default function GroupAvailability({ route, navigation }) {
 
       events = events.concat(userEvents);
       // console.log("FB CALENDAR OF ", user, " : ", userEvents);
+
     }
 
     setCalendars(events);
@@ -130,7 +134,7 @@ export default function GroupAvailability({ route, navigation }) {
 
     //breaks down the total free slots into chunks based on the interval set (1, 2, 3, hours, etc)
     freeSlots.forEach(function(free, index) {
-        let freeHours = new Date(free.endDate).getHours() - new Date(free.startDate).getHours();
+       /* let freeHours = new Date(free.endDate).getHours() - new Date(free.startDate).getHours();
         let freeStart = new Date(free.startDate);
         while( freeStart.getHours() + freeHours + freeInterval >= 0) { // 11 + 4 + 2 >= 0
             if( freeHours >= freeInterval ) {
@@ -148,7 +152,69 @@ export default function GroupAvailability({ route, navigation }) {
                 //add another one for 11 to 11:59pm 
             }
             freeHours--;
-        }
+        }*/
+
+        let freeStart = new Date(free.startDate);
+        let freeEnd = new Date(free.endDate);
+
+        let startHours = freeStart.getHours();
+        let endHours = freeEnd.getHours();
+
+        //let freeHours = endHours - startHours;
+        let freeHours = (freeEnd.getTime() - freeStart.getTime())/ 3600000; //getting time diff in milliseconds to avoid showing times like 2:45-3:15
+
+        if( Math.abs(freeHours) >= freeInterval ) {
+
+        if(freeStart.getDate() >= rootStart.getDate() && freeEnd.getDate() <= rootEnd.getDate()) { 
+
+            //if on same day
+            if (freeStart.getDate() == freeEnd.getDate()){
+               hourSlots.push({startDate:convertDate(freeStart), endDate: convertDate(freeEnd)});
+
+            } else {
+                  let night = new Date (free.startDate);
+                  night.setHours(latestTime,0,0);
+
+                  let morning = new Date (free.endDate);
+                  morning.setHours(earliestTime,0,0);
+
+                  console.log(convertDate(freeStart));
+
+
+                  if (freeStart.getHours() != night.getHours() ) {
+                    hourSlots.push({startDate:convertDate(freeStart), endDate: convertDate(night)});
+                  }
+
+                  if (freeEnd.getHours() != morning.getHours() ) {
+                    console.log(freeEnd.getHours());
+                    console.log(morning.getHours());
+
+                    hourSlots.push({startDate:convertDate(morning), endDate: convertDate(freeEnd)});
+                  }
+
+            }
+       }
+         //  }
+
+   {/*     if(startHours >= rootStart.getHours() && endHours <= rootEnd.getHours()) { 
+            if ((startHours >= earliestTime) && (endHours <= latestTime)) {
+              hourSlots.push({startDate:convertDate(freeStart), endDate: convertDate(freeEnd)});
+              temp = {};
+
+            } else if ((startHours >= earliestTime) && (endHours <= latestTime)) {
+              temp.night = new Date (free.startDate);
+              temp.night.setHours(latestTime);
+
+              temp.morning = new Date (free.endDate);
+              temp.morning.setHours(earliestTime);
+
+              hourSlots.push({startDate:convertDate(temp.s), endDate: convertDate(temp.night)});
+              hourSlots.push({startDate:convertDate(temp.morning), endDate: convertDate(temp.e)});
+
+            } 
+
+        }*/}
+      }
     })
     hourSlots.sort(
       (objA, objB) => new Date(objA.startDate) - new Date(objB.startDate),
