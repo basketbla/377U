@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "michael",
-    "slug": "michael",
+    "name": "dindin",
+    "slug": "dindin",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/dindinicon.png",
@@ -22,7 +22,7 @@
         "NSRemindersUsageDescription": "Requires calendar read access to easily import user availability"
       },
       "bundleIdentifier": "com.dindintheapp",
-      "buildNumber": 2
+      "buildNumber": "2"
     },
     "android": {
       "adaptiveIcon": {

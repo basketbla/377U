@@ -27,7 +27,7 @@ import { useFriends } from '../contexts/FriendsContext';
 
 export default function ContactsPageNew({ navigation }) {
 
-  const { currentUser } = useAuth();
+  const { currentUser, setIsNew } = useAuth();
 
   const isFocused = useIsFocused();
 
@@ -308,7 +308,7 @@ export default function ContactsPageNew({ navigation }) {
           onScrollEndDrag={() => Keyboard.dismiss() }
           onScrollBeginDrag={() => Keyboard.dismiss() }
         />
-        <Pressable style={styles.nextButton} onPress={() => navigation.navigate('CalendarSync')}>
+        <Pressable style={styles.nextButton} onPress={() => setIsNew(false)}>
           <Text style={styles.nextLabel}>Next</Text>
         </Pressable>
       </View>
@@ -319,7 +319,7 @@ export default function ContactsPageNew({ navigation }) {
     return (
       <View style={styles.container}>
         <Text style={styles.deniedText}>Please enable contacts to add your friends</Text>
-        <Pressable style={styles.nextButton} onPress={() => navigation.navigate('CalendarSync')}>
+        <Pressable style={styles.nextButton} onPress={() => setIsNew(false)}>
           <Text style={styles.nextLabel}>Next</Text>
         </Pressable>
       </View>

@@ -165,7 +165,7 @@ function OnboardingStack() {
         <Stack.Screen name="Onboarding" component={Onboarding} />
         <Stack.Screen name="ContactsPage" component={ContactsPageNew} />
         {/* <Stack.Screen name="CalendarSyncBackup" component={CalendarSyncBackup} /> */}
-        {/* <Stack.Screen name="AddCalendar" component={AddCalendar} /> */}
+        <Stack.Screen name="AddCalendar" component={AddCalendar} />
       </Stack.Navigator>
     </NavigationContainer>
   );
