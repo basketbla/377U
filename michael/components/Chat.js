@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View, Pressable } from 'react-native'
-import React, { useState, useCallback, useEffect } from "react";
-import { GiftedChat, InputToolbar, Send } from "react-native-gifted-chat";
+import { StyleSheet, Text, View, Pressable, Platform } from 'react-native'
+import React, { useState, useCallback, useEffect, useRef } from "react";
+import { GiftedChat, InputToolbar } from "react-native-gifted-chat";
 import firebase from "@firebase/app";
 import { addMessageByObj, getCurrentUser, getGroup } from '../utils/firebase';
 import { useAuth } from '../contexts/AuthContext';
@@ -21,10 +21,30 @@ Notifications.setNotificationHandler({
 });
 
 export default function Chat({ navigation, route }) {
+  // state = {
+  //   notification: {},
+  // };
+
+  // // componentDidMount() {
+  //   registerForPushNotificationsAsync();
+
+  //   Notifications.addNotificationReceivedListener(this._handleNotification);
+    
+  //   Notifications.addNotificationResponseReceivedListener(this._handleNotificationResponse);
+  // }
+
+  // _handleNotification = notification => {
+  //   this.setState({ notification: notification });
+  // };
+
+  // _handleNotificationResponse = response => {
+  //   console.log(response);
+  // };
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState(false);
-  // const notificationListener = useRef();
-  // const responseListener = useRef();
+  console.log(expoPushToken)
+  const notificationListener = useRef();
+  const responseListener = useRef();
   
   const { group } = route.params;
   const { userFirebaseDetails } = useAuth();
@@ -53,41 +73,61 @@ export default function Chat({ navigation, route }) {
   //     console.log(response);
   //   });
 
-  //   return () => {
-  //     Notifications.removeNotificationSubscription(notificationListener.current);
-  //     Notifications.removeNotificationSubscription(responseListener.current);
-  //   };
-  // }, []);
+  // Can use this function below, OR use Expo's Push Notification Tool-> https://expo.dev/notifications
+  async function sendPushNotification(expoPushToken) {
+    const message = {
+      to: expoPushToken,
+      sound: 'default',
+      title: 'You got a message on Din Din!',
+      body: 'Someone requested you to go on an adventure',
+      data: { someData: 'goes here' },
+    };
 
-  // async function schedulePushNotification() {
-  //   await Notifications.scheduleNotificationAsync({
-  //     content: {
-  //       title: "You've got mail! 📬",
-  //       body: 'Here is the notification body',
-  //       data: { data: 'goes here' },
-  //     },
-  //     trigger: { seconds: 2 },
-  //   });
-  // }
+    await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-encoding': 'gzip, deflate',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(message),
+    });
+  }
 
-  // async function registerForPushNotificationsAsync() {
-  //   let token;
-  //   if (Device.isDevice) {
-  //     const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  //     let finalStatus = existingStatus;
-  //     if (existingStatus !== 'granted') {
-  //       const { status } = await Notifications.requestPermissionsAsync();
-  //       finalStatus = status;
-  //     }
-  //     if (finalStatus !== 'granted') {
-  //       alert('Failed to get push token for push notification!');
-  //       return;
-  //     }
-  //     token = (await Notifications.getExpoPushTokenAsync()).data;
-  //     console.log(token);
-  //   } else {
-  //     alert('Must use physical device for Push Notifications');
-  //   }
+  async function schedulePushNotification(messageBody) {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "You got a message on Din Din! 📬",
+//         body: 'Here is the notification body ', messageBody,
+        body: 'Check the notification! '
+        data: { data: messageBody },
+      },
+      trigger: { seconds: 2 },
+    });
+  }
+
+  //how to make sure you have the right credentials to get notifications
+  async function registerForPushNotificationsAsync() {
+    let token;
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!');
+        return;
+      }
+      token = (await Notifications.getExpoPushTokenAsync()).data;
+      console.log('this is token ', token);
+      console.log(expoPushToken)
+      this.setState({ expoPushToken: token });
+    } else {
+      alert('Must use physical device for Push Notifications');
+    }
+
   
   //   if (Platform.OS === 'android') {
   //     Notifications.setNotificationChannelAsync('default', {
@@ -99,6 +139,17 @@ export default function Chat({ navigation, route }) {
   //   }
   
   //   return token;
+  // }
+
+  // async function schedulePushNotification() {
+  //   await Notifications.scheduleNotificationAsync({
+  //     content: {
+  //       title: "You've got mail! 📬",
+  //       body: 'Here is the notification body',
+  //       data: { data: 'goes here' },
+  //     },
+  //     trigger: { seconds: 2 },
+  //   });
   // }
 
   useEffect(() => {
@@ -160,10 +211,15 @@ navigation.setOptions({ headerTitle: route.params.group.name, headerRight: () =>
   }, []);
 
   // firebase onsend or non-firebase onsend
-  //** Dvaid's changes added async to it
+  //** David's changes added async to it
   const onSend = useCallback(async (messages = []) => {
     addMessageByObj(group.id, messages[0]);
-    await schedulePushNotification()
+    console.log('message reached here1 ', expoPushToken)
+    // await sendPushNotification(expoPushToken)
+    let messageBody = messages[0]
+    schedulePushNotification()
+    // await schedulePushNotification(messageBody)
+    console.log('message reached here2 ', expoPushToken)
   }, []);
 
 
