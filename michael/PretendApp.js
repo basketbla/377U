@@ -7,6 +7,13 @@ import { useAuth } from './contexts/AuthContext';
 import { COLORS } from './utils/constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import React, { 
+  useEffect,
+  useRef
+} from 'react';
+import { registerForPushNotificationsAsync } from './utils/expo';
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
 
 import VerifyPhone from './components/VerifyPhone';
 import SendTexts from './components/SendTexts';
@@ -33,6 +40,7 @@ import ContactsPageNew from './components/ContactsPageNew';
 import GroupAvailability from './components/GroupAvailability';
 import AddCalendar from './components/AddCalendar';
 import Welcome from './components/Welcome';
+import { addUserPushToken } from './utils/firebase';
 
 
 const Stack = createNativeStackNavigator();
@@ -42,7 +50,56 @@ const matTab = createMaterialTopTabNavigator();
 
 export default function PretendApp() {
 
-  const { currentUser, isNew } = useAuth();
+  const { currentUser, isNew, userFirebaseDetails, setUserFirebaseDetails } = useAuth();
+
+  const notificationListener = useRef();
+  const responseListener = useRef();
+
+  useEffect(async () => {
+    // If user doesn't have a push notification token, make one.
+    if (!userFirebaseDetails) {
+      return;
+    }
+
+    if (userFirebaseDetails.uid && !userFirebaseDetails.pushToken) {
+      if (!Device.isDevice) {
+        return
+      }
+      let token = await registerForPushNotificationsAsync();
+      setUserFirebaseDetails({...userFirebaseDetails, pushToken: token})
+      await addUserPushToken(userFirebaseDetails.uid, token);
+    }
+
+  }, [userFirebaseDetails])
+
+  // Another use effect to actually listen for notifications
+  useEffect(() => {
+
+    // So it doesn't show notif when app is running
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: false,
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+      }),
+    });
+
+    // This listener is fired whenever a notification is received while the app is foregrounded
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      // I don't know if we want to actually do anything with this?
+      console.log(notification)
+    });
+
+    // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+    });
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
 
   // User is not signed in
   if (currentUser === null || isNew === null) {

@@ -138,9 +138,9 @@ export default function CreateGroup({ navigation, route }) {
 
     // If two people, want their name as the name
     if (Object.keys(group.users).length === 2) {
-      navigation.navigate('Chat', {group: {...group, numFree: Object.keys(group.users).length, totalNum: Object.keys(group.users).length, id: groupKey, name: allUsers[Object.keys(group.users).filter(id => id !== currentUser.uid)].name}}) 
+      navigation.navigate('Chat', {group: {...group, numFree: Object.keys(group.users).length, totalNum: Object.keys(group.users).length, id: groupKey, name: allUsers[Object.keys(group.users).filter(id => id !== currentUser.uid)].name}, sendNotif: messageText}) 
     }
-    navigation.navigate('Chat', {group: {...group, numFree: Object.keys(group.users).length, totalNum: Object.keys(group.users).length, id: groupKey}})
+    navigation.navigate('Chat', {group: {...group, numFree: Object.keys(group.users).length, totalNum: Object.keys(group.users).length, id: groupKey}, sendNotif: messageText})
   }
 
   return (

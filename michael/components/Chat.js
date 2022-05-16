@@ -12,94 +12,12 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
-
 export default function Chat({ navigation, route }) {
-  const [expoPushToken, setExpoPushToken] = useState('');
-  const [notification, setNotification] = useState(false);
-  // const notificationListener = useRef();
-  // const responseListener = useRef();
   
   const { group } = route.params;
   const { userFirebaseDetails } = useAuth();
-  // const [messages, setMessages] = useState(Object.keys(group.messages).map(id => ({...group.messages[id], _id: id, createdAt: JSON.parse(group.messages[id].createdAt)})));
   const [messages, setMessages] = useState([]);
-
-
-
-
-  // useEffect(async () => {
-  //   console.log(group)
-  // }, [])
-
-  const { chatname } = "hello, world"; //name of the chat group 
-  // console.log(firebase.auth().currentUser);
-
-
-  // useEffect(() => { //messaging
-  //   registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
-
-  //   notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-  //     setNotification(notification);
-  //   });
-
-  //   responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-  //     console.log(response);
-  //   });
-
-  //   return () => {
-  //     Notifications.removeNotificationSubscription(notificationListener.current);
-  //     Notifications.removeNotificationSubscription(responseListener.current);
-  //   };
-  // }, []);
-
-  // async function schedulePushNotification() {
-  //   await Notifications.scheduleNotificationAsync({
-  //     content: {
-  //       title: "You've got mail! 📬",
-  //       body: 'Here is the notification body',
-  //       data: { data: 'goes here' },
-  //     },
-  //     trigger: { seconds: 2 },
-  //   });
-  // }
-
-  // async function registerForPushNotificationsAsync() {
-  //   let token;
-  //   if (Device.isDevice) {
-  //     const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  //     let finalStatus = existingStatus;
-  //     if (existingStatus !== 'granted') {
-  //       const { status } = await Notifications.requestPermissionsAsync();
-  //       finalStatus = status;
-  //     }
-  //     if (finalStatus !== 'granted') {
-  //       alert('Failed to get push token for push notification!');
-  //       return;
-  //     }
-  //     token = (await Notifications.getExpoPushTokenAsync()).data;
-  //     console.log(token);
-  //   } else {
-  //     alert('Must use physical device for Push Notifications');
-  //   }
-  
-  //   if (Platform.OS === 'android') {
-  //     Notifications.setNotificationChannelAsync('default', {
-  //       name: 'default',
-  //       importance: Notifications.AndroidImportance.MAX,
-  //       vibrationPattern: [0, 250, 250, 250],
-  //       lightColor: '#FF231F7C',
-  //     });
-  //   }
-  
-  //   return token;
-  // }
+  const [groupTokens, setGroupTokens] = useState([]);
 
   useEffect(() => {
     // Kind of can't test this well right now. TODO: TEST WITH TWO PHONES
@@ -122,24 +40,8 @@ export default function Chat({ navigation, route }) {
         GiftedChat.append(previousMessages, newMessage)
       );
     })
-    // let unsubscribeFromNewSnapshots = db
-    //   .collection("Chats") //ideally firestore, not realtime db
-    //   .doc(chatname)
-    //   .onSnapshot((snapshot) => {
-    //     console.log("New Snapshot!");
-    //     let newMessages = snapshot.data().messages.map((singleMessage) => {
-    //       singleMessage.createdAt = singleMessage.createdAt.seconds * 1000;
-    //       return singleMessage;
-    //     });
-    //     setMessages(newMessages);
-    //   });
 
-    // return function cleanupBeforeUnmounting() {
-    //   unsubscribeFromNewSnapshots();
-    // };
-
-
-navigation.setOptions({ headerTitle: route.params.group.name, headerRight: () => (
+    navigation.setOptions({ headerTitle: route.params.group.name, headerRight: () => (
       <View style={{flexDirection: 'row'}} > 
 
     
@@ -153,17 +55,73 @@ navigation.setOptions({ headerTitle: route.params.group.name, headerRight: () =>
           </View> 
 
 
-          ), });
+    ), });
 
 
-    return [unsubscribe, route.params.group.name];
+    return [unsubscribe];
   }, []);
+
+  useEffect(async () => {
+    // Super inefficient way of doing this. Will fix when I clean up firebase
+    let userTokens = [];
+    for (let id of Object.keys(group.users)) {
+      if (id === userFirebaseDetails.uid) {
+        continue;
+      }
+      let token = (await getCurrentUser(id)).val().pushToken;
+      if (token) {
+        userTokens.push(token);
+      }
+    }
+    console.log(userTokens);
+    setGroupTokens(userTokens);
+
+    if (route.params.sendNotif) {
+      sendPushNotifications(route.params.sendNotif, userTokens);
+    }
+  }, [])
+
+  const sendPushNotifications = async (messageBody, userTokens) => {
+
+    console.log('sending text')
+    console.log(groupTokens)
+    let tokens = groupTokens;
+    if (userTokens) {
+      tokens = userTokens;
+    }
+    for (let expoPushToken of tokens) {
+      // Some existing users don't have tokens. Dont mess with it.
+      if (!expoPushToken) {
+        return
+      }
+  
+      const message = {
+        to: expoPushToken,
+        sound: 'default',
+        title: userFirebaseDetails.name,
+        body: messageBody,
+        // data: { someData: 'goes here' },
+      };
+    
+      await fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Accept-encoding': 'gzip, deflate',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(message),
+      });
+    }
+
+  }
 
   // firebase onsend or non-firebase onsend
   //** Dvaid's changes added async to it
-  const onSend = useCallback(async (messages = []) => {
+  const onSend = useCallback((messages = []) => {
     addMessageByObj(group.id, messages[0]);
-    await schedulePushNotification()
+    // await schedulePushNotification()
+    // sendPushNotifications(messages[0].text);
   }, []);
 
 
@@ -196,7 +154,7 @@ navigation.setOptions({ headerTitle: route.params.group.name, headerRight: () =>
         // renderInputToolbar={props => customtInputToolbar(props)}
         bottomOffset={80} // This is probably bad but can't worry about right now
         messages={messages}
-        onSend={messages => onSend(messages)}
+        onSend={messages => {onSend(messages); sendPushNotifications(messages[0].text)}}
         user={{
             _id: userFirebaseDetails.uid,
             name: userFirebaseDetails.name,

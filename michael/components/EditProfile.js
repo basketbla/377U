@@ -116,12 +116,13 @@ export default function EditProfile({route, navigation}) {
 
     // Update firebase details
     setUserFirebaseDetails({
+      ...userFirebaseDetails,
       name: name,
       username: username,
-      phoneNumber: userFirebaseDetails.phoneNumber,
+      // phoneNumber: userFirebaseDetails.phoneNumber,
       profilePic: image,
-      uid: currentUser.uid,
-      isFree: userFirebaseDetails.isFree
+      // uid: currentUser.uid,
+      // isFree: userFirebaseDetails.isFree
     })
 
     // Need to check if this username is taken

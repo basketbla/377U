@@ -249,6 +249,10 @@ export const updateGroupName = (groupId, newName) => {
   return set(ref_db(database, `groups/${groupId}/name`), newName);
 }
 
+export const addUserPushToken = (userId, token) => {
+  return set(ref_db(database, `users/${userId}/pushToken`), token);
+}
+
 
 
 // addFriendRequest('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');
