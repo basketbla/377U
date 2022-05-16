@@ -4,9 +4,9 @@
     "slug": "michael",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/dindinicon.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/dindinsplash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -20,14 +20,18 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSRemindersUsageDescription": "Requires calendar read access to easily import user availability"
-      }
+      },
+      "bundleIdentifier": "com.dindintheapp",
+      "buildNumber": 2
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "permissions": ["READ_CALENDAR"],
+      "permissions": [
+        "READ_CALENDAR"
+      ],
       "package": "com.dindin"
     },
     "web": {
