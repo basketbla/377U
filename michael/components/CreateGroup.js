@@ -55,6 +55,7 @@ export default function CreateGroup({ navigation, route }) {
   const [messageText, setMessageText] = useState('');
   const [sendingMessage, setSendingMessage] = useState(false);
   const [noFriends, setNoFriends] = useState(false);
+  const [allUsers, setAllUsers] = useState();
 
   // TODO: make the text input not shitty and then actually make da groups!
 
@@ -70,6 +71,7 @@ export default function CreateGroup({ navigation, route }) {
     }
     let friendIds = Object.keys(friends.val());
     let users = await getUsers();
+    setAllUsers(users);
 
     if (route.params && route.params.selected) {
       setSelectedUsers(route.params.selected)
@@ -132,6 +134,12 @@ export default function CreateGroup({ navigation, route }) {
       await createGroup(groupKey, selectedUsers, userFirebaseDetails, messageText);
     }
     let group = (await getGroup(groupKey)).val();
+
+
+    // If two people, want their name as the name
+    if (Object.keys(group.users).length === 2) {
+      navigation.navigate('Chat', {group: {...group, numFree: Object.keys(group.users).length, totalNum: Object.keys(group.users).length, id: groupKey, name: allUsers[Object.keys(group.users).filter(id => id !== currentUser.uid)].name}}) 
+    }
     navigation.navigate('Chat', {group: {...group, numFree: Object.keys(group.users).length, totalNum: Object.keys(group.users).length, id: groupKey}})
   }
 
