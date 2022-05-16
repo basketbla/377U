@@ -27,7 +27,8 @@ export default function GroupAvailability({ route, navigation }) {
       let freeSlots = await findCalendarSlots(interval, meetingInterval);
       
       setFreeSlots(freeSlots);
-      setSuggestedSlots(pickFreeSlots(freeSlots));
+      // setSuggestedSlots(pickFreeSlots(freeSlots));
+      setSuggestedSlots(freeSlots);
       
       
       // } else {
