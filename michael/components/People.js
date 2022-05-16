@@ -162,7 +162,7 @@ export default function People({ navigation }) {
           keyExtractor={item => item.username}
           horizontal={true}
           style={styles.freeNowList}
-          //contentContainerStyle={styles.freeNowContainer}
+          contentContainerStyle={styles.freeNowContainer}
           showsHorizontalScrollIndicator={false}
         />
       }
@@ -230,7 +230,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 20,
     marginBottom: 10,
-
   },
   groupLabel: {
     marginRight: 'auto',
@@ -251,15 +250,12 @@ const styles = StyleSheet.create({
     width: '100%',
     flexGrow: 0,
     marginTop: 3,
-    marginBottom: 10,
    // height: 120,
     paddingRight: 40,
   },
   freeNowContainer: {
    // paddingRight: 20,
-    height: '19%',
     width: '100%',
-
   },
   profilePic: {
     width: 60,
@@ -274,6 +270,7 @@ const styles = StyleSheet.create({
   groupList: {
     width: '100%',
     flexGrow: 1,
+    flex: 1
   },
   groupEntry: {
     width: '100%',
