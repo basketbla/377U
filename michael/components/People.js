@@ -204,10 +204,11 @@ const styles = StyleSheet.create({
     // width: '95%',
     marginLeft: 5,
     marginRight: 5,
+    marginBottom: '3%'
 
   },
   topBar: {
-    marginTop: '10%',
+    marginTop: '13%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
@@ -237,7 +238,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 20,
     marginBottom: 10,
-   paddingTop: 3,
+    paddingTop: '5%',
 
 
   },
@@ -249,13 +250,13 @@ const styles = StyleSheet.create({
   freeNowList: {
     width: '100%',
     flexGrow: 0,
-    marginTop: 3,
+    marginTop: 5,
    // height: 120,
     paddingRight: 40,
   },
   freeNowContainer: {
    // paddingRight: 20,
-    width: '100%',
+   // width: '100%',
   },
   profilePic: {
     width: 60,
