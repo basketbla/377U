@@ -25,7 +25,7 @@
         "NSPhotoLibraryUsageDescription": "This app uses the photo library to let people upload profile pictures"
       },
       "bundleIdentifier": "com.dindintheapp",
-      "buildNumber": "2"
+      "buildNumber": "3"
     },
     "android": {
       "adaptiveIcon": {

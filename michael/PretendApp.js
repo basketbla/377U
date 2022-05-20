@@ -57,6 +57,7 @@ export default function PretendApp() {
 
   useEffect(async () => {
     // If user doesn't have a push notification token, make one.
+    // This messes up if we move to a different device. Maybe store a list?
     if (!userFirebaseDetails) {
       return;
     }
