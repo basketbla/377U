@@ -50,7 +50,7 @@ const matTab = createMaterialTopTabNavigator();
 
 export default function PretendApp() {
 
-  const { currentUser, isNew, userFirebaseDetails, setUserFirebaseDetails } = useAuth();
+  const { currentUser, setCurrentUser, isNew, userFirebaseDetails, setUserFirebaseDetails } = useAuth();
 
   const notificationListener = useRef();
   const responseListener = useRef();
@@ -101,6 +101,19 @@ export default function PretendApp() {
       Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
+
+  // Check async storage to see if user is signed in
+  useEffect(async () => {
+    // Need some kind of loading state...
+    try {
+      const value = await AsyncStorage.getItem('currentUser')
+      if(value !== null) {
+        setCurrentUser(JSON.parse(value))
+      }
+    } catch(e) {
+      // error reading value
+    }
+  }, [])
 
   // User is not signed in
   if (currentUser === null || isNew === null) {
