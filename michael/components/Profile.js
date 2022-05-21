@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useIsFocused } from "@react-navigation/native";
 import { COLORS } from '../utils/constants';
 import { setAvailability, getAvailability} from '../utils/firebase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Profile({ navigation }) {
 
@@ -45,7 +46,7 @@ export default function Profile({ navigation }) {
         { text: "Cancel", onPress: undefined, style: "cancel" },
         {
           text: "Sign Out",
-          onPress: async () => await logout()
+          onPress: async () => { await AsyncStorage.removeItem('currentUser'); await logout(); }
         },
       ]
     );
