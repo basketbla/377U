@@ -20,17 +20,7 @@ export default function Chat({ navigation, route }) {
   const [groupTokens, setGroupTokens] = useState([]);
 
   useEffect(() => {
-    // Kind of can't test this well right now. TODO: TEST WITH TWO PHONES
     const unsubscribe = onChildAdded(ref_db(database, `groups/${group.id}/messages`), (snapshot, previousMessages) => {
-      // I can't think of a better way to do this
-      // console.log(messages.map(message => message.text));
-      // console.log(snapshot.val());
-      // if (!messages.map(message => message._id).includes(snapshot.key)) {
-      //   let newMessage = snapshot.val();
-      //   newMessage = {...newMessage, _id: snapshot.key, createdAt: JSON.parse(newMessage.createdAt)};
-      //   setMessages([...messages, newMessage]);
-      // }
-      // console.log(snapshot.val())
 
       let newMessage = snapshot.val();
       newMessage = {...newMessage, _id: snapshot.key, createdAt: JSON.parse(newMessage.createdAt)};

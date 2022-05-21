@@ -23,14 +23,16 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import { Camera } from 'expo-camera';
 import * as Device from 'expo-device';
-import { uploadImageToStorage, saveUserDetails, getUsers } from '../utils/firebase';
+import { uploadImageToStorage, saveUserDetails  } from '../utils/firebase';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+import { useFriends } from '../contexts/FriendsContext';
 
 export default function EditProfile({route, navigation}) {
 
   const { userDetails } = route.params;
   const { currentUser, logout, setUserFirebaseDetails, userFirebaseDetails } = useAuth();
+  const { allUsers } = useFriends();
   
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState(userDetails.name);
@@ -127,7 +129,7 @@ export default function EditProfile({route, navigation}) {
 
     // Need to check if this username is taken
     if (username !== userDetails.username) {
-      let usernames = Object.values(await getUsers()).map(item => item.username);
+      let usernames = Object.values(allUsers).map(item => item.username);
 
       if (usernames.includes(username)) {
         setLoading(false);

@@ -16,14 +16,11 @@ export function useFriends() {
 // I've only done this in react not react native so hopefully it works the same
 export function FriendsProvider({ children }) { 
 
-  const [allExistingGlobal, setAllExistingGlobal] = useState([]);
-  const [allFriendRequestsGlobal, setAllFriendRequestsGlobal] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
 
   const value = {
-    allExistingGlobal,
-    setAllExistingGlobal,
-    allFriendRequestsGlobal,
-    setAllFriendRequestsGlobal
+    allUsers,
+    setAllUsers
   }
 
   return (

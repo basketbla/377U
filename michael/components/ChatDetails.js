@@ -4,21 +4,20 @@ import React, {
   useState
 } from 'react'
 import { COLORS } from '../utils/constants';
-import { getUsers } from '../utils/firebase';
 import BlandUser from './BlandUser';
+import { useFriends } from '../contexts/FriendsContext';
 
 export default function ChatDetails({ route, navigation }) {
   
   const { group } = route.params;
 
+  const { allUsers } = useFriends();
+
   const [freeNow, setFreeNow] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [allUsers, setAllUsers] = useState([]);
 
   useEffect(async () => {
     // Really need to share all users throughout app
-    let users = await getUsers();
-    setAllUsers(users);
     setLoading(false);
   }, [])
 

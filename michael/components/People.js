@@ -6,10 +6,11 @@ import React, {
 import { colors, SearchBar } from 'react-native-elements';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { COLORS, DEFUALT_PROFILE_PIC, hash } from '../utils/constants';
-import { getFriends, getUsers, getCurrentUser, getUserGroups, getGroup } from '../utils/firebase';
+import { getFriends, getCurrentUser, getUserGroups, getGroup } from '../utils/firebase';
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import BlandUser from './BlandUser';
+import { useFriends } from '../contexts/FriendsContext';
 
 const FreeNow = ({ user }) => {
 
@@ -58,9 +59,9 @@ export default function People({ navigation }) {
   const [allFriends, setAllFriends] = useState([]);
   const [friendsToDisplay, setFriendsToDisplay] = useState([]);
   const [friendsMap, setFriendsMap] = useState({});
-  const [allUsers, setAllUsers] = useState();
 
   const { currentUser, setUserFirebaseDetails } = useAuth();
+  const { allUsers } = useFriends();
 
   // Still just all friends, not free friends
   useEffect(async () => {
@@ -68,8 +69,7 @@ export default function People({ navigation }) {
     console.log('useeffect on people')
 
     // Need to make this just a globally known thing so I don't keep fetching
-    let users = await getUsers();
-    setAllUsers(users);
+    let users = allUsers;
 
     // Setting userFirebaseDetails here too
     let userStuff = await getCurrentUser(currentUser.uid);

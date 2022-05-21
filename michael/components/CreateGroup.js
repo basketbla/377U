@@ -7,10 +7,11 @@ import React, {
 import { COLORS, hash } from '../utils/constants';
 import { useHeaderHeight } from '@react-navigation/elements';
 import useKeyboardHeight from 'react-native-use-keyboard-height';
-import { addMessage, createGroup, getFriends, getGroup, getUsers } from '../utils/firebase';
+import { addMessage, createGroup, getFriends, getGroup } from '../utils/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { set } from 'firebase/database';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useFriends } from '../contexts/FriendsContext';
 
 const User = ({ contact, selectedUsers, setSelectedUsers, setFriendsText }) => {
 
@@ -45,6 +46,7 @@ export default function CreateGroup({ navigation, route }) {
   const keyboardHeight = useKeyboardHeight();
 
   const { currentUser, userFirebaseDetails } = useAuth();
+  const { allUsers } = useFriends();
 
   const friendInputRef = useRef();
   const [friendsText, setFriendsText] = useState(''); 
@@ -55,7 +57,6 @@ export default function CreateGroup({ navigation, route }) {
   const [messageText, setMessageText] = useState('');
   const [sendingMessage, setSendingMessage] = useState(false);
   const [noFriends, setNoFriends] = useState(false);
-  const [allUsers, setAllUsers] = useState();
 
   // TODO: make the text input not shitty and then actually make da groups!
 
@@ -70,8 +71,7 @@ export default function CreateGroup({ navigation, route }) {
       return
     }
     let friendIds = Object.keys(friends.val());
-    let users = await getUsers();
-    setAllUsers(users);
+    let users = allUsers;
 
     if (route.params && route.params.selected) {
       setSelectedUsers(route.params.selected)

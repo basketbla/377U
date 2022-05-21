@@ -16,10 +16,11 @@ import React, {
 } from 'react'
 import * as Contacts from 'expo-contacts';
 import { COLORS, DEFUALT_PROFILE_PIC } from '../utils/constants';
-import { getFriendRequests, getFriends, getUsers, removeFriend } from '../utils/firebase';
+import { getFriendRequests, getFriends, removeFriend } from '../utils/firebase';
 import * as SMS from 'expo-sms';
 import { useAuth } from '../contexts/AuthContext';
 import { useIsFocused } from "@react-navigation/native";
+import { useFriends } from '../contexts/FriendsContext'
 
 const User = ({ contact, handleRemoveFriend }) => {
 
@@ -80,6 +81,7 @@ export default function OldFriends({ navigation }) {
   const isFocused = useIsFocused();
 
   const { currentUser } = useAuth();
+  const { allUsers } = useFriends();
 
   const [search, setSearch] = useState('');
   const [friends, setFriends] = useState([]);
@@ -90,7 +92,7 @@ export default function OldFriends({ navigation }) {
   // Fetch all friends
   useEffect(async () => {
       let friendsSnapshot = await getFriends(currentUser.uid);
-      let users = await getUsers();
+      let users = allUsers;
       let friendUsers = [];
       if (friendsSnapshot && friendsSnapshot.val()) {
         friendUsers = Object.keys(friendsSnapshot.val()).map(id => {return {...users[id], id: id}});

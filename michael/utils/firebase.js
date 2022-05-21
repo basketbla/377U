@@ -7,14 +7,26 @@ import { DEFUALT_PROFILE_PIC } from "./constants";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// const firebaseConfig = {
+//   apiKey: "AIzaSyB_IwyT48ZP56E8LkpR9vKxbhGj464O7-8",
+//   authDomain: "michael-b65b3.firebaseapp.com",
+//   projectId: "michael-b65b3",
+//   storageBucket: "michael-b65b3.appspot.com",
+//   messagingSenderId: "454609421610",
+//   appId: "1:454609421610:web:f77caefc3a73d76dd80a53",
+//   measurementId: "G-0YN0GGNEF0"
+// };
+
+
+// DEVELOPMENT SERVER
 const firebaseConfig = {
-  apiKey: "AIzaSyB_IwyT48ZP56E8LkpR9vKxbhGj464O7-8",
-  authDomain: "michael-b65b3.firebaseapp.com",
-  projectId: "michael-b65b3",
-  storageBucket: "michael-b65b3.appspot.com",
-  messagingSenderId: "454609421610",
-  appId: "1:454609421610:web:f77caefc3a73d76dd80a53",
-  measurementId: "G-0YN0GGNEF0"
+  apiKey: "AIzaSyC7hlHDUpvEiMEQYV1NIUuIwhE_DUSKzXA",
+  authDomain: "dindin-development.firebaseapp.com",
+  projectId: "dindin-development",
+  storageBucket: "dindin-development.appspot.com",
+  messagingSenderId: "877759589171",
+  appId: "1:877759589171:web:c8ae5e8a5a2d288334ec46",
+  measurementId: "G-LJ45GPH4K3"
 };
 
 // Initialize Firebase
@@ -45,7 +57,7 @@ export const getUsers = async () => {
     return snapshot.val();
   } 
   else {
-    return [];
+    return {};
   } 
 }
 export const setCalEvents= (userId, events) => {

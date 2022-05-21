@@ -42,7 +42,8 @@ import ContactsPageNew from './components/ContactsPageNew';
 import GroupAvailability from './components/GroupAvailability';
 import AddCalendar from './components/AddCalendar';
 import Welcome from './components/Welcome';
-import { addUserPushToken } from './utils/firebase';
+import { addUserPushToken, getUsers } from './utils/firebase';
+import { useFriends } from './contexts/FriendsContext';
 
 
 const Stack = createNativeStackNavigator();
@@ -53,6 +54,7 @@ const matTab = createMaterialTopTabNavigator();
 export default function PretendApp() {
 
   const { currentUser, setCurrentUser, isNew, setIsNew, userFirebaseDetails, setUserFirebaseDetails } = useAuth();
+  const { allUsers, setAllUsers } = useFriends();
 
   const notificationListener = useRef();
   const responseListener = useRef();
@@ -122,6 +124,17 @@ export default function PretendApp() {
       setLoading(false);
       setError(true);
     }
+  }, [])
+
+  // On load, fetch all users. 
+  // This means we won't be able to see new users that join, 
+  // but feels worth the performance boost.
+  useEffect(async () => {
+    let daUsers = await getUsers();
+    if (Object.keys(daUsers).length === 0) {
+      setError(true);
+    }
+    setAllUsers(daUsers);
   }, [])
 
   // If we're loading, just display the splash screen
