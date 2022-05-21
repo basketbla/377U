@@ -89,7 +89,7 @@ export default function Chat({ navigation, route }) {
         sound: 'default',
         title: userFirebaseDetails.name,
         body: messageBody,
-        // data: { someData: 'goes here' },
+        data: { group: group },
       };
     
       await fetch('https://exp.host/--/api/v2/push/send', {

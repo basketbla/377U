@@ -18,9 +18,14 @@ export function FriendsProvider({ children }) {
 
   const [allUsers, setAllUsers] = useState([]);
 
+  // Doesn't really fit, but need a way to navigate based on notification
+  const [navigateTo, setNavigateTo] = useState();
+
   const value = {
     allUsers,
-    setAllUsers
+    setAllUsers,
+    navigateTo,
+    setNavigateTo
   }
 
   return (

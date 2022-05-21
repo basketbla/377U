@@ -55,7 +55,7 @@ const matTab = createMaterialTopTabNavigator();
 export default function PretendApp() {
 
   const { currentUser, setCurrentUser, isNew, setIsNew, userFirebaseDetails, setUserFirebaseDetails } = useAuth();
-  const { allUsers, setAllUsers } = useFriends();
+  const { allUsers, setAllUsers, setNavigateTo } = useFriends();
 
   const notificationListener = useRef();
   const responseListener = useRef();
@@ -103,7 +103,10 @@ export default function PretendApp() {
 
     // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log(response);
+      let group = response.notification.request.content.data;
+      if (group) {
+        setNavigateTo({to: 'Chat', group: group})
+      }
     });
 
     return () => {

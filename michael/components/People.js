@@ -62,7 +62,7 @@ export default function People({ navigation }) {
   const [friendsMap, setFriendsMap] = useState({});
 
   const { currentUser, setUserFirebaseDetails } = useAuth();
-  const { allUsers } = useFriends();
+  const { allUsers, navigateTo, setNavigateTo } = useFriends();
 
   // Still just all friends, not free friends
   useEffect(async () => {
@@ -97,7 +97,7 @@ export default function People({ navigation }) {
     }
 
     setLoading(false);
-  }, [])
+  }, [isFocused])
 
    // Add listener for new groups
    useEffect(() => {
@@ -119,6 +119,19 @@ export default function People({ navigation }) {
 
   // Listener for individual messages will be hard bc we need to do every group...
   // OH. Could store last message in group and do a listener on that?
+
+
+  useEffect(() => {
+    if (!navigateTo) {
+      return
+    }
+    // I messed something up here but whatever...
+    let group = navigateTo.group.group;
+    console.log(group)
+    setNavigateTo(null);
+    console.log(group.users)
+    navigation.navigate('Chat', {group: {...group, numFree: Object.keys(group.users).length, totalNum: Object.keys(group.users).length}})
+  }, [navigateTo])
 
   const handleSearch = text => {
     setSearch(text);
