@@ -36,6 +36,20 @@ export const database = getDatabase();
 const dbRef = ref_db(database);
 const storage = getStorage(app);
 
+
+// TEMP FUNCTION TO REFORMAT MESSAGES
+// const temp = async () => {
+//   let groups = (await get(ref_db(database, '/groups'))).val();
+//   let newMessages = {}
+//   Object.keys(groups).forEach(id => {newMessages[id] = groups[id].messages})
+//   await set(ref_db(database, '/messages'), newMessages)
+//   // Then for each group, remove messages from group
+// }
+
+
+
+
+
 export const getCurrentUser = (userId) => {
   return get(child(dbRef, `users/` + userId));
 }
