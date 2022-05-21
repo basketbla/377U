@@ -251,9 +251,9 @@ export default function NewFriends({ navigation }) {
     return (
       <View style={styles.container}>
         <Text style={styles.deniedText}>Please enable contacts to add your friends</Text>
-        <Pressable style={styles.nextButton} onPress={handleNext}>
+        {/* <Pressable style={styles.nextButton} onPress={handleNext}>
           <Text style={styles.nextLabel}>Next</Text>
-        </Pressable>
+        </Pressable> */}
       </View>
     )
   }
