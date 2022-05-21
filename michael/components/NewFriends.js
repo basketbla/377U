@@ -24,7 +24,7 @@ import ContactEntry from './ContactEntry';
 import ExistingContact from './ExistingContact';
 import FriendRequest from './FriendRequest';
 import { useFriends } from '../contexts/FriendsContext';
-import { onChildChanged, onChildAdded, ref as ref_db } from 'firebase/database';
+import { onChildChanged, onChildAdded, ref as ref_db, onValue } from 'firebase/database';
 import { database } from '../utils/firebase'
 
 
@@ -38,8 +38,8 @@ export default function NewFriends({ navigation }) {
   const [contactStatus, setContactStatus] = useState('');
   const [search, setSearch] = useState('');
   const [sectionData, setSectionData] = useState();
-  const [allExistingAccounts, setAllExistingAccounts] = useState();
-  const [allOtherContacts, setAllOtherContacts] = useState();
+  const [allExistingAccounts, setAllExistingAccounts] = useState([]);
+  const [allOtherContacts, setAllOtherContacts] = useState([]);
   const [allFriendRequests, setAllFriendRequests] = useState();
   const [pageLoading, setPageLoading] = useState(true);
 
@@ -152,14 +152,27 @@ export default function NewFriends({ navigation }) {
   }, [isFocused]);
 
 
-  // Add a listener to see if friend requests have changed
+  // Add listeners to see if friend requests have changed
   useEffect(() => {
-    const unsubscribe = onChildAdded(ref_db(database, `friendRequests/${currentUser.uid}`), (snapshot, previousChild) => {
-      console.log(snapshot.val())
-    })
+
+    // Wasting a time setting friendRequests the first time, but I think it's fine
+    const unsubscribe = onValue(ref_db(database, `friendRequests/${currentUser.uid}`), (friendRequests) => {
+      if (friendRequests && friendRequests.val()) {
+        let friendRequestIds = Object.keys(friendRequests.val());
+        friendRequests = friendRequestIds.map(id => (
+          {...allUsers[id], id: id}
+        ));
+      }
+      else {
+        friendRequests = [];
+      }
+      setAllFriendRequests(friendRequests);
+      setSectionData([{title: `Friend Requests (${friendRequests.length})`, data: friendRequests, renderItem: renderFriendRequest}, {title: `Contacts on Din Din (${allExistingAccounts.length})`, data: allExistingAccounts, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${allOtherContacts.length})`, data: allOtherContacts, renderItem: renderNewItem}]);
+    });
+    
 
     return unsubscribe;
-  }, []);
+  }, [allExistingAccounts, allOtherContacts]);
 
   // For rendering contacts with accounts
   const renderExistingItem = ({item}) => {

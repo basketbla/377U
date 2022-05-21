@@ -15,7 +15,6 @@ import { COLORS, DEFUALT_PROFILE_PIC } from '../utils/constants';
 import { useAuth } from '../contexts/AuthContext';
 import { saveUserDetails } from '../utils/firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { saveUserDetails } from '../utils/firebase';
 import { useFriends } from '../contexts/FriendsContext';
 
 export default function Username({ navigation }) {

@@ -16,7 +16,8 @@ import React, {
 } from 'react'
 import * as Contacts from 'expo-contacts';
 import { COLORS, DEFUALT_PROFILE_PIC } from '../utils/constants';
-import { getFriendRequests, getFriends, removeFriend } from '../utils/firebase';
+import { getFriendRequests, getFriends, removeFriend, database } from '../utils/firebase';
+import { onValue, ref as ref_db } from 'firebase/database';
 import * as SMS from 'expo-sms';
 import { useAuth } from '../contexts/AuthContext';
 import { useIsFocused } from "@react-navigation/native";
@@ -101,6 +102,26 @@ export default function OldFriends({ navigation }) {
       setFriendsToDisplay(friendUsers);
       setLoading(false);
   }, [isFocused]);
+
+  // Add listeners to see if anyone accepted requests
+  useEffect(() => {
+
+    // Wasting a time setting friendRequests the first time, but I think it's fine
+    const unsubscribe = onValue(ref_db(database, `friends/${currentUser.uid}`), (snapshot) => {
+      if (snapshot.val()) {
+        let friendUsers = Object.keys(snapshot.val()).map(id => {return {...allUsers[id], id: id}});
+        setFriends(friendUsers)
+        setFriendsToDisplay(friendUsers)
+      }
+      else {
+        setFriends([])
+        setFriendsToDisplay([])
+      }
+    });
+    
+
+    return unsubscribe;
+  }, []);
 
   // For rendering contacts with accounts
   const renderItem = ({item}) => {

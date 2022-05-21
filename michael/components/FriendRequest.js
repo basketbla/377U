@@ -38,8 +38,8 @@ export default function FriendRequest({ contact, currUser }) {
     await removeSentFriendRequest(contact.id, currUser.uid);
     // setAllFriendRequestsGlobal([...allFriendRequestsGlobal.filter(user => user.id !== contact.id)]);
     // setAllExistingGlobal([...allExistingGlobal.filter(user => user.id !== contact.id)]);
-    setAccepted(true);
-    setLoading(false);
+    // setAccepted(true);
+    // setLoading(false);
   }
 
   return (

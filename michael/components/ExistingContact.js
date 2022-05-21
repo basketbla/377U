@@ -18,14 +18,12 @@ export default function ExistingContact({ contact }) {
 
   const { currentUser } = useAuth();
 
-  const [sent, setSent] = useState(contact.requestSent);
   const [loading, setLoading] = useState(false);
 
   const handleSendRequest = async () => {
     setLoading(true);
     await addFriendRequest(currentUser.uid, contact.id);
     await addSentFriendRequest(currentUser.uid, contact.id);
-    setSent(true);
     setLoading(false);
   }
 
@@ -53,16 +51,16 @@ export default function ExistingContact({ contact }) {
       </View>
       {
         contact.isFriend ?
-        <></>
+        <View style={styles.padding}/>
         :
-        <Pressable style={(sent || loading) ? styles.acceptRequestButtonDisabled : styles.acceptRequestButton} onPress={handleSendRequest} disabled={sent || loading}>
+        <Pressable style={(contact.requestSent || loading) ? styles.acceptRequestButtonDisabled : styles.acceptRequestButton} onPress={handleSendRequest} disabled={contact.requestSent || loading}>
           {
             loading ?
             <ActivityIndicator/>
             :
             <>
               {
-                sent ?
+                contact.requestSent ?
                 <Text style={styles.acceptRequestText}>Sent!</Text>
                 :
                 <Text style={styles.acceptRequestText}>Add</Text>
@@ -189,5 +187,11 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     textAlign: 'center',
+  },
+  padding: {
+    marginLeft: 'auto',
+    marginRight: 15,
+    padding: 10,
+    width: 80,
   },
 })
