@@ -76,7 +76,9 @@ export default function PretendApp() {
       }
       let token = await registerForPushNotificationsAsync();
       // setUserFirebaseDetails({...userFirebaseDetails, pushToken: token})
-      await addUserPushToken(userFirebaseDetails.uid, token);
+      if (token) {
+        await addUserPushToken(userFirebaseDetails.uid, token);
+      }
     }
 
   }, [userFirebaseDetails])
@@ -173,8 +175,8 @@ export default function PretendApp() {
     );
   }
 
-  // User just signed up, do onboarding
-  if (!!currentUser && isNew) {
+  // User just signed up, do onboarding. ALSO catch the case where they restarted after signing up
+  if ((!!currentUser && isNew) || Object.keys(userFirebaseDetails).length === 1) {
     return (
       <OnboardingStack/>
     );

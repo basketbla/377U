@@ -107,9 +107,7 @@ export default function Chat({ navigation, route }) {
 
   // firebase onsend or non-firebase onsend
   const onSend = useCallback((messages = []) => {
-    for (let i = 0; i < 1000; i++) {
-      addMessageByObj(group.id, messages[0]);
-    }
+    addMessageByObj(group.id, messages[0]);
   }, []);
 
 

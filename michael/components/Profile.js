@@ -32,7 +32,6 @@ export default function Profile({ navigation }) {
   // Fetch user data from firebase on load
   useEffect(async () => {
     console.log('use effect on profile screen')
-    console.log(userFirebaseDetails)
     // let userStuff = await getCurrentUser(currentUser.uid);
     setUserDetails(userFirebaseDetails);
     setIsFree(userFirebaseDetails.isFree);
