@@ -102,7 +102,7 @@ export default function AddProfilePic({navigation}) {
             setLoading(true);
 
             // Also update firebase details
-            setUserFirebaseDetails({...userFirebaseDetails, profilePic: uri})
+            // setUserFirebaseDetails({...userFirebaseDetails, profilePic: uri})
 
             let newUrl = await uploadImageToStorage(uri, currentUser.uid);
             await updateProfilePic(newUrl, currentUser.uid);

@@ -74,7 +74,7 @@ export default function People({ navigation }) {
 
     // Setting userFirebaseDetails here too
     let userStuff = await getCurrentUser(currentUser.uid);
-    setUserFirebaseDetails({...userStuff.val(), uid: currentUser.uid});
+    // setUserFirebaseDetails({...userStuff.val(), uid: currentUser.uid});
 
     let userGroups = await getUserGroups(currentUser.uid);
     setAllGroups(userGroups.map(group => ({...group, numFree: Object.keys(group.users).reduce((previousValue, currUser) => (previousValue + users[currUser].isFree), 0), totalNum: Object.keys(group.users).length})));

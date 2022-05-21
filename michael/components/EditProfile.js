@@ -117,15 +117,15 @@ export default function EditProfile({route, navigation}) {
     setLoading(true);
 
     // Update firebase details
-    setUserFirebaseDetails({
-      ...userFirebaseDetails,
-      name: name,
-      username: username,
-      // phoneNumber: userFirebaseDetails.phoneNumber,
-      profilePic: image,
-      // uid: currentUser.uid,
-      // isFree: userFirebaseDetails.isFree
-    })
+    // setUserFirebaseDetails({
+    //   ...userFirebaseDetails,
+    //   name: name,
+    //   username: username,
+    //   // phoneNumber: userFirebaseDetails.phoneNumber,
+    //   profilePic: image,
+    //   // uid: currentUser.uid,
+    //   // isFree: userFirebaseDetails.isFree
+    // })
 
     // Need to check if this username is taken
     if (username !== userDetails.username) {

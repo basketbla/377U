@@ -118,7 +118,7 @@ export default function CalendarSync({ navigation }) {
   async function setCurrAvailability(avail) {
     setIsFree(avail);
     await setAvailability(currentUser.uid, avail);
-    setUserFirebaseDetails({...userFirebaseDetails, isFree: avail})
+    // setUserFirebaseDetails({...userFirebaseDetails, isFree: avail})
     // console.log("AVAIL: ", avail);
   }
 

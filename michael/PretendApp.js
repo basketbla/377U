@@ -16,6 +16,9 @@ import { registerForPushNotificationsAsync } from './utils/expo';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { addUserPushToken, getCurrentUser, getUsers, database } from './utils/firebase';
+import { onValue, ref as ref_db } from 'firebase/database';
+import { useFriends } from './contexts/FriendsContext';
 
 import VerifyPhone from './components/VerifyPhone';
 import SendTexts from './components/SendTexts';
@@ -42,8 +45,6 @@ import ContactsPageNew from './components/ContactsPageNew';
 import GroupAvailability from './components/GroupAvailability';
 import AddCalendar from './components/AddCalendar';
 import Welcome from './components/Welcome';
-import { addUserPushToken, getUsers } from './utils/firebase';
-import { useFriends } from './contexts/FriendsContext';
 
 
 const Stack = createNativeStackNavigator();
@@ -74,7 +75,7 @@ export default function PretendApp() {
         return
       }
       let token = await registerForPushNotificationsAsync();
-      setUserFirebaseDetails({...userFirebaseDetails, pushToken: token})
+      // setUserFirebaseDetails({...userFirebaseDetails, pushToken: token})
       await addUserPushToken(userFirebaseDetails.uid, token);
     }
 
@@ -111,11 +112,11 @@ export default function PretendApp() {
 
   // Check async storage to see if user is signed in
   useEffect(async () => {
-    // Need some kind of loading state...
     try {
       const value = await AsyncStorage.getItem('currentUser')
       if(value !== null) {
-        setCurrentUser(JSON.parse(value));
+        let tempCurrUser = JSON.parse(value);
+        setCurrentUser(tempCurrUser);
         setIsNew(false)
       }
 
@@ -133,6 +134,19 @@ export default function PretendApp() {
       setError(true);
     }
   }, [])
+
+  // Listener that changes user details when updated in firebase
+  useEffect(() => {
+    if (!currentUser) {
+      return
+    }
+
+    const unsubscribe = onValue(ref_db(database, `users/${currentUser.uid}`), (snapshot) => {
+      setUserFirebaseDetails({...snapshot.val(), uid: currentUser.uid})
+    });
+    return unsubscribe;
+
+  }, [currentUser]);
 
   // If we're loading, just display the splash screen
   if (loading) {

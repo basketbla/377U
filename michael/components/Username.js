@@ -55,15 +55,15 @@ export default function Username({ navigation }) {
     // Changed this to save phone number instead of email.
     saveUserDetails(currentUser.uid, name, username, currentUser.phoneNumber, DEFUALT_PROFILE_PIC).then(async (result) => {
       setValidating(false);
-      setUserFirebaseDetails({
-        name: name,
-        username: username,
-        phoneNumber: currentUser.phoneNumber,
-        profilePic: DEFUALT_PROFILE_PIC,
-        uid: currentUser.uid,
-        isFree: true,
-        pushToken: null,
-      })
+      // setUserFirebaseDetails({
+      //   name: name,
+      //   username: username,
+      //   phoneNumber: currentUser.phoneNumber,
+      //   profilePic: DEFUALT_PROFILE_PIC,
+      //   uid: currentUser.uid,
+      //   isFree: true,
+      //   pushToken: null,
+      // })
       await AsyncStorage.setItem('currentUser', JSON.stringify(currentUser))
       navigation.navigate('AddProfilePic')
     })

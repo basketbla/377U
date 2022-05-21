@@ -25,13 +25,14 @@ export default function Profile({ navigation }) {
     let newAvailability = !isFree;
     setIsFree(newAvailability);
     await setAvailability(currentUser.uid, newAvailability);
-    setUserFirebaseDetails({...userFirebaseDetails, isFree: newAvailability})
+    // setUserFirebaseDetails({...userFirebaseDetails, isFree: newAvailability})
   }
 
 
   // Fetch user data from firebase on load
   useEffect(async () => {
     console.log('use effect on profile screen')
+    console.log(userFirebaseDetails)
     // let userStuff = await getCurrentUser(currentUser.uid);
     setUserDetails(userFirebaseDetails);
     setIsFree(userFirebaseDetails.isFree);
