@@ -184,7 +184,7 @@ function SignInStack() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false, gestureEnabled: 'false'}}>
-        <Stack.Screen name="Welcome" component={Welcome}/> 
+        {/* <Stack.Screen name="Welcome" component={Welcome}/>  */}
         <Stack.Screen name="SignUpWithPhone" component={SignUpWithPhone}/>
         <Stack.Screen name="SignIn" component={SignIn}/>
         <Stack.Screen name="SignUp" component={SignUp}/> 
