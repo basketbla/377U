@@ -6,6 +6,7 @@ import { addMessageByObj, getCurrentUser, getGroup } from '../utils/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { onChildAdded, ref as ref_db} from "firebase/database";
 import { database } from '../utils/firebase';
+import { beautifyDate } from './GroupAvailability.js'
 import { COLORS } from '../utils/constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as Notifications from 'expo-notifications';
@@ -14,12 +15,13 @@ import * as Device from 'expo-device';
 
 export default function Chat({ navigation, route }) {
   
-  const { group } = route.params;
+  const { group, chosenSlot } = route.params;
   const { userFirebaseDetails } = useAuth();
   const [messages, setMessages] = useState([]);
   const [groupTokens, setGroupTokens] = useState([]);
 
   useEffect(() => {
+    // console.log("routeS: ", route.params);
     // Kind of can't test this well right now. TODO: TEST WITH TWO PHONES
     const unsubscribe = onChildAdded(ref_db(database, `groups/${group.id}/messages`), (snapshot, previousMessages) => {
       // I can't think of a better way to do this
@@ -73,7 +75,7 @@ export default function Chat({ navigation, route }) {
         userTokens.push(token);
       }
     }
-    console.log(userTokens);
+    // console.log("userTokens: ", userTokens);
     setGroupTokens(userTokens);
 
     if (route.params.sendNotif) {
@@ -146,7 +148,21 @@ export default function Chat({ navigation, route }) {
  //      </View>
 
   return (
-    <View style={styles.container}> 
+    <View style={styles.container}>
+      {chosenSlot ? 
+        <>
+        <Text style={styles.headerText}> You're on for: </Text>
+        <Pressable 
+          onPress={() => navigation.navigate('GroupAvailability', { group: group })} 
+          style={[styles.buttonText]}>
+          <Text>{beautifyDate(chosenSlot.startDate, chosenSlot.endDate)}</Text>
+      
+        </Pressable>
+        </>
+        :
+        <></>
+      }
+      
       {/*<Pressable onPress={() => navigation.navigate('GroupAvailability', { group: group })} style={styles.header}>
           <Text style={styles.headerTitle}>See when everyone's free</Text>
       </Pressable>*/}
@@ -184,6 +200,29 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.yellow,
    // paddingTop: '10%', // Feels kind of bad,
   },
+  buttonText: {
+    backgroundColor: COLORS.yellow,
+    height: 50,
+    alignItems: 'center', 
+    justifyContent: 'center',
+    marginTop: 15,
+    marginRight:20,
+    marginLeft:20,
+    paddingLeft:8,
+    paddingRight:8,
+    borderRadius: 10,
+    fontSize: 20,
+  },
+  headerText: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    marginTop:20,
+    color: COLORS.darkGrey,
+    fontSize:14,
+    marginBottom:10,
+
+ },
   headerTitle: {
     fontWeight: 'bold',
     fontSize: 15,

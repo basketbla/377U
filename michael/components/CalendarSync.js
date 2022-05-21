@@ -171,12 +171,12 @@ export default function CalendarSync({ navigation }) {
     return null;
 
 
-{/*
-  return (
-    <>
-      <Text>CALENDARSYNC signinnnnn</Text>
-    </>
-      )*/}
+// {/*
+//   return (
+//     <>
+//       {/* <Text>CALENDARSYNC signinnnnn</Text> */}
+//     </>
+//       )*/}
 
 
 }
