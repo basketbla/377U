@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, Image } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -9,11 +9,13 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import React, { 
   useEffect,
-  useRef
+  useRef,
+  useState
 } from 'react';
 import { registerForPushNotificationsAsync } from './utils/expo';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import VerifyPhone from './components/VerifyPhone';
 import SendTexts from './components/SendTexts';
@@ -50,13 +52,17 @@ const matTab = createMaterialTopTabNavigator();
 
 export default function PretendApp() {
 
-  const { currentUser, isNew, userFirebaseDetails, setUserFirebaseDetails } = useAuth();
+  const { currentUser, setCurrentUser, isNew, setIsNew, userFirebaseDetails, setUserFirebaseDetails } = useAuth();
 
   const notificationListener = useRef();
   const responseListener = useRef();
 
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   useEffect(async () => {
     // If user doesn't have a push notification token, make one.
+    // This messes up if we move to a different device. Maybe store a list?
     if (!userFirebaseDetails) {
       return;
     }
@@ -100,6 +106,41 @@ export default function PretendApp() {
       Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
+
+  // Check async storage to see if user is signed in
+  useEffect(async () => {
+    // Need some kind of loading state...
+    try {
+      const value = await AsyncStorage.getItem('currentUser')
+      if(value !== null) {
+        setCurrentUser(JSON.parse(value));
+        setIsNew(false)
+      }
+      setLoading(false);
+    } catch(e) {
+      // error reading value
+      setLoading(false);
+      setError(true);
+    }
+  }, [])
+
+  // If we're loading, just display the splash screen
+  if (loading) {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Image source={require('./assets/dindinsplash.png')} style={{width: '100%', height: '100%'}}/>
+      </View>
+    )
+  }
+
+  if (error) {
+    // TODO: Make this error screen prettier
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Text>There was an error. Try reloading the app</Text>
+      </View>
+    );
+  }
 
   // User is not signed in
   if (currentUser === null || isNew === null) {

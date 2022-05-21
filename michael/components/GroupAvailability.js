@@ -175,12 +175,12 @@ export default function GroupAvailability({ route, navigation }) {
             } else {
                   let night = new Date (free.startDate);
                   night.setHours(latestTime,0,0);
+                  console.log(night.getHours());
 
                   let morning = new Date (free.endDate);
                   morning.setHours(earliestTime,0,0);
 
                   // console.log(convertDate(freeStart));
-
 
                   if (freeStart.getHours() != night.getHours() ) {
                     hourSlots.push({startDate:convertDate(freeStart), endDate: convertDate(night)});
@@ -189,6 +189,7 @@ export default function GroupAvailability({ route, navigation }) {
                   if (freeEnd.getHours() != morning.getHours() ) {
                     // console.log(freeEnd.getHours());
                     // console.log(morning.getHours());
+
 
                     hourSlots.push({startDate:convertDate(morning), endDate: convertDate(freeEnd)});
                   }

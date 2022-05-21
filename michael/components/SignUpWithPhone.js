@@ -20,6 +20,7 @@ import PhoneInput from "react-native-phone-number-input";
 import { FirebaseRecaptchaVerifierModal, FirebaseRecaptchaBanner } from 'expo-firebase-recaptcha';
 import { PhoneAuthProvider, signInWithCredential } from 'firebase/auth';
 import { app, auth } from '../utils/firebase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SignUpWithPhone() {
 
@@ -28,7 +29,7 @@ export default function SignUpWithPhone() {
   // ref needed because we pass it to verifyPhoneNumber
   const recaptchaVerifier = useRef(null);
 
-  const { setIsNew } = useAuth();
+  const { setIsNew, currentUser } = useAuth();
 
   const [error, setError] = useState(false);
   const [errorText, setErrorText] = useState('');
@@ -118,6 +119,12 @@ export default function SignUpWithPhone() {
       );
       // Should have put this in firebase.js but I don't want to so whatever
       let response = await signInWithCredential(auth, credential);
+
+      // Only save logged in if they aren't a new user.
+      if (!response._tokenResponse.isNewUser) {
+        await AsyncStorage.setItem('currentUser', JSON.stringify(currentUser));
+      }
+
       setIsNew(response._tokenResponse.isNewUser);
     } catch (err) {
       setValidating(false);

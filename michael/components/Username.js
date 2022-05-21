@@ -14,6 +14,7 @@ import React, {
 import { COLORS, DEFUALT_PROFILE_PIC } from '../utils/constants';
 import { useAuth } from '../contexts/AuthContext';
 import { getUsers, saveUserDetails } from '../utils/firebase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Username({ navigation }) {
 
@@ -50,7 +51,7 @@ export default function Username({ navigation }) {
 
 
     // Changed this to save phone number instead of email.
-    saveUserDetails(currentUser.uid, name, username, currentUser.phoneNumber, DEFUALT_PROFILE_PIC).then(result => {
+    saveUserDetails(currentUser.uid, name, username, currentUser.phoneNumber, DEFUALT_PROFILE_PIC).then(async (result) => {
       setValidating(false);
       setUserFirebaseDetails({
         name: name,
@@ -61,6 +62,7 @@ export default function Username({ navigation }) {
         isFree: true,
         pushToken: null,
       })
+      await AsyncStorage.setItem('currentUser', JSON.stringify(currentUser))
       navigation.navigate('AddProfilePic')
     })
     .catch(error => {
