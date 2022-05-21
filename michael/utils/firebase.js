@@ -173,36 +173,32 @@ export const getGroup = (groupId) => {
 
 export const createGroup = async (groupId, selectedUsers, currUser, message) => {
 
-  // Add group id to userGroups for each user in userIdList
+  // Add group to userGroups for each user in userIdList
   const usersObj = {};
   const updates = {};
-  // let groupName = '';
+  let groupName = 'New Group'
+
   for (const user of selectedUsers) {
     usersObj[user.id] = true;
-    updates['/userGroups/' + user.id + '/' + groupId] = true;
-    // if (groupName === '') {
-    //   groupName += user.name.substring(0, user.name.indexOf(' '));
-    // }
-    // else {
-    //   groupName += ', ' + user.name.substring(0, user.name.indexOf(' '));
-    // }
   }
-  // Not sure if this is the best place to do this
-  // if (groupName.length > 18) {
-  //   groupName = groupName.substring(0, 18) + '...';
-  // }
   usersObj[currUser.uid] = true;
-  updates['/userGroups/' + currUser.uid + '/' + groupId] = true;
-  
-  // Leaving the group name stuff alone for now and just calling it 'new group'
-  let groupName = 'New Group'
+
+  // SHOOT. Can't just store groups directly in usergroups because then updating would be hard
   updates[`groups/${groupId}/users/`] = usersObj;
   updates[`groups/${groupId}/name`] = groupName;
+
+  for (const user of selectedUsers) {
+    // updates['/userGroups/' + user.id + '/' + groupId + '/users/'] =  usersObj;
+    // updates['/userGroups/' + user.id + '/' + groupId + '/name'] =  groupName;
+    updates['/userGroups/' + user.id + '/' + groupId] =  true;
+  }
+  // updates['/userGroups/' + currUser.uid + '/' + groupId + '/users/'] =  usersObj;
+  // updates['/userGroups/' + currUser.uid + '/' + groupId + '/name'] =  groupName;
+  updates['/userGroups/' + currUser.uid + '/' + groupId] =  true;
+  
   await update(ref_db(database), updates);
 
-  // await set(ref_db(database, `groups/${groupId}/users/`), usersObj);
-
-  await push(ref_db(database, `groups/${groupId}/messages`), {
+  await push(ref_db(database, `messages/${groupId}`), {
     text: message,
     createdAt: JSON.stringify(new Date()),
     user: {
@@ -214,7 +210,7 @@ export const createGroup = async (groupId, selectedUsers, currUser, message) => 
 }
 
 export const addMessage = async (groupId, currUser, message) => {
-  await push(ref_db(database, `groups/${groupId}/messages`), {
+  await push(ref_db(database, `messages/${groupId}`), {
     text: message,
     createdAt: JSON.stringify(new Date()),
     user: {
@@ -228,7 +224,7 @@ export const addMessage = async (groupId, currUser, message) => {
 // Takes in the giftedChat object
 export const addMessageByObj = (groupId, message) => {
   // This leaves an _id on each message and I'm just gonna ignore it maybe? Idk
-  return push(ref_db(database, `groups/${groupId}/messages`), {
+  return push(ref_db(database, `messages/${groupId}`), {
     ...message,
     createdAt: JSON.stringify(new Date())
   });
@@ -255,6 +251,15 @@ export const getUserGroups = async (uid) => {
   else {
     return [];
   }
+}
+
+export const getGroupsByIds = async (groupIds) => {;
+  let groups = [];
+  for (let id of groupIds) {
+    let groupSnapshot = await get(ref_db(database, `groups/${id}`));
+    groups.push({...groupSnapshot.val(), id: id});
+  }
+  return groups
 }
 
 export const updateGroupName = (groupId, newName) => {

@@ -118,23 +118,20 @@ export default function PretendApp() {
         setCurrentUser(JSON.parse(value));
         setIsNew(false)
       }
+
+      // Also fetch all users. Just need all the loading to be in one place :/
+      let daUsers = await getUsers();
+      if (Object.keys(daUsers).length === 0) {
+        setError(true);
+      }
+      setAllUsers(daUsers);
+
       setLoading(false);
     } catch(e) {
       // error reading value
       setLoading(false);
       setError(true);
     }
-  }, [])
-
-  // On load, fetch all users. 
-  // This means we won't be able to see new users that join, 
-  // but feels worth the performance boost.
-  useEffect(async () => {
-    let daUsers = await getUsers();
-    if (Object.keys(daUsers).length === 0) {
-      setError(true);
-    }
-    setAllUsers(daUsers);
   }, [])
 
   // If we're loading, just display the splash screen

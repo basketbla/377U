@@ -149,7 +149,7 @@ export default function NewFriends({ navigation }) {
       setContactStatus(status);
     }
     setPageLoading(false);
-  }, [isFocused]);
+  }, []);
 
 
   // Add listeners to see if friend requests have changed

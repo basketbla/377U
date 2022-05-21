@@ -20,14 +20,14 @@ export default function Chat({ navigation, route }) {
   const [groupTokens, setGroupTokens] = useState([]);
 
   useEffect(() => {
-    const unsubscribe = onChildAdded(ref_db(database, `groups/${group.id}/messages`), (snapshot, previousMessages) => {
+    const unsubscribe = onChildAdded(ref_db(database, `messages/${group.id}`), (snapshot, previousMessages) => {
 
       let newMessage = snapshot.val();
       newMessage = {...newMessage, _id: snapshot.key, createdAt: JSON.parse(newMessage.createdAt)};
 
       // Okay still so confused on what this is doing but it works so whatever
-      setMessages((previousMessages) =>
-        GiftedChat.append(previousMessages, newMessage)
+      setMessages((prevMessages) =>
+        GiftedChat.append(prevMessages, newMessage)
       );
     })
 
@@ -48,7 +48,7 @@ export default function Chat({ navigation, route }) {
     ), });
 
 
-    return [unsubscribe];
+    return unsubscribe;
   }, []);
 
   useEffect(async () => {
@@ -72,7 +72,6 @@ export default function Chat({ navigation, route }) {
   }, [])
 
   const sendPushNotifications = async (messageBody, userTokens) => {
-
     console.log('sending text')
     console.log(groupTokens)
     let tokens = groupTokens;
@@ -107,11 +106,10 @@ export default function Chat({ navigation, route }) {
   }
 
   // firebase onsend or non-firebase onsend
-  //** Dvaid's changes added async to it
   const onSend = useCallback((messages = []) => {
-    addMessageByObj(group.id, messages[0]);
-    // await schedulePushNotification()
-    // sendPushNotifications(messages[0].text);
+    for (let i = 0; i < 1000; i++) {
+      addMessageByObj(group.id, messages[0]);
+    }
   }, []);
 
 

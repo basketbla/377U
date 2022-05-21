@@ -6,7 +6,8 @@ import React, {
 import { colors, SearchBar } from 'react-native-elements';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { COLORS, DEFUALT_PROFILE_PIC, hash } from '../utils/constants';
-import { getFriends, getCurrentUser, getUserGroups, getGroup } from '../utils/firebase';
+import { getFriends, getCurrentUser, getUserGroups, database, getGroupsByIds } from '../utils/firebase';
+import { onValue, ref as ref_db } from 'firebase/database';
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import BlandUser from './BlandUser';
@@ -96,7 +97,28 @@ export default function People({ navigation }) {
     }
 
     setLoading(false);
-  }, [isFocused])
+  }, [])
+
+   // Add listener for new groups
+   useEffect(() => {
+
+    const unsubscribe = onValue(ref_db(database, `userGroups/${currentUser.uid}`), async (snapshot) => {
+      if (snapshot.val()) {
+        let userGroups = await getGroupsByIds(Object.keys(snapshot.val()));
+        setAllGroups(userGroups.map(group => ({...group, numFree: Object.keys(group.users).reduce((previousValue, currUser) => (previousValue + allUsers[currUser].isFree), 0), totalNum: Object.keys(group.users).length})));
+        setGroupsToDisplay(userGroups.map(group => ({...group, numFree: Object.keys(group.users).reduce((previousValue, currUser) => (previousValue + allUsers[currUser].isFree), 0), totalNum: Object.keys(group.users).length})));
+      }
+      else {
+        setAllGroups([])
+        setGroupsToDisplay([])
+      }
+    });
+    
+    return unsubscribe;
+  }, []);
+
+  // Listener for individual messages will be hard bc we need to do every group...
+  // OH. Could store last message in group and do a listener on that?
 
   const handleSearch = text => {
     setSearch(text);

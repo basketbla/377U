@@ -101,7 +101,7 @@ export default function OldFriends({ navigation }) {
       setFriends(friendUsers);
       setFriendsToDisplay(friendUsers);
       setLoading(false);
-  }, [isFocused]);
+  }, []);
 
   // Add listeners to see if anyone accepted requests
   useEffect(() => {
