@@ -41,14 +41,14 @@ const ContactEntry = ({ contact, type, profilePicsMap }) => (
     if (!contact.phoneNumbers && contact.emails) {
       await SMS.sendSMSAsync(
         [contact.emails[0].email],
-        'Download dindin! https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+        'Download dindin! https://testflight.apple.com/join/ZfW7d93U'
       );
       return
     }
 
     await SMS.sendSMSAsync(
       [contact.phoneNumbers[0].digits],
-      'Download dindin! https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+      'Download dindin! https://testflight.apple.com/join/ZfW7d93U'
     );
   }}>
     {/* <View style={{...styles.profilePic, backgroundColor: `${PROFILE_COLORS[contact.firstName.charCodeAt(1) % PROFILE_COLORS.length]}`}}>
