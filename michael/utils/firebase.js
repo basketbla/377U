@@ -1,10 +1,11 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, deleteUser as deleteAuthUser } from "firebase/auth";
 import { getDatabase, ref as ref_db, set, get, child, remove, push, update } from "firebase/database";
 import { getStorage, ref as ref_storage, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { DEFUALT_PROFILE_PIC, NOTIFICATION_TYPES } from "./constants";
 import { sendPushNotification } from "./expo";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -263,7 +264,9 @@ export const getUserGroups = async (uid) => {
     // Or keep it like this and don't re-fetch group data when going to chat
     for (let id of groupIds) {
       let groupSnapshot = await get(ref_db(database, `groups/${id}`));
-      groups.push({...groupSnapshot.val(), id: id});
+      if (groupSnapshot.val()) {
+        groups.push({...groupSnapshot.val(), id: id});
+      }
     }
     return groups
   }
@@ -276,7 +279,12 @@ export const getGroupsByIds = async (groupIds) => {;
   let groups = [];
   for (let id of groupIds) {
     let groupSnapshot = await get(ref_db(database, `groups/${id}`));
-    groups.push({...groupSnapshot.val(), id: id});
+
+    // if group has been deleted, remove it from userGroups
+    // Wait this feels sketchy. Maybe make a 'deletedGroups' thing in database and remove based on that?
+    if (groupSnapshot.val()) {
+      groups.push({...groupSnapshot.val(), id: id});
+    }
   }
   return groups
 }
@@ -293,9 +301,36 @@ export const addUserPushToken = (userId, token) => {
 // Remove user from all groups. If group only has one other person, delete it.
 // Then delete the user from database AND auth
 // Can't remove all friends... will need to change friends to update db when someone tries to fetch someone who has been deleted.
-// putting this off for now
-// export const deleteUser = () => {
 
+// THIS WAS HARDER THAN I THOUGHT
+// For whenever I do this: need to make an actual deleted accounts/groups folder, then reference that when doing cleanup over time
+
+// Things to clean up over time:
+// * groups that have been deleted
+// * 
+// export const deleteUser = async (userId) => {
+//   await AsyncStorage.removeItem('currentUser');
+//   await remove(ref_db(database, `users/${userId}`));
+//   let groupSnapshot = await get(ref_db(database, `userGroups/${userId}`));
+//   console.log(groupSnapshot)
+//   let groupIds = Object.keys(groupSnapshot.val());
+//   console.log(groupIds)
+//   for (let groupId of groupIds) {
+//     let group = await get(ref_db(database, `groups/${groupId}`));
+//     console.log(group)
+//     group = group.val()
+//     if (Object.keys(group.users).length === 2) {
+//       await remove(ref_db(database, `groups/${groupId}`))
+//     }
+//     else {
+//       await remove(ref_db(database, `groups/${groupId}/users/${userId}`))
+//     }
+//   }
+//   await remove(ref_db(database, `userGroups/${userId}`));
+//   await remove(ref_db(database, `friends/${userId}`));
+//   await remove(ref_db(database, `friendRequests/${userId}`));
+//   await remove(ref_db(database, `sentFriendRequests/${userId}`));
+//   await deleteAuthUser(auth.currentUser);
 // }
 
 

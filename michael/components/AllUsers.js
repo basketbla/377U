@@ -64,6 +64,10 @@ export default function AllUsers({ navigation }) {
   const [newFriends, setNewFriends] = useState([]);
   const [requestees, setRequestees] = useState([]);
 
+  // THIS IS THE ONE PLACE THAT REALLY GETS AFFECTED BY STORING ALL USERS ONCE
+  // Do we ever want to refresh this???
+
+  // Yeah actually leads to bug. If one person refreshes app and adds another, they show up as undefined because friend requests is ahead of allUsers
 
   // Fetch all friends
   useEffect(async () => {

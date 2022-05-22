@@ -136,7 +136,8 @@ export default function PretendApp() {
       // Also fetch all users. Just need all the loading to be in one place :/
       let daUsers = await getUsers();
       if (Object.keys(daUsers).length === 0) {
-        setError(true);
+        // Normally want this to error, but it's legitimate if there are no users
+        // setError(true);
       }
       setAllUsers(daUsers);
 
