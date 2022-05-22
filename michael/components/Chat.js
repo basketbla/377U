@@ -71,6 +71,7 @@ export default function Chat({ navigation, route }) {
     }
   }, [])
 
+  // Could redo this to use the function from expo.js...
   const sendPushNotifications = async (messageBody, userTokens) => {
     let tokens = groupTokens;
     if (userTokens) {

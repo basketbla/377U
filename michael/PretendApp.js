@@ -103,6 +103,8 @@ export default function PretendApp() {
 
     // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+
+      // This approach is gonna be buggy if people have the app running in background not on people screen... whatever
       let data = response.notification.request.content.data;
 
       if (data.type === NOTIFICATION_TYPES.message) {

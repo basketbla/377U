@@ -170,9 +170,7 @@ export const removeFriendRequest = (requesterId, requesteeId) => {
   return remove(ref_db(database, `friendRequests/${requesteeId}/${requesterId}`));
 }
 
-// Also want to send notification
-// get push token of requesteeId and send request
-// Maybe export a send notification function from expo.js file?
+// Wait. I'm an idiot. I probably should have just put this where I call it. Whatever.
 export const addSentFriendRequest = (requesterId, requesteeId, pushToken, userDetails) => {
   if (pushToken) {
     sendPushNotification(`${userDetails.name} sent you a friend request!`, `Go accept @${userDetails.username}'s request!`, pushToken, { type: NOTIFICATION_TYPES.newFriendRequest })

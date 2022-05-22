@@ -10,12 +10,17 @@ import React, {
   useEffect,
   useState
 } from 'react'
-import { COLORS } from '../utils/constants';
+import { COLORS, NOTIFICATION_TYPES } from '../utils/constants';
 import { useFriends } from '../contexts/FriendsContext';
 import { addFriend, removeFriendRequest, removeSentFriendRequest } from '../utils/firebase';
+import { sendPushNotification } from '../utils/expo';
+import { useAuth } from '../contexts/AuthContext';
 
 
 export default function FriendRequest({ contact, currUser }) {
+
+  const { userFirebaseDetails } = useAuth();
+  const { allUsers } = useFriends();
 
   const [loading, setLoading] = useState(false);
   const [accepted, setAccepted] = useState(false);
@@ -36,6 +41,10 @@ export default function FriendRequest({ contact, currUser }) {
     await addFriend(contact.id, currUser.uid);
     await removeFriendRequest(contact.id, currUser.uid);
     await removeSentFriendRequest(contact.id, currUser.uid);
+
+    if (allUsers[contact.id]?.pushToken) {
+      sendPushNotification(`${userFirebaseDetails.name} accepted your friend request!`, 'Go send them a message!', allUsers[contact.id].pushToken, { type: NOTIFICATION_TYPES.friendRequestAccepted })
+    }
     // setAllFriendRequestsGlobal([...allFriendRequestsGlobal.filter(user => user.id !== contact.id)]);
     // setAllExistingGlobal([...allExistingGlobal.filter(user => user.id !== contact.id)]);
     // setAccepted(true);
