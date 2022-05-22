@@ -4,7 +4,7 @@ import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useAuth } from './contexts/AuthContext';
-import { COLORS } from './utils/constants';
+import { COLORS, NOTIFICATION_TYPES } from './utils/constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import React, { 
@@ -103,9 +103,15 @@ export default function PretendApp() {
 
     // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      let group = response.notification.request.content.data;
-      if (group) {
-        setNavigateTo({to: 'Chat', group: group})
+      let data = response.notification.request.content.data;
+
+      if (data.type === NOTIFICATION_TYPES.message) {
+        if (data.group) {
+          setNavigateTo({to: 'Chat', group: data.group})
+        }
+      }
+      else if (data.type === NOTIFICATION_TYPES.newFriendRequest) {
+        setNavigateTo({to: 'FriendsTab'})
       }
     });
 
@@ -179,7 +185,7 @@ export default function PretendApp() {
   }
 
   // User just signed up, do onboarding. ALSO catch the case where they restarted after signing up
-  if ((!!currentUser && isNew) || Object.keys(userFirebaseDetails).length === 1) {
+  if ((!!currentUser && isNew) || (userFirebaseDetails && Object.keys(userFirebaseDetails).length === 1)) {
     return (
       <OnboardingStack/>
     );

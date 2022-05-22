@@ -142,11 +142,15 @@ export default function People({ navigation }) {
       return
     }
     // I messed something up here but whatever...
-    let group = navigateTo.group.group;
-    console.log(group)
+    let group = navigateTo.group;
+    let to = navigateTo.to;
     setNavigateTo(null);
-    console.log(group.users)
-    navigation.navigate('Chat', {group: {...group, numFree: Object.keys(group.users).length, totalNum: Object.keys(group.users).length}})
+    if (to === 'Chat') {
+      navigation.navigate('Chat', {group: {...group, numFree: Object.keys(group.users).length, totalNum: Object.keys(group.users).length}})
+    }
+    else if (to === 'FriendsTab') {
+      navigation.navigate('FriendsTab');
+    }
   }, [navigateTo])
 
   const handleSearch = text => {

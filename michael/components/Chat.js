@@ -6,7 +6,7 @@ import { addMessageByObj, getCurrentUser, getGroup } from '../utils/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { onChildAdded, ref as ref_db} from "firebase/database";
 import { database } from '../utils/firebase';
-import { COLORS } from '../utils/constants';
+import { COLORS, NOTIFICATION_TYPES } from '../utils/constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
@@ -72,8 +72,6 @@ export default function Chat({ navigation, route }) {
   }, [])
 
   const sendPushNotifications = async (messageBody, userTokens) => {
-    console.log('sending text')
-    console.log(groupTokens)
     let tokens = groupTokens;
     if (userTokens) {
       tokens = userTokens;
@@ -89,7 +87,7 @@ export default function Chat({ navigation, route }) {
         sound: 'default',
         title: userFirebaseDetails.name,
         body: messageBody,
-        data: { group: group },
+        data: { group: group, type: NOTIFICATION_TYPES.message },
       };
     
       await fetch('https://exp.host/--/api/v2/push/send', {

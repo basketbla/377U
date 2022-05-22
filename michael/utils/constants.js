@@ -57,3 +57,8 @@ export const hash = (inputstr) => {
   }
   return hash;
 }
+
+export const NOTIFICATION_TYPES = {
+  newFriendRequest: 'newFriendRequest',
+  message: 'message'
+}

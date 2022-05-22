@@ -3,7 +3,8 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getDatabase, ref as ref_db, set, get, child, remove, push, update } from "firebase/database";
 import { getStorage, ref as ref_storage, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { DEFUALT_PROFILE_PIC } from "./constants";
+import { DEFUALT_PROFILE_PIC, NOTIFICATION_TYPES } from "./constants";
+import { sendPushNotification } from "./expo";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -169,7 +170,13 @@ export const removeFriendRequest = (requesterId, requesteeId) => {
   return remove(ref_db(database, `friendRequests/${requesteeId}/${requesterId}`));
 }
 
-export const addSentFriendRequest = (requesterId, requesteeId) => {
+// Also want to send notification
+// get push token of requesteeId and send request
+// Maybe export a send notification function from expo.js file?
+export const addSentFriendRequest = (requesterId, requesteeId, pushToken, userDetails) => {
+  if (pushToken) {
+    sendPushNotification(`${userDetails.name} sent you a friend request!`, `Go accept @${userDetails.username}'s request!`, pushToken, { type: NOTIFICATION_TYPES.newFriendRequest })
+  }
   return set(ref_db(database, `sentFriendRequests/${requesterId}/${requesteeId}`), true);
 }
 

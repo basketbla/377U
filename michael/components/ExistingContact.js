@@ -12,18 +12,20 @@ import React, {
 import { COLORS } from '../utils/constants';
 import { addFriendRequest, addSentFriendRequest } from '../utils/firebase';
 import { useAuth } from '../contexts/AuthContext';
+import { useFriends } from '../contexts/FriendsContext';
 
 
 export default function ExistingContact({ contact }) {
 
-  const { currentUser } = useAuth();
+  const { currentUser, userFirebaseDetails } = useAuth();
+  const { allUsers } = useFriends();
 
   const [loading, setLoading] = useState(false);
 
   const handleSendRequest = async () => {
     setLoading(true);
     await addFriendRequest(currentUser.uid, contact.id);
-    await addSentFriendRequest(currentUser.uid, contact.id);
+    await addSentFriendRequest(currentUser.uid, contact.id, allUsers[contact.id]?.pushToken, userFirebaseDetails);
     setLoading(false);
   }
 
