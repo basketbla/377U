@@ -60,6 +60,7 @@ export default function People({ navigation }) {
   const [allFriends, setAllFriends] = useState([]);
   const [friendsToDisplay, setFriendsToDisplay] = useState([]);
   const [friendsMap, setFriendsMap] = useState({});
+  const [friendRequests, setFriendRequests] = useState([]);
 
   const { currentUser, setUserFirebaseDetails } = useAuth();
   const { allUsers, navigateTo, setNavigateTo } = useFriends();
@@ -120,6 +121,21 @@ export default function People({ navigation }) {
   // Listener for individual messages will be hard bc we need to do every group...
   // OH. Could store last message in group and do a listener on that?
 
+  // Add listener for new friend requests
+  useEffect(() => {
+
+    const unsubscribe = onValue(ref_db(database, `friendRequests/${currentUser.uid}`), async (snapshot) => {
+      if (snapshot.val()) {
+        setFriendRequests(Object.keys(snapshot.val()));
+      }
+      else {
+        setFriendRequests([]);
+      }
+    });
+    
+    return unsubscribe;
+  }, []);
+
 
   useEffect(() => {
     if (!navigateTo) {
@@ -168,7 +184,15 @@ export default function People({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <Ionicons name={'person-add'} size={30} style={{ marginLeft: 5, marginTop:2 }} color={COLORS.yellow} onPress={() => navigation.navigate('FriendsTab')}/>
+        <View style={styles.addPeopleIconContainer}>
+          <Ionicons name={'person-add'} size={30} style={{ marginLeft: 5, marginTop:2 }} color={COLORS.yellow} onPress={() => navigation.navigate('FriendsTab')}/>
+          {
+            friendRequests.length !== 0 ?
+            <View style={styles.addPeopleActivity}/>
+            :
+            <></>
+          }
+        </View>
         <Pressable style={styles.addGroup} onPress={() => navigation.navigate('CreateGroup')}>
           {/* <Text style={styles.addText}>New group</Text> */}
           {/* <Ionicons name={'add'} size={30} color={COLORS.yellow}/> */}
@@ -374,5 +398,17 @@ const styles = StyleSheet.create({
     paddingLeft:15,
     paddingRight:15,
         flexGrow: 0,
+  },
+  addPeopleIconContainer: {
+
+  },
+  addPeopleActivity: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: COLORS.iosBlue,
+    position: 'absolute',
+    top: 0,
+    right: 0
   }
 })

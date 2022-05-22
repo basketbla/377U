@@ -102,7 +102,6 @@ export default function AllUsers({ navigation }) {
       // Don't show the current user
       users = users.filter(user => user.id !== currentUser.uid)
 
-
       setFriends(users);
       setFriendsToDisplay(users);
       setLoading(false);
@@ -160,25 +159,31 @@ export default function AllUsers({ navigation }) {
   // Update display based on new friend requests
   useEffect(() => {
     let temp = [...friends]
-    temp = temp.map(user => {return {...user, isFriend: requesters.includes(user.id) || user.isFriend}})
-    setFriends(temp)
-    setFriendsToDisplay(temp)
+    if (temp.length !== 0) {
+      temp = temp.map(user => {return {...user, isFriend: requesters.includes(user.id) || user.isFriend}})
+      setFriends(temp)
+      setFriendsToDisplay(temp)
+    }
   }, [requesters])
 
-  // Update display based on accepted friend requests. 
+  // // Update display based on accepted friend requests. 
   useEffect(() => {
     let temp = [...friends]
-    temp = temp.map(user => {return {...user, isFriend: newFriends.includes(user.id), requestSent: (user.requestSent && !newFriends.includes(user.id))}})
-    setFriends(temp)
-    setFriendsToDisplay(temp)
+    if (temp.length !== 0) {
+      temp = temp.map(user => {return {...user, isFriend: newFriends.includes(user.id), requestSent: (user.requestSent && !newFriends.includes(user.id))}})
+      setFriends(temp)
+      setFriendsToDisplay(temp)
+    }
   }, [newFriends])
 
-  // Update display based on new sent friend requests
+  // // Update display based on new sent friend requests
   useEffect(() => {
     let temp = [...friends]
-    temp = temp.map(user => {return {...user, requestSent: requestees.includes(user.id)}})
-    setFriends(temp)
-    setFriendsToDisplay(temp)
+    if (temp.length !== 0) {
+      temp = temp.map(user => {return {...user, requestSent: requestees.includes(user.id)}})
+      setFriends(temp)
+      setFriendsToDisplay(temp)
+    }
   }, [requestees])
 
 
@@ -215,12 +220,12 @@ export default function AllUsers({ navigation }) {
       />
       {
         friends.length === 0 ?
-        <Text style={{flex: 1, fontSize: 20, color: COLORS.darkGrey}}>You have no friends :(</Text>
+        <Text style={{flex: 1, fontSize: 20, color: COLORS.darkGrey}}>There are no users???</Text>
         :
         <>
           {
             friendsToDisplay.length === 0 ?
-            <Text style={{flex: 1, fontSize: 20, color: COLORS.darkGrey}}>No matching friends</Text>
+            <Text style={{flex: 1, fontSize: 20, color: COLORS.darkGrey}}>No matching users</Text>
             :
             <FlatList
               data={friendsToDisplay}

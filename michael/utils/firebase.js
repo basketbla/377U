@@ -285,6 +285,14 @@ export const addUserPushToken = (userId, token) => {
 }
 
 
+// Remove user from all groups. If group only has one other person, delete it.
+// Then delete the user from database AND auth
+// Can't remove all friends... will need to change friends to update db when someone tries to fetch someone who has been deleted.
+// putting this off for now
+// export const deleteUser = () => {
+
+// }
+
 
 // addFriendRequest('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');
 // addFriend('1', 'L5CTIRTqqiOp1QkqqcLsWJMva733');
