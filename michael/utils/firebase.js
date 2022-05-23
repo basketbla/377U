@@ -230,23 +230,33 @@ export const createGroup = async (groupId, selectedUsers, currUser, message) => 
 }
 
 export const addMessage = async (groupId, currUser, message) => {
-  await push(ref_db(database, `messages/${groupId}`), {
+
+  let created = JSON.stringify(new Date());
+  let messageObj = {
     text: message,
-    createdAt: JSON.stringify(new Date()),
+    createdAt: created,
     user: {
       _id: currUser.uid,
       name: currUser.name,
       avatar: currUser.profilePic,
-    },
-  });
+    }
+  }
+  set(ref_db(database, `groups/${groupId}/lastMessage`), messageObj);
+  await push(ref_db(database, `messages/${groupId}`), messageObj);
 }
 
 // Takes in the giftedChat object
-export const addMessageByObj = (groupId, message) => {
+export const addMessageByObj = (groupId, message, userId) => {
   // This leaves an _id on each message and I'm just gonna ignore it maybe? Idk
+
+  // Is this the right way to do this async?
+  let created = JSON.stringify(new Date());
+  set(ref_db(database, `groups/${groupId}/lastMessage`), {...message, createdAt: created});
+  set(ref_db(database, `userGroups/${userId}/${groupId}/localLastSeen`), created);
+
   return push(ref_db(database, `messages/${groupId}`), {
     ...message,
-    createdAt: JSON.stringify(new Date())
+    createdAt: created
   });
 }
 
@@ -254,6 +264,12 @@ export const getUserGroups = async (uid) => {
   let groupIdSnapshot = await get(ref_db(database, `userGroups/${uid}`));
   if (groupIdSnapshot.exists()) {
     let groupIds = Object.keys(groupIdSnapshot.val());
+
+    let localLastSeen = {};
+    for (let id of groupIds) {
+      localLastSeen[id] = groupIdSnapshot.val()[id].localLastSeen
+    }
+
     let groups = [];
     // This is slow but I don't know a better way
     // Could store metadata inside of usergroups? But then would be hard to keep updated / get free users
@@ -265,7 +281,7 @@ export const getUserGroups = async (uid) => {
     for (let id of groupIds) {
       let groupSnapshot = await get(ref_db(database, `groups/${id}`));
       if (groupSnapshot.val()) {
-        groups.push({...groupSnapshot.val(), id: id});
+        groups.push({...groupSnapshot.val(), id: id, localLastSeen: localLastSeen[id]});
       }
     }
     return groups
@@ -295,6 +311,10 @@ export const updateGroupName = (groupId, newName) => {
 
 export const addUserPushToken = (userId, token) => {
   return set(ref_db(database, `users/${userId}/pushToken`), token);
+}
+
+export const updateLocalLastSeen = (userId, groupId, date) => {
+  return set(ref_db(database, `userGroups/${userId}/${groupId}/localLastSeen`), date);
 }
 
 

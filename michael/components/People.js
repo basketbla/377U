@@ -12,6 +12,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import BlandUser from './BlandUser';
 import { useFriends } from '../contexts/FriendsContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const FreeNow = ({ user }) => {
 
@@ -34,8 +35,19 @@ const Group = ({ group, allUsers }) => {
 
   const navigation = useNavigation();
 
+  // useEffect(() => {
+  //   console.log('last seen:')
+  //   console.log(group.localLastSeen)
+  // }, [group])
+
   return (
     <Pressable onPress={() => navigation.navigate('Chat', {group: group})} style={styles.groupEntry}>
+      {/* {
+        group.localLastSeen < JSON.parse(group.lastMessage.createdAt) ?
+        <View style={styles.unreadMessageDot} />
+        :
+        <></>
+      } */}
       <View style={styles.groupEntryTextContainer}>
         <Text style={styles.groupEntryName}>{group.name}</Text>
         <Text style={styles.groupEntryFree}>{`${group.numFree}/${group.totalNum} free`}</Text>
@@ -61,6 +73,7 @@ export default function People({ navigation }) {
   const [friendsToDisplay, setFriendsToDisplay] = useState([]);
   const [friendsMap, setFriendsMap] = useState({});
   const [friendRequests, setFriendRequests] = useState([]);
+  const [groupIds, setGroupIds] = useState([]);
 
   const { currentUser, setUserFirebaseDetails } = useAuth();
   const { allUsers, navigateTo, setNavigateTo } = useFriends();
@@ -68,18 +81,37 @@ export default function People({ navigation }) {
   // Still just all friends, not free friends
   useEffect(async () => {
 
+    // function compareMessagesByDate( a, b ) {
+    //   return JSON.parse(a.lastMessage.createdAt) <= JSON.parse(b.lastMessage.createdAt);
+    // }
+
     console.log('useeffect on people')
 
-    // Need to make this just a globally known thing so I don't keep fetching
     let users = allUsers;
 
     // Setting userFirebaseDetails here too
-    let userStuff = await getCurrentUser(currentUser.uid);
+    // let userStuff = await getCurrentUser(currentUser.uid);
     // setUserFirebaseDetails({...userStuff.val(), uid: currentUser.uid});
 
-    let userGroups = await getUserGroups(currentUser.uid);
-    setAllGroups(userGroups.map(group => ({...group, numFree: Object.keys(group.users).reduce((previousValue, currUser) => (previousValue + users[currUser].isFree), 0), totalNum: Object.keys(group.users).length})));
-    setGroupsToDisplay(userGroups.map(group => ({...group, numFree: Object.keys(group.users).reduce((previousValue, currUser) => (previousValue + users[currUser].isFree), 0), totalNum: Object.keys(group.users).length})));
+    // let userGroups = await getUserGroups(currentUser.uid);
+    // setGroupIds(userGroups.map(group => group.id));
+
+
+    // // Get the saved last seen messages
+    // let localLastSeen = {};
+    // for (let id of userGroups.map(group => group.id)) {
+    //   let date = await AsyncStorage.getItem(JSON.stringify(id));
+    //   if (date) {
+    //     localLastSeen[id] = JSON.parse(date);
+    //   }
+    // }
+
+    // userGroups = userGroups.map(group => ({...group, localLastSeen: localLastSeen[group.id]}))
+    // userGroups = userGroups.map(group => ({...group, numFree: Object.keys(group.users).reduce((previousValue, currUser) => (previousValue + users[currUser].isFree), 0), totalNum: Object.keys(group.users).length}));
+    // userGroups.sort(compareMessagesByDate)
+
+    // setAllGroups(userGroups);
+    // setGroupsToDisplay(userGroups);
     // {name: 'All Friends', numFree: 5, totalNum: 10, id: '1'}
 
     let friends = await getFriends(currentUser.uid);
@@ -100,14 +132,39 @@ export default function People({ navigation }) {
     setLoading(false);
   }, [isFocused])
 
-   // Add listener for new groups
-   useEffect(() => {
+  // Add listener for new groups
+  useEffect(() => {
+
+    function compareMessagesByDate( a, b ) {
+      return JSON.parse(a.lastMessage.createdAt) <= JSON.parse(b.lastMessage.createdAt);
+    }
 
     const unsubscribe = onValue(ref_db(database, `userGroups/${currentUser.uid}`), async (snapshot) => {
+      console.log('running groups value thing')
       if (snapshot.val()) {
         let userGroups = await getGroupsByIds(Object.keys(snapshot.val()));
-        setAllGroups(userGroups.map(group => ({...group, numFree: Object.keys(group.users).reduce((previousValue, currUser) => (previousValue + allUsers[currUser].isFree), 0), totalNum: Object.keys(group.users).length})));
-        setGroupsToDisplay(userGroups.map(group => ({...group, numFree: Object.keys(group.users).reduce((previousValue, currUser) => (previousValue + allUsers[currUser].isFree), 0), totalNum: Object.keys(group.users).length})));
+
+        setGroupIds(userGroups.map(group => group.id));
+
+        // let localLastSeen = {};
+        // for (let id of Object.keys(snapshot.val())) {
+        //   localLastSeen[id] = JSON.parse(snapshot.val()[id].localLastSeen)
+        // }
+        // userGroups = userGroups.map(group => ({...group, localLastSeen: localLastSeen[group.id]}))
+
+        // let localLastSeen = {};
+        // for (let id of userGroups.map(group => group.id)) {
+        //   let date = await AsyncStorage.getItem(JSON.stringify(id));
+        //   if (date) {
+        //     localLastSeen[id] = JSON.parse(date);
+        //   }
+        // }
+        // userGroups = userGroups.map(group => ({...group, localLastSeen: localLastSeen[group.id]}))
+
+        userGroups = userGroups.map(group => ({...group, numFree: Object.keys(group.users).reduce((previousValue, currUser) => (previousValue + allUsers[currUser].isFree), 0), totalNum: Object.keys(group.users).length}))
+        userGroups.sort(compareMessagesByDate);
+        setAllGroups(userGroups);
+        setGroupsToDisplay(userGroups);
       }
       else {
         setAllGroups([])
@@ -116,10 +173,56 @@ export default function People({ navigation }) {
     });
     
     return unsubscribe;
-  }, []);
+  }, [isFocused]);
 
-  // Listener for individual messages will be hard bc we need to do every group...
-  // OH. Could store last message in group and do a listener on that?
+  // Add listener for every group in userGroups (for new lastMessage)
+  useEffect(() => {
+
+    function compareMessagesByDate( a, b ) {
+      return JSON.parse(a.lastMessage.createdAt) <= JSON.parse(b.lastMessage.createdAt);
+    }
+
+    let unsubscribeList = [];
+    
+    for (let id of groupIds) {
+      console.log('adding listener for ', id);
+      const unsubscribe = onValue(ref_db(database, `groups/${id}`), async (snapshot) => {
+        // This is only one, won't give the whole list of groups...
+        // Just update this group in list of groups?
+
+        let updatedGroup = snapshot.val();
+        if (!updatedGroup) {
+          return
+        }
+        updatedGroup = {...updatedGroup, id: snapshot.key}
+        let userGroups = allGroups;
+        if (userGroups.length === 0) {
+          return
+        }
+        userGroups = userGroups.map(group => { 
+          if (group.id === updatedGroup.id) {
+            // return {...updatedGroup, localLastSeen: group.localLastSeen}
+            return updatedGroup
+          }
+          else {
+            return group
+          }
+        })
+        // console.log('doing group listener')
+        // console.log(snapshot.val())
+        // let userGroups = await getGroupsByIds(Object.keys(snapshot.val()));
+        userGroups = userGroups.map(group => ({...group, numFree: Object.keys(group.users).reduce((previousValue, currUser) => (previousValue + allUsers[currUser].isFree), 0), totalNum: Object.keys(group.users).length}))
+        userGroups.sort(compareMessagesByDate);
+        setAllGroups(userGroups);
+        setGroupsToDisplay(userGroups);
+      });
+      unsubscribeList.push(unsubscribe)
+    }
+    
+    return unsubscribeList;
+  }, [groupIds]);
+
+  // TODO: Add listener for people becoming free, then I can get rid of the big useEffect
 
   // Add listener for new friend requests
   useEffect(() => {
@@ -344,7 +447,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingLeft: 15,
+    paddingLeft: 25,
     paddingRight: 40,
   },
 
@@ -414,5 +517,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     right: 0
+  },
+  unreadMessageDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: COLORS.iosBlue,
+    position: 'absolute',
+    left: 5,
   }
 })

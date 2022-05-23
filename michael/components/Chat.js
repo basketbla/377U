@@ -2,15 +2,16 @@ import { StyleSheet, Text, View, Pressable } from 'react-native'
 import React, { useState, useCallback, useEffect } from "react";
 import { GiftedChat, InputToolbar, Send } from "react-native-gifted-chat";
 import firebase from "@firebase/app";
-import { addMessageByObj, getCurrentUser, getGroup } from '../utils/firebase';
+import { addMessageByObj, getCurrentUser, getGroup, updateLocalLastSeen } from '../utils/firebase';
 import { useAuth } from '../contexts/AuthContext';
-import { onChildAdded, ref as ref_db} from "firebase/database";
+import { onChildAdded, ref as ref_db, set} from "firebase/database";
 import { database } from '../utils/firebase';
 import { COLORS, NOTIFICATION_TYPES } from '../utils/constants';
 import { beautifyDate } from './GroupAvailability.js'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function Chat({ navigation, route }) {
@@ -19,12 +20,18 @@ export default function Chat({ navigation, route }) {
   const { userFirebaseDetails } = useAuth();
   const [messages, setMessages] = useState([]);
   const [groupTokens, setGroupTokens] = useState([]);
+  // const [localLastSeen, setLocalLastSeen] = useState();
 
   useEffect(() => {
     const unsubscribe = onChildAdded(ref_db(database, `messages/${group.id}`), (snapshot, previousMessages) => {
 
       let newMessage = snapshot.val();
       newMessage = {...newMessage, _id: snapshot.key, createdAt: JSON.parse(newMessage.createdAt)};
+
+      // if (newMessage.createdAt > localLastSeen) {
+      //   setLocalLastSeen(group.newMessage.createdAt)
+      //   updateLocalLastSeen(userFirebaseDetails.uid, group.id, JSON.stringify(newMessage.createdAt))
+      // }
 
       // Okay still so confused on what this is doing but it works so whatever
       setMessages((prevMessages) =>
@@ -72,6 +79,13 @@ export default function Chat({ navigation, route }) {
     }
   }, [])
 
+  // On open, save the last message seen in async storage
+  // Also need to do this every time we send a message
+  // useEffect(async () => {
+  //   setLocalLastSeen(JSON.parse(group.lastMessage.createdAt))
+  //   updateLocalLastSeen(userFirebaseDetails.uid, group.id, group.lastMessage.createdAt)
+  // }, [])
+
   // Could redo this to use the function from expo.js...
   const sendPushNotifications = async (messageBody, userTokens) => {
     let tokens = groupTokens;
@@ -107,7 +121,7 @@ export default function Chat({ navigation, route }) {
 
   // firebase onsend or non-firebase onsend
   const onSend = useCallback((messages = []) => {
-    addMessageByObj(group.id, messages[0]);
+    addMessageByObj(group.id, messages[0], userFirebaseDetails.uid);
   }, []);
 
 
