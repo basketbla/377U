@@ -16,7 +16,7 @@ import React, {
 } from 'react'
 import * as Contacts from 'expo-contacts';
 import { COLORS, DEFUALT_PROFILE_PIC } from '../utils/constants';
-import { getFriendRequests, getFriends, removeFriend, database } from '../utils/firebase';
+import { getFriendRequests, getFriends, removeFriend, database, getUsers } from '../utils/firebase';
 import { onValue, ref as ref_db } from 'firebase/database';
 import * as SMS from 'expo-sms';
 import { useAuth } from '../contexts/AuthContext';

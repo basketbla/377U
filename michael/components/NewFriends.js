@@ -140,8 +140,8 @@ export default function NewFriends({ navigation }) {
 
       setAllExistingAccounts(existingAccounts);
       setAllOtherContacts(otherContacts);
-      setAllFriendRequests(friendRequests);
-      setSectionData([{title: `Friend Requests (${friendRequests.length})`, data: friendRequests, renderItem: renderFriendRequest}, {title: `Contacts on Din Din (${existingAccounts.length})`, data: existingAccounts, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
+      // setAllFriendRequests(friendRequests);
+      // setSectionData([{title: `Friend Requests (${friendRequests.length})`, data: friendRequests, renderItem: renderFriendRequest}, {title: `Contacts on Din Din (${existingAccounts.length})`, data: existingAccounts, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
       
       setContactStatus(status);
     }
@@ -157,6 +157,7 @@ export default function NewFriends({ navigation }) {
 
     // Wasting a time setting friendRequests the first time, but I think it's fine
     const unsubscribe = onValue(ref_db(database, `friendRequests/${currentUser.uid}`), async (friendRequests) => {
+      console.log('Friend request listener fired')
       if (friendRequests && friendRequests.val()) {
         let friendRequestIds = Object.keys(friendRequests.val());
 
@@ -173,7 +174,6 @@ export default function NewFriends({ navigation }) {
           newAllUsers = await getUsers();
           setAllUsers(newAllUsers)
         }
-
 
         friendRequests = friendRequestIds.map(id => (
           {...newAllUsers[id], id: id}
