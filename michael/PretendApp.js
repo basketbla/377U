@@ -70,6 +70,10 @@ export default function PretendApp() {
       return;
     }
 
+    // Need to change this. Instead, store an array of push tokens. Save device token in async storage.
+    // When you sign out, remove the local token from the array in firebase
+    // When you sign in, generate a new token if there isn't one in storage, and add that to the array in firebase
+    // Change all the notification functions to instead send push notifs to ALL tokens in array
     if (userFirebaseDetails.uid && !userFirebaseDetails.pushToken) {
       if (!Device.isDevice) {
         return
