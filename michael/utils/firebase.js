@@ -6,6 +6,7 @@ import { getStorage, ref as ref_storage, uploadBytesResumable, getDownloadURL } 
 import { DEFUALT_PROFILE_PIC, NOTIFICATION_TYPES } from "./constants";
 import { sendPushNotification } from "./expo";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAnalytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -35,6 +36,7 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth();
 export const database = getDatabase();
+export const analytics = getAnalytics(app);
 const dbRef = ref_db(database);
 const storage = getStorage(app);
 
