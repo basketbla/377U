@@ -26,6 +26,13 @@ export default function Chat({ navigation, route }) {
       let newMessage = snapshot.val();
       newMessage = {...newMessage, _id: snapshot.key, createdAt: JSON.parse(newMessage.createdAt)};
 
+      const messagesRef = database.child("groups").child('messages').child(`${group.id}`).child(_id)
+      // const messagesRef = firebase.database().ref(`${companySymbol}Messages`);
+      messagesRef.orderByChild("createdAt")
+        // the callback function once a new message has been created. 
+        console.log(snapshot.val()); 
+      // });
+
       // Okay still so confused on what this is doing but it works so whatever
       setMessages((prevMessages) =>
         GiftedChat.append(prevMessages, newMessage)
