@@ -54,61 +54,57 @@ export default function AllUsers({ navigation }) {
   const isFocused = useIsFocused();
 
   const { currentUser } = useAuth();
-  const { allUsers } = useFriends();
+  const { allUsers, setAllUsers } = useFriends();
 
   const [search, setSearch] = useState('');
   const [friends, setFriends] = useState([]);
   const [friendsToDisplay, setFriendsToDisplay] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [requesters, setRequesters] = useState([]);
   const [newFriends, setNewFriends] = useState([]);
   const [requestees, setRequestees] = useState([]);
 
-  // THIS IS THE ONE PLACE THAT REALLY GETS AFFECTED BY STORING ALL USERS ONCE
-  // Do we ever want to refresh this???
-
-  // Yeah actually leads to bug. If one person refreshes app and adds another, they show up as undefined because friend requests is ahead of allUsers
-
   // Fetch all friends
+  // Can take out since I have listeners now I think...
   useEffect(async () => {
-      let users = allUsers;
-      users = Object.keys(users).map(id => {return {...users[id], id: id}});
+      // let users = allUsers;
+      // users = Object.keys(users).map(id => {return {...users[id], id: id}});
 
-      let sentRequestsSnapshot = await getSentFriendRequests(currentUser.uid);
+      // let sentRequestsSnapshot = await getSentFriendRequests(currentUser.uid);
 
 
-      // Show if friend request has been sent or not
-      if (sentRequestsSnapshot && sentRequestsSnapshot.val()) {
-        let requestees = Object.keys(sentRequestsSnapshot.val());
-        users = users.map(user => {return {...user, requestSent: requestees.includes(user.id)}})
-      }
-      else {
-        users = users.map(user => {return {...user, requestSent: false}})
-      }
+      // // Show if friend request has been sent or not
+      // if (sentRequestsSnapshot && sentRequestsSnapshot.val()) {
+      //   let requestees = Object.keys(sentRequestsSnapshot.val());
+      //   users = users.map(user => {return {...user, requestSent: requestees.includes(user.id)}})
+      // }
+      // else {
+      //   users = users.map(user => {return {...user, requestSent: false}})
+      // }
 
-      // Show if friend or not
-      let friendsSnapshot = await getFriends(currentUser.uid);
-      if (friendsSnapshot && friendsSnapshot.val()) {
-        let friendIds = Object.keys(friendsSnapshot.val());
-        users = users.map(user => {return {...user, isFriend: friendIds.includes(user.id)}})
-      }
-      else {
-        users = users.map(user => {return {...user, isFriend: false}})
-      }
+      // // Show if friend or not
+      // let friendsSnapshot = await getFriends(currentUser.uid);
+      // if (friendsSnapshot && friendsSnapshot.val()) {
+      //   let friendIds = Object.keys(friendsSnapshot.val());
+      //   users = users.map(user => {return {...user, isFriend: friendIds.includes(user.id)}})
+      // }
+      // else {
+      //   users = users.map(user => {return {...user, isFriend: false}})
+      // }
 
-      // Also mark as friend if they've sent you a request
-      let receivedSnapshot = await getFriendRequests(currentUser.uid);
-      if (receivedSnapshot && receivedSnapshot.val()) {
-        let requesters = Object.keys(receivedSnapshot.val());
-        users = users.map(user => {return {...user, isFriend: requesters.includes(user.id)}})
-      }
+      // // Also mark as friend if they've sent you a request
+      // let receivedSnapshot = await getFriendRequests(currentUser.uid);
+      // if (receivedSnapshot && receivedSnapshot.val()) {
+      //   let requesters = Object.keys(receivedSnapshot.val());
+      //   users = users.map(user => {return {...user, isFriend: requesters.includes(user.id)}})
+      // }
 
-      // Don't show the current user
-      users = users.filter(user => user.id !== currentUser.uid)
+      // // Don't show the current user
+      // users = users.filter(user => user.id !== currentUser.uid)
 
-      setFriends(users);
-      setFriendsToDisplay(users);
-      setLoading(false);
+      // setFriends(users);
+      // setFriendsToDisplay(users);
+      // setLoading(false);
   }, []);
 
 
@@ -160,35 +156,67 @@ export default function AllUsers({ navigation }) {
     return unsubscribe;
   }, []);
 
-  // Update display based on new friend requests
+  // Add listener to see if all users have changed. If we get big enough, this could be bad.
   useEffect(() => {
-    let temp = [...friends]
-    if (temp.length !== 0) {
-      temp = temp.map(user => {return {...user, isFriend: requesters.includes(user.id) || user.isFriend}})
-      setFriends(temp)
-      setFriendsToDisplay(temp)
-    }
-  }, [requesters])
+
+    const unsubscribe = onValue(ref_db(database, `users`), (snapshot) => {
+      if (snapshot.val()) {
+        setAllUsers(snapshot.val());
+      }
+    });
+    
+
+    return unsubscribe;
+  }, []);
+
+  // // Update display based on new friend requests
+  // useEffect(() => {
+  //   let temp = [...friends]
+  //   if (temp.length !== 0) {
+  //     temp = temp.map(user => {return {...user, isFriend: requesters.includes(user.id) || user.isFriend}})
+  //     setFriends(temp)
+  //     setFriendsToDisplay(temp)
+  //   }
+  // }, [requesters])
 
   // // Update display based on accepted friend requests. 
-  useEffect(() => {
-    let temp = [...friends]
-    if (temp.length !== 0) {
-      temp = temp.map(user => {return {...user, isFriend: newFriends.includes(user.id), requestSent: (user.requestSent && !newFriends.includes(user.id))}})
-      setFriends(temp)
-      setFriendsToDisplay(temp)
-    }
-  }, [newFriends])
+  // useEffect(() => {
+  //   let temp = [...friends]
+  //   if (temp.length !== 0) {
+  //     temp = temp.map(user => {return {...user, isFriend: newFriends.includes(user.id), requestSent: (user.requestSent && !newFriends.includes(user.id))}})
+  //     setFriends(temp)
+  //     setFriendsToDisplay(temp)
+  //   }
+  // }, [newFriends])
 
   // // Update display based on new sent friend requests
+  // useEffect(() => {
+  //   let temp = [...friends]
+  //   if (temp.length !== 0) {
+  //     temp = temp.map(user => {return {...user, requestSent: requestees.includes(user.id)}})
+  //     setFriends(temp)
+  //     setFriendsToDisplay(temp)
+  //   }
+  // }, [requestees])
+
+  // Update display based on all users changed
   useEffect(() => {
-    let temp = [...friends]
+    let temp = Object.keys(allUsers).map(id => {return {...allUsers[id], id: id}});
     if (temp.length !== 0) {
-      temp = temp.map(user => {return {...user, requestSent: requestees.includes(user.id)}})
+      temp = temp.map(user => {return {...user, isFriend: requesters.includes(user.id) || user.isFriend || newFriends.includes(user.id), requestSent: (requestees.includes(user.id) && !newFriends.includes(user.id)) }})
+      
+      // Don't show the current user
+      temp = temp.filter(user => user.id !== currentUser.uid)
+
       setFriends(temp)
       setFriendsToDisplay(temp)
     }
-  }, [requestees])
+    else {
+      setFriends([])
+      setFriendsToDisplay([])
+    }
+
+  }, [allUsers, requestees, requesters, newFriends])
 
 
   // For rendering contacts with accounts
@@ -224,7 +252,7 @@ export default function AllUsers({ navigation }) {
       />
       {
         friends.length === 0 ?
-        <Text style={{flex: 1, fontSize: 20, color: COLORS.darkGrey}}>There are no users???</Text>
+        <Text style={{flex: 1, fontSize: 20, color: COLORS.darkGrey}}>There are no other users???</Text>
         :
         <>
           {

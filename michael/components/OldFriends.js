@@ -82,7 +82,7 @@ export default function OldFriends({ navigation }) {
   const isFocused = useIsFocused();
 
   const { currentUser } = useAuth();
-  const { allUsers } = useFriends();
+  const { allUsers, setAllUsers } = useFriends();
 
   const [search, setSearch] = useState('');
   const [friends, setFriends] = useState([]);
@@ -107,9 +107,25 @@ export default function OldFriends({ navigation }) {
   useEffect(() => {
 
     // Wasting a time setting friendRequests the first time, but I think it's fine
-    const unsubscribe = onValue(ref_db(database, `friends/${currentUser.uid}`), (snapshot) => {
+    const unsubscribe = onValue(ref_db(database, `friends/${currentUser.uid}`), async (snapshot) => {
       if (snapshot.val()) {
-        let friendUsers = Object.keys(snapshot.val()).map(id => {return {...allUsers[id], id: id}});
+        let friendIds = Object.keys(snapshot.val());
+
+        // Same thing as in newFriends. Still hacky
+        let shouldRefresh = false;
+        for (let id of friendIds) {
+          if (allUsers[id] === undefined) {
+            shouldRefresh = true;
+          }
+        }
+
+        let newAllUsers = allUsers;
+        if (shouldRefresh) {
+          newAllUsers = await getUsers();
+          setAllUsers(newAllUsers)
+        }
+
+        let friendUsers = Object.keys(snapshot.val()).map(id => {return {...newAllUsers[id], id: id}});
         setFriends(friendUsers)
         setFriendsToDisplay(friendUsers)
       }

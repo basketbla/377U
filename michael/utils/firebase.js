@@ -303,11 +303,13 @@ export const addUserPushToken = (userId, token) => {
 // Can't remove all friends... will need to change friends to update db when someone tries to fetch someone who has been deleted.
 
 // THIS WAS HARDER THAN I THOUGHT
-// For whenever I do this: need to make an actual deleted accounts/groups folder, then reference that when doing cleanup over time
 
 // Things to clean up over time:
 // * groups that have been deleted
 // * 
+
+// For whenever I do this: need to make an actual deleted accounts/groups folder, then reference that when doing cleanup over time
+
 // export const deleteUser = async (userId) => {
 //   await AsyncStorage.removeItem('currentUser');
 //   await remove(ref_db(database, `users/${userId}`));
@@ -321,6 +323,7 @@ export const addUserPushToken = (userId, token) => {
 //     group = group.val()
 //     if (Object.keys(group.users).length === 2) {
 //       await remove(ref_db(database, `groups/${groupId}`))
+//       // Should also remove messages for that group
 //     }
 //     else {
 //       await remove(ref_db(database, `groups/${groupId}/users/${userId}`))

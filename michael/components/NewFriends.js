@@ -16,7 +16,7 @@ import React, {
 } from 'react'
 import * as Contacts from 'expo-contacts';
 import { COLORS, DEFUALT_PROFILE_PIC } from '../utils/constants';
-import { addFriend, getFriendRequests, getFriends, getSentFriendRequests, removeFriendRequest } from '../utils/firebase';
+import { addFriend, getFriendRequests, getFriends, getSentFriendRequests, getUsers, removeFriendRequest } from '../utils/firebase';
 import * as SMS from 'expo-sms';
 import { useAuth } from '../contexts/AuthContext'
 import { useIsFocused } from '@react-navigation/native';
@@ -31,7 +31,7 @@ import { database } from '../utils/firebase'
 export default function NewFriends({ navigation }) {
 
   const { currentUser } = useAuth();
-  const { allUsers } = useFriends();
+  const { allUsers, setAllUsers } = useFriends();
 
   const isFocused = useIsFocused();
 
@@ -156,11 +156,27 @@ export default function NewFriends({ navigation }) {
   useEffect(() => {
 
     // Wasting a time setting friendRequests the first time, but I think it's fine
-    const unsubscribe = onValue(ref_db(database, `friendRequests/${currentUser.uid}`), (friendRequests) => {
+    const unsubscribe = onValue(ref_db(database, `friendRequests/${currentUser.uid}`), async (friendRequests) => {
       if (friendRequests && friendRequests.val()) {
         let friendRequestIds = Object.keys(friendRequests.val());
+
+        // This is hacky. But if we get a friend request that's not in allUsers, just update allUsers
+        let shouldRefresh = false;
+        for (let id of friendRequestIds) {
+          if (allUsers[id] === undefined) {
+            shouldRefresh = true;
+          }
+        }
+
+        let newAllUsers = allUsers;
+        if (shouldRefresh) {
+          newAllUsers = await getUsers();
+          setAllUsers(newAllUsers)
+        }
+
+
         friendRequests = friendRequestIds.map(id => (
-          {...allUsers[id], id: id}
+          {...newAllUsers[id], id: id}
         ));
       }
       else {
