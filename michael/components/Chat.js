@@ -12,6 +12,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Analytics from 'expo-firebase-analytics';
 
 
 export default function Chat({ navigation, route }) {
@@ -21,6 +22,11 @@ export default function Chat({ navigation, route }) {
   const [messages, setMessages] = useState([]);
   const [groupTokens, setGroupTokens] = useState([]);
   // const [localLastSeen, setLocalLastSeen] = useState();
+
+  // Testing analytics
+  useEffect(() => {
+    Analytics.logEvent('OpenChat')
+  }, [])
 
   useEffect(() => {
     const unsubscribe = onChildAdded(ref_db(database, `messages/${group.id}`), (snapshot, previousMessages) => {

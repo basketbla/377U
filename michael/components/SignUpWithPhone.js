@@ -23,6 +23,7 @@ import { app, auth } from '../utils/firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logEvent } from "firebase/analytics";
 import { analytics } from '../utils/firebase';
+import * as Analytics from 'expo-firebase-analytics';
 
 export default function SignUpWithPhone() {
 
@@ -123,7 +124,7 @@ export default function SignUpWithPhone() {
       let response = await signInWithCredential(auth, credential);
 
       // Login event for analytics
-      // logEvent(analytics, 'login');
+      Analytics.logEvent('login')
 
       // Only save logged in if they aren't a new user.
       if (!response._tokenResponse.isNewUser) {

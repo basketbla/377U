@@ -164,8 +164,6 @@ export default function People({ navigation }) {
 
         userGroups = userGroups.map(group => ({...group, numFree: Object.keys(group.users).reduce((previousValue, currUser) => (previousValue + allUsers[currUser].isFree), 0), totalNum: Object.keys(group.users).length}))
         userGroups.sort(compareMessagesByDate);
-        console.log('in group use effect')
-        console.log(userGroups)
         setAllGroups(userGroups);
         setGroupsToDisplay(userGroups);
 
@@ -222,8 +220,6 @@ export default function People({ navigation }) {
         // let userGroups = await getGroupsByIds(Object.keys(snapshot.val()));
         userGroups = userGroups.map(group => ({...group, numFree: Object.keys(group.users).reduce((previousValue, currUser) => (previousValue + allUsers[currUser].isFree), 0), totalNum: Object.keys(group.users).length}))
         userGroups.sort(compareMessagesByDate);
-        console.log('in message use effect')
-        console.log(userGroups)
         setAllGroups(userGroups);
         setGroupsToDisplay(userGroups);
       });
