@@ -6,7 +6,7 @@ import React, {
 import { colors, SearchBar } from 'react-native-elements';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { COLORS, DEFUALT_PROFILE_PIC, hash } from '../utils/constants';
-import { getFriends, getCurrentUser, getUserGroups, database, getGroupsByIds } from '../utils/firebase';
+import { getFriends, getCurrentUser, getUserGroups, database, getGroupsByIds, getUsers } from '../utils/firebase';
 import { onValue, ref as ref_db } from 'firebase/database';
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigation, useIsFocused } from '@react-navigation/native';
@@ -76,7 +76,7 @@ export default function People({ navigation }) {
   const [groupIds, setGroupIds] = useState([]);
 
   const { currentUser, setUserFirebaseDetails } = useAuth();
-  const { allUsers, navigateTo, setNavigateTo } = useFriends();
+  const { allUsers, setAllUsers, navigateTo, setNavigateTo } = useFriends();
 
   // Still just all friends, not free friends
   useEffect(async () => {
@@ -147,6 +147,19 @@ export default function People({ navigation }) {
 
         setGroupIds(userGroups.map(group => group.id));
 
+        // If the group came from a new user, need to update newUsers
+        let newAllUsers = allUsers
+        let shouldRefreshUsers = false;
+        for (let id of userGroups.map(group => group.id)) {
+          if (!newAllUsers[id]) {
+            shouldRefreshUsers = true;
+          }
+        }
+        if (shouldRefreshUsers) {
+          newAllUsers = await getUsers();
+          setAllUsers(newAllUsers);
+        }
+
         // let localLastSeen = {};
         // for (let id of Object.keys(snapshot.val())) {
         //   localLastSeen[id] = JSON.parse(snapshot.val()[id].localLastSeen)
@@ -162,18 +175,24 @@ export default function People({ navigation }) {
         // }
         // userGroups = userGroups.map(group => ({...group, localLastSeen: localLastSeen[group.id]}))
 
-        userGroups = userGroups.map(group => ({...group, numFree: Object.keys(group.users).reduce((previousValue, currUser) => (previousValue + allUsers[currUser].isFree), 0), totalNum: Object.keys(group.users).length}))
+        userGroups = userGroups.map(group => ({...group, numFree: Object.keys(group.users).reduce((previousValue, currUser) => {
+          if (!newAllUsers[currUser]) {
+            return previousValue
+          }
+          return (previousValue + newAllUsers[currUser].isFree)
+        }, 0), totalNum: Object.keys(group.users).length}))
+
         userGroups.sort(compareMessagesByDate);
         setAllGroups(userGroups);
         setGroupsToDisplay(userGroups);
 
-        // Not sure about this
-        setLoading(false)
       }
       else {
         setAllGroups([])
         setGroupsToDisplay([])
       }
+      // Not sure about this
+      setLoading(false)
     });
     
     return unsubscribe;
@@ -203,6 +222,7 @@ export default function People({ navigation }) {
         }
         updatedGroup = {...updatedGroup, id: snapshot.key}
         let userGroups = allGroups;
+
         if (userGroups.length === 0) {
           return
         }
@@ -218,7 +238,12 @@ export default function People({ navigation }) {
         // console.log('doing group listener')
         // console.log(snapshot.val())
         // let userGroups = await getGroupsByIds(Object.keys(snapshot.val()));
-        userGroups = userGroups.map(group => ({...group, numFree: Object.keys(group.users).reduce((previousValue, currUser) => (previousValue + allUsers[currUser].isFree), 0), totalNum: Object.keys(group.users).length}))
+        userGroups = userGroups.map(group => ({...group, numFree: Object.keys(group.users).reduce((previousValue, currUser) => {
+          if (!allUsers[currUser]) {
+            return previousValue
+          }
+          return (previousValue + allUsers[currUser].isFree)
+        }, 0), totalNum: Object.keys(group.users).length}))
         userGroups.sort(compareMessagesByDate);
         setAllGroups(userGroups);
         setGroupsToDisplay(userGroups);
