@@ -21,9 +21,11 @@ export default function ExistingContact({ contact }) {
   const { allUsers } = useFriends();
 
   const [loading, setLoading] = useState(false);
+  const [requestSent, setRequestSent] = useState(contact.requestSent);
 
   const handleSendRequest = async () => {
     setLoading(true);
+    setRequestSent(true);
     await addFriendRequest(currentUser.uid, contact.id);
     await addSentFriendRequest(currentUser.uid, contact.id, allUsers[contact.id]?.pushToken, userFirebaseDetails);
     setLoading(false);
@@ -55,14 +57,14 @@ export default function ExistingContact({ contact }) {
         contact.isFriend ?
         <View style={styles.padding}/>
         :
-        <Pressable style={(contact.requestSent || loading) ? styles.acceptRequestButtonDisabled : styles.acceptRequestButton} onPress={handleSendRequest} disabled={contact.requestSent || loading}>
+        <Pressable style={(requestSent || loading) ? styles.acceptRequestButtonDisabled : styles.acceptRequestButton} onPress={handleSendRequest} disabled={requestSent || loading}>
           {
             loading ?
             <ActivityIndicator/>
             :
             <>
               {
-                contact.requestSent ?
+                requestSent ?
                 <Text style={styles.acceptRequestText}>Sent!</Text>
                 :
                 <Text style={styles.acceptRequestText}>Add</Text>

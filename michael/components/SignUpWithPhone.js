@@ -123,7 +123,7 @@ export default function SignUpWithPhone() {
       let response = await signInWithCredential(auth, credential);
 
       // Login event for analytics
-      logEvent(analytics, 'login');
+      // logEvent(analytics, 'login');
 
       // Only save logged in if they aren't a new user.
       if (!response._tokenResponse.isNewUser) {

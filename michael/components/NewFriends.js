@@ -40,10 +40,14 @@ export default function NewFriends({ navigation }) {
   const [sectionData, setSectionData] = useState();
   const [allExistingAccounts, setAllExistingAccounts] = useState([]);
   const [allOtherContacts, setAllOtherContacts] = useState([]);
-  const [allFriendRequests, setAllFriendRequests] = useState();
+  const [allFriendRequests, setAllFriendRequests] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
+  const [requestees, setRequestees] = useState([]);
+  const [newFriends, setNewFriends] = useState([]);
+  const [requesters, setRequesters] = useState([]);
 
   // Get contact permissions
+  // NEED TO ADJUST THIS BECAUSE I ADDED LISTENERS
   useEffect(async () => {
     console.log('use effecting in newfriends');
 
@@ -149,7 +153,7 @@ export default function NewFriends({ navigation }) {
       setContactStatus(status);
     }
     setPageLoading(false);
-  }, []);
+  }, [isFocused]);
 
 
   // Add listeners to see if friend requests have changed
@@ -182,6 +186,7 @@ export default function NewFriends({ navigation }) {
       else {
         friendRequests = [];
       }
+
       setAllFriendRequests(friendRequests);
       setSectionData([{title: `Friend Requests (${friendRequests.length})`, data: friendRequests, renderItem: renderFriendRequest}, {title: `Contacts on Din Din (${allExistingAccounts.length})`, data: allExistingAccounts, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${allOtherContacts.length})`, data: allOtherContacts, renderItem: renderNewItem}]);
     });
@@ -189,6 +194,68 @@ export default function NewFriends({ navigation }) {
 
     return unsubscribe;
   }, [allExistingAccounts, allOtherContacts]);
+
+  // // Listener to handle updates to existing accountsx
+  // useEffect(() => {
+  //   console.log('existing account useeffect')
+  //   let existingAccounts = allExistingAccounts.filter(user => !requesters.includes(user.id) && !newFriends.includes(user.id))
+  //   existingAccounts = existingAccounts.map(user => {return {...user, requestSent: requestees.includes(user.id) }})
+  //   setAllExistingAccounts(existingAccounts)
+  // }, [requestees, newFriends, requesters])
+
+  // // UseEffect to update the sectionlist when one of the components changes
+  // useEffect(() => {
+  //   setSectionData([{title: `Friend Requests (${allFriendRequests.length})`, data: allFriendRequests, renderItem: renderFriendRequest}, {title: `Contacts on Din Din (${allExistingAccounts.length})`, data: allExistingAccounts, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${allOtherContacts.length})`, data: allOtherContacts, renderItem: renderNewItem}]);
+  // }, [allExistingAccounts, allFriendRequests, allOtherContacts])
+
+  // // Add listeners to see if your sent requests have changed.
+  // useEffect(() => {
+
+  //   const unsubscribe = onValue(ref_db(database, `sentFriendRequests/${currentUser.uid}`), (snapshot) => {
+  //     if (snapshot.val()) {
+  //       setRequestees(Object.keys(snapshot.val()));
+  //     }
+  //     else {
+  //       setRequestees([])
+  //     }
+  //   });
+    
+
+  //   return unsubscribe;
+  // }, []);
+
+  // // Add listener to see if someone has accepted your request. Not super necessary? Also assumes that you can't stop being friends
+  // useEffect(() => {
+
+  //   const unsubscribe = onValue(ref_db(database, `friends/${currentUser.uid}`), (snapshot) => {
+  //     if (snapshot.val()) {
+  //       setNewFriends(Object.keys(snapshot.val()));
+  //     }
+  //     else {
+  //       setNewFriends([])
+  //     }
+  //   });
+    
+
+  //   return unsubscribe;
+  // }, []);
+
+  
+  // // Add listeners to see if you've been sent a request. If you have, mark them as a friend
+  // useEffect(() => {
+
+  //   const unsubscribe = onValue(ref_db(database, `friendRequests/${currentUser.uid}`), (snapshot) => {
+  //     if (snapshot.val()) {
+  //       setRequesters(Object.keys(snapshot.val()));
+  //     }
+  //     else {
+  //       setRequesters([])
+  //     }
+  //   });
+    
+
+  //   return unsubscribe;
+  // }, []);
 
   // For rendering contacts with accounts
   const renderExistingItem = ({item}) => {
