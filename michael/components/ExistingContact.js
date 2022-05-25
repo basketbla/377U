@@ -13,6 +13,7 @@ import { COLORS } from '../utils/constants';
 import { addFriendRequest, addSentFriendRequest } from '../utils/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { useFriends } from '../contexts/FriendsContext';
+import * as Analytics from 'expo-firebase-analytics';
 
 
 export default function ExistingContact({ contact }) {
@@ -25,6 +26,9 @@ export default function ExistingContact({ contact }) {
 
   const handleSendRequest = async () => {
     setLoading(true);
+
+    Analytics.logEvent('SendFriendRequest')
+
     setRequestSent(true);
     await addFriendRequest(currentUser.uid, contact.id);
     await addSentFriendRequest(currentUser.uid, contact.id, allUsers[contact.id]?.pushToken, userFirebaseDetails);

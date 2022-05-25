@@ -12,6 +12,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { set } from 'firebase/database';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useFriends } from '../contexts/FriendsContext';
+import * as Analytics from 'expo-firebase-analytics';
 
 const User = ({ contact, selectedUsers, setSelectedUsers, setFriendsText }) => {
 
@@ -131,6 +132,7 @@ export default function CreateGroup({ navigation, route }) {
       await addMessage(groupKey, userFirebaseDetails, messageText);
     }
     else {
+      Analytics.logEvent('CreateGroup');
       await createGroup(groupKey, selectedUsers, userFirebaseDetails, messageText);
     }
     let group = (await getGroup(groupKey)).val();

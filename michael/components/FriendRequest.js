@@ -15,6 +15,7 @@ import { useFriends } from '../contexts/FriendsContext';
 import { addFriend, removeFriendRequest, removeSentFriendRequest } from '../utils/firebase';
 import { sendPushNotification } from '../utils/expo';
 import { useAuth } from '../contexts/AuthContext';
+import * as Analytics from 'expo-firebase-analytics';
 
 
 export default function FriendRequest({ contact, currUser }) {
@@ -37,6 +38,8 @@ export default function FriendRequest({ contact, currUser }) {
   // Since this was so FUCKING hard to do I'm just gonna disable button when added
   const handleAccept = async () => {
     setLoading(true);
+
+    Analytics.logEvent('AcceptFriendRequest')
     // await handleAcceptBig(contact.id);
     await addFriend(contact.id, currUser.uid);
     await removeFriendRequest(contact.id, currUser.uid);

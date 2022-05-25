@@ -13,13 +13,14 @@ import { useNavigation, useIsFocused } from '@react-navigation/native';
 import BlandUser from './BlandUser';
 import { useFriends } from '../contexts/FriendsContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Analytics from 'expo-firebase-analytics';
 
 const FreeNow = ({ user }) => {
 
   const navigation = useNavigation();
 
   return (
-    <Pressable style={styles.freeNow} onPress={() => navigation.navigate('CreateGroup', { selected: [user]})}>
+    <Pressable style={styles.freeNow} onPress={() => {Analytics.logEvent('PressFreeUser'); navigation.navigate('CreateGroup', { selected: [user]})}}>
       <Image
         style={styles.profilePic}
         source={{
@@ -41,7 +42,7 @@ const Group = ({ group, allUsers }) => {
   // }, [group])
 
   return (
-    <Pressable onPress={() => navigation.navigate('Chat', {group: group})} style={styles.groupEntry}>
+    <Pressable onPress={() => {Analytics.logEvent('PressGroup'); navigation.navigate('Chat', {group: group})}} style={styles.groupEntry}>
       {/* {
         group.localLastSeen < JSON.parse(group.lastMessage.createdAt) ?
         <View style={styles.unreadMessageDot} />
@@ -332,7 +333,7 @@ export default function People({ navigation }) {
             <></>
           }
         </View>
-        <Pressable style={styles.addGroup} onPress={() => navigation.navigate('CreateGroup')}>
+        <Pressable style={styles.addGroup} onPress={() => {Analytics.logEvent('CreateMessage'); navigation.navigate('CreateGroup')}}>
           {/* <Text style={styles.addText}>New group</Text> */}
           {/* <Ionicons name={'add'} size={30} color={COLORS.yellow}/> */}
           <Ionicons name="create" style={{ marginRight: 2 }} size={32} color={COLORS.yellow} />

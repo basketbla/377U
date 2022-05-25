@@ -49,11 +49,11 @@ export default function Chat({ navigation, route }) {
       <View style={{flexDirection: 'row'}} > 
 
     
-      <Pressable onPress={() => navigation.navigate('ChatDetails', { group: group })} style={styles.headerButtonRight}>
+      <Pressable onPress={() => {Analytics.logEvent('PressChatDetails'); navigation.navigate('ChatDetails', { group: group })}} style={styles.headerButtonRight}>
           <Ionicons name="information-circle" size={30} color={COLORS.yellow}/>
         </Pressable>
 
-       <Pressable onPress={() => navigation.navigate('GroupAvailability', { group: group })} style={styles.headerButtonRight}>
+       <Pressable onPress={() => {Analytics.logEvent('PressCalendar'); navigation.navigate('GroupAvailability', { group: group })}} style={styles.headerButtonRight}>
           <Ionicons name="calendar" size={30} color={COLORS.yellow}/>
       </Pressable>
           </View> 
@@ -94,6 +94,9 @@ export default function Chat({ navigation, route }) {
 
   // Could redo this to use the function from expo.js...
   const sendPushNotifications = async (messageBody, userTokens) => {
+
+    Analytics.logEvent('SendChat')
+
     let tokens = groupTokens;
     if (userTokens) {
       tokens = userTokens;
