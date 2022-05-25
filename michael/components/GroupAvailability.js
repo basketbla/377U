@@ -160,27 +160,65 @@ export default function GroupAvailability({ route, navigation }) {
         let startHours = freeStart.getHours();
         let endHours = freeEnd.getHours();
 
+
+        let night = new Date (free.startDate);
+        night.setHours(latestTime,0,0);
+
+        let morning = new Date (free.endDate);
+        morning.setHours(earliestTime,0,0);
+
+
+
+        
+
+      {/*    //if we ever move the latest time earlier and there are weird night time slots
+          if(freeEnd.getHours() > night.getHours() && freeStart.getHours() < night.getHours()) {
+            console.log('night' + freeEnd.getHours());
+            freeEnd.setHours(latestTime,0,0);
+          }*/}
+
+
+
         //let freeHours = endHours - startHours;
         let freeHours = (freeEnd.getTime() - freeStart.getTime())/ 3600000; //getting time diff in milliseconds to avoid showing times like 2:45-3:15
 
         if( Math.abs(freeHours) >= freeInterval ) {
 
-        if(freeStart.getDate() >= rootStart.getDate() && freeEnd.getDate() <= rootEnd.getDate()) { 
-
             //if on same day
             if (freeStart.getDate() == freeEnd.getDate()){
-               hourSlots.push({startDate:convertDate(freeStart), endDate: convertDate(freeEnd)});
+
+
+
+                //if it is like 5am - 9am, change to 8am - 9am
+                 if(freeStart.getHours() < morning.getHours() && freeEnd.getHours() > morning.getHours()) {
+
+                   console.log('morn ' + convertDate(freeStart) + ' ' + convertDate(freeEnd));
+
+                  freeStart.setHours(earliestTime,0,0);
+                  hourSlots.push({startDate:convertDate(freeStart), endDate: convertDate(freeEnd)});
+
+
+                  } else if (freeStart.getHours() < morning.getHours() && freeEnd.getHours() <= morning.getHours()) {
+                   //if it is like 5am - 8am, don't push
+
+                   console.log('skippedEarly ' + convertDate(freeStart) + ' ' + convertDate(freeEnd));
+
+                  } else {
+                   //if it is like 8am - 10pm
+
+                     hourSlots.push({startDate:convertDate(freeStart), endDate: convertDate(freeEnd)});
+                  }
 
             } else {
-                  let night = new Date (free.startDate);
-                  night.setHours(latestTime,0,0);
-                  console.log(night.getHours());
-
-                  let morning = new Date (free.endDate);
-                  morning.setHours(earliestTime,0,0);
+                  
 
                   if (freeStart.getHours() < night.getHours() ) {
                     hourSlots.push({startDate:convertDate(freeStart), endDate: convertDate(night)});
+
+
+                  }  else {
+                    console.log('skippedNight ' + convertDate(freeStart) + ' ' + convertDate(freeEnd));
+
                   }
 
                   if (freeEnd.getHours() > morning.getHours() ) {
@@ -188,10 +226,15 @@ export default function GroupAvailability({ route, navigation }) {
                     console.log(morning.getHours());
 
                     hourSlots.push({startDate:convertDate(morning), endDate: convertDate(freeEnd)});
+                  } 
+
+                  else {
+                    console.log('skippedMorning ' + convertDate(freeStart) + ' ' + convertDate(freeEnd));
+
                   }
 
+
             }
-       }
          //  }
 
    {/*     if(startHours >= rootStart.getHours() && endHours <= rootEnd.getHours()) { 
