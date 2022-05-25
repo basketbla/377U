@@ -17,20 +17,23 @@ import React, {
   useLayoutEffect,
   useRef
 } from 'react'
-import { getCurrentUser } from '../utils/firebase';
+import { deleteUser, getCurrentUser } from '../utils/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import { Camera } from 'expo-camera';
 import * as Device from 'expo-device';
-import { uploadImageToStorage, saveUserDetails, getUsers } from '../utils/firebase';
+import { uploadImageToStorage, saveUserDetails  } from '../utils/firebase';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+import { useFriends } from '../contexts/FriendsContext';
+import { COLORS } from '../utils/constants';
 
 export default function EditProfile({route, navigation}) {
 
   const { userDetails } = route.params;
   const { currentUser, logout, setUserFirebaseDetails, userFirebaseDetails } = useAuth();
+  const { allUsers } = useFriends();
   
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState(userDetails.name);
@@ -99,6 +102,20 @@ export default function EditProfile({route, navigation}) {
       ]
     );
   }
+
+  // const deleteAccountAlert = () => {
+  //   Alert.alert(
+  //     "Delete Account",
+  //     "Are you sure you want to delete your account? Once you do this, you will never be able to recover it.",
+  //     [
+  //       { text: "Cancel", onPress: undefined, style: "cancel" },
+  //       {
+  //         text: "Delete",
+  //         onPress: async () => await deleteUser(currentUser.uid)
+  //       }
+  //     ]
+  //   );
+  // }
   
   const takePicture = async () => {
     let photo = await camRef.current?.takePictureAsync();
@@ -115,19 +132,19 @@ export default function EditProfile({route, navigation}) {
     setLoading(true);
 
     // Update firebase details
-    setUserFirebaseDetails({
-      ...userFirebaseDetails,
-      name: name,
-      username: username,
-      // phoneNumber: userFirebaseDetails.phoneNumber,
-      profilePic: image,
-      // uid: currentUser.uid,
-      // isFree: userFirebaseDetails.isFree
-    })
+    // setUserFirebaseDetails({
+    //   ...userFirebaseDetails,
+    //   name: name,
+    //   username: username,
+    //   // phoneNumber: userFirebaseDetails.phoneNumber,
+    //   profilePic: image,
+    //   // uid: currentUser.uid,
+    //   // isFree: userFirebaseDetails.isFree
+    // })
 
     // Need to check if this username is taken
     if (username !== userDetails.username) {
-      let usernames = Object.values(await getUsers()).map(item => item.username);
+      let usernames = Object.values(allUsers).map(item => item.username);
 
       if (usernames.includes(username)) {
         setLoading(false);
@@ -226,6 +243,11 @@ export default function EditProfile({route, navigation}) {
           value={username}
         />
         <Text style={{...styles.errorText, display: usernameError ? 'flex' : 'none'}}>{usernameErrorText}</Text>
+        
+        {/* This is BAD PLACEMENT for this... Would be better to make a separate page or something */}
+        {/* <Pressable style={styles.deleteAccount} onPress={deleteAccountAlert}>
+          <Text style={styles.deleteAccountText}>Delete account</Text>
+        </Pressable> */}
       </View>
     </TouchableWithoutFeedback>
   )
@@ -340,5 +362,12 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
     marginTop: 10,
+  },
+  deleteAccount: {
+    position: 'absolute',
+    bottom: 50,
+  },
+  deleteAccountText: {
+    color: COLORS.iosBlue,
   }
 })

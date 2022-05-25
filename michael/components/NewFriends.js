@@ -24,39 +24,32 @@ import ContactEntry from './ContactEntry';
 import ExistingContact from './ExistingContact';
 import FriendRequest from './FriendRequest';
 import { useFriends } from '../contexts/FriendsContext';
+import { onChildChanged, onChildAdded, ref as ref_db, onValue } from 'firebase/database';
+import { database } from '../utils/firebase'
 
 
 export default function NewFriends({ navigation }) {
 
   const { currentUser } = useAuth();
+  const { allUsers, setAllUsers } = useFriends();
 
   const isFocused = useIsFocused();
-
-  // const { allExistingGlobal, setAllExistingGlobal, allFriendRequestsGlobal, setAllFriendRequestsGlobal } = useFriends();
 
   const [contactStatus, setContactStatus] = useState('');
   const [search, setSearch] = useState('');
   const [sectionData, setSectionData] = useState();
-  const [allExistingAccounts, setAllExistingAccounts] = useState();
-  const [allOtherContacts, setAllOtherContacts] = useState();
-  const [allFriendRequests, setAllFriendRequests] = useState();
+  const [allExistingAccounts, setAllExistingAccounts] = useState([]);
+  const [allOtherContacts, setAllOtherContacts] = useState([]);
+  const [allFriendRequests, setAllFriendRequests] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
+  const [requestees, setRequestees] = useState([]);
+  const [newFriends, setNewFriends] = useState([]);
+  const [requesters, setRequesters] = useState([]);
 
   // Get contact permissions
+  // NEED TO ADJUST THIS BECAUSE I ADDED LISTENERS
   useEffect(async () => {
     console.log('use effecting in newfriends');
-
-    // used to filter out duplicates in existing
-    const isPropValuesEqual = (subject, target, propNames) =>
-      propNames.every(propName => subject[propName] === target[propName]);
-
-    const getUniqueItemsByProperties = (items, propNames) => {
-      const propNamesArray = Array.from(propNames);
-    
-      return items.filter((item, index, array) =>
-        index === array.findIndex(foundItem => isPropValuesEqual(foundItem, item, propNamesArray))
-      );
-    };
 
     // Check permission for contacts
     const { status } = await Contacts.requestPermissionsAsync();
@@ -67,7 +60,7 @@ export default function NewFriends({ navigation }) {
       });
 
       // Check which contacts have dindin and which ones don't
-      let users = await getUsers();
+      let users = allUsers;
 
       // Get friendRequests
       let friendRequests = await getFriendRequests(currentUser.uid);
@@ -85,17 +78,6 @@ export default function NewFriends({ navigation }) {
 
       let existingEmails = Object.values(users).map(user => user.email);
       let existingNumbers = Object.values(users).map(user => user.phoneNumber);
-      
-      // Map emails to profile pics so we can get people's images
-      // let profilePics = Object.values(users).map(user => user.profilePic);
-      // let profilePicNumberMap = {};
-      // let profilePicEmailMap = {};
-      // existingNumbers.forEach((element, index) => {
-      //   profilePicNumberMap[element] = profilePics[index];
-      // });
-      // existingEmails.forEach((element, index) => {
-      //   profilePicEmailMap[element] = profilePics[index];
-      // });
 
       let existingAccounts = data.filter(user => {
         // Exclude friend requests
@@ -126,6 +108,7 @@ export default function NewFriends({ navigation }) {
       let userList = Object.keys(users).map(key => {
         return {...users[key], id: key}
       })
+
       existingAccounts = existingAccounts.map(contact => {
         // Oh shit this may be inefficient... whatever
         if (contact.phoneNumbers) {
@@ -137,11 +120,6 @@ export default function NewFriends({ navigation }) {
         return null;
       })
 
-      
-
-      // TODO: NEED TO CHECK IF REQUEST HAS BEEN SENT FOR EXISTING ONES
-      // Fuck. I think the best way to do this is just to add a 'sentFriendRequests' thing in the db,
-      // then update that whenever we do stuff with friends
       let sentRequestsSnapshot = await getSentFriendRequests(currentUser.uid);
       if (sentRequestsSnapshot && sentRequestsSnapshot.val()) {
         let requestees = Object.keys(sentRequestsSnapshot.val());
@@ -164,49 +142,10 @@ export default function NewFriends({ navigation }) {
       // Filter out duplicates (same contact saved twice)
       existingAccounts = existingAccounts.filter((v,i,a)=>a.findIndex(v2=>(v2.id===v.id))===i)
 
-
-      // if (friendsSnapshot && friendsSnapshot.val()) {
-      //   friendUsers = Object.keys(friendsSnapshot.val()).map(id => {return {...users[id], id: id}});
-      // }
-
-      // This is ugly, hopefully it works
-      // existingAccounts = existingAccounts.map(user => {
-      //   if (user.emails) {
-      //     return {...user, profilePic: profilePicEmailMap[user.emails[0].email]}
-      //   }
-      //   if (user.phoneNumbers) {
-      //     return {...user, profilePic: profilePicNumberMap[user.phoneNumbers[0].digits]}
-      //   }
-      // })
-
-      // Doing the same thing as profile pic but with username
-      // let usernames = Object.values(users).map(user => user.username);
-      // let usernameEmailMap = {};
-      // let usernameNumberMap = {};
-      // existingEmails.forEach((element, index) => {
-      //   usernameEmailMap[element] = usernames[index];
-      // });
-      // existingNumbers.forEach((element, index) => {
-      //   usernameNumberMap[element] = usernames[index];
-      // });
-
-      // existingAccounts = existingAccounts.map(user => {
-      //   if (user.emails) {
-      //     return {...user, username: usernameEmailMap[user.emails[0].email]}
-      //   }
-      //   if (user.phoneNumbers) {
-      //     return {...user, username: usernameEmailMap[user.phoneNumbers[0].digits]}
-      //   }
-      // })
-
-
-      // setAllFriendRequestsGlobal(friendRequests);
-      // setAllExistingGlobal(existingAccounts);
-
       setAllExistingAccounts(existingAccounts);
       setAllOtherContacts(otherContacts);
-      setAllFriendRequests(friendRequests);
-      setSectionData([{title: `Friend Requests (${friendRequests.length})`, data: friendRequests, renderItem: renderFriendRequest}, {title: `Contacts on Din Din (${existingAccounts.length})`, data: existingAccounts, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
+      // setAllFriendRequests(friendRequests);
+      // setSectionData([{title: `Friend Requests (${friendRequests.length})`, data: friendRequests, renderItem: renderFriendRequest}, {title: `Contacts on Din Din (${existingAccounts.length})`, data: existingAccounts, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${otherContacts.length})`, data: otherContacts, renderItem: renderNewItem}]);
       
       setContactStatus(status);
     }
@@ -216,11 +155,107 @@ export default function NewFriends({ navigation }) {
     setPageLoading(false);
   }, [isFocused]);
 
-  // Jesus christ what am I doing
+
+  // Add listeners to see if friend requests have changed
+  useEffect(() => {
+
+    // Wasting a time setting friendRequests the first time, but I think it's fine
+    const unsubscribe = onValue(ref_db(database, `friendRequests/${currentUser.uid}`), async (friendRequests) => {
+      console.log('Friend request listener fired')
+      if (friendRequests && friendRequests.val()) {
+        let friendRequestIds = Object.keys(friendRequests.val());
+
+        // This is hacky. But if we get a friend request that's not in allUsers, just update allUsers
+        let shouldRefresh = false;
+        for (let id of friendRequestIds) {
+          if (allUsers[id] === undefined) {
+            shouldRefresh = true;
+          }
+        }
+
+        let newAllUsers = allUsers;
+        if (shouldRefresh) {
+          newAllUsers = await getUsers();
+          setAllUsers(newAllUsers)
+        }
+
+        friendRequests = friendRequestIds.map(id => (
+          {...newAllUsers[id], id: id}
+        ));
+      }
+      else {
+        friendRequests = [];
+      }
+
+      setAllFriendRequests(friendRequests);
+      setSectionData([{title: `Friend Requests (${friendRequests.length})`, data: friendRequests, renderItem: renderFriendRequest}, {title: `Contacts on Din Din (${allExistingAccounts.length})`, data: allExistingAccounts, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${allOtherContacts.length})`, data: allOtherContacts, renderItem: renderNewItem}]);
+    });
+    
+
+    return unsubscribe;
+  }, [allExistingAccounts, allOtherContacts]);
+
+  // // Listener to handle updates to existing accountsx
   // useEffect(() => {
-  //   setAllFriendRequests(allFriendRequestsGlobal);
-  //   setAllExistingAccounts(allExistingGlobal);
-  // }, [allFriendRequestsGlobal, allExistingGlobal])
+  //   console.log('existing account useeffect')
+  //   let existingAccounts = allExistingAccounts.filter(user => !requesters.includes(user.id) && !newFriends.includes(user.id))
+  //   existingAccounts = existingAccounts.map(user => {return {...user, requestSent: requestees.includes(user.id) }})
+  //   setAllExistingAccounts(existingAccounts)
+  // }, [requestees, newFriends, requesters])
+
+  // // UseEffect to update the sectionlist when one of the components changes
+  // useEffect(() => {
+  //   setSectionData([{title: `Friend Requests (${allFriendRequests.length})`, data: allFriendRequests, renderItem: renderFriendRequest}, {title: `Contacts on Din Din (${allExistingAccounts.length})`, data: allExistingAccounts, renderItem: renderExistingItem }, {title: `Invite Other Contacts (${allOtherContacts.length})`, data: allOtherContacts, renderItem: renderNewItem}]);
+  // }, [allExistingAccounts, allFriendRequests, allOtherContacts])
+
+  // // Add listeners to see if your sent requests have changed.
+  // useEffect(() => {
+
+  //   const unsubscribe = onValue(ref_db(database, `sentFriendRequests/${currentUser.uid}`), (snapshot) => {
+  //     if (snapshot.val()) {
+  //       setRequestees(Object.keys(snapshot.val()));
+  //     }
+  //     else {
+  //       setRequestees([])
+  //     }
+  //   });
+    
+
+  //   return unsubscribe;
+  // }, []);
+
+  // // Add listener to see if someone has accepted your request. Not super necessary? Also assumes that you can't stop being friends
+  // useEffect(() => {
+
+  //   const unsubscribe = onValue(ref_db(database, `friends/${currentUser.uid}`), (snapshot) => {
+  //     if (snapshot.val()) {
+  //       setNewFriends(Object.keys(snapshot.val()));
+  //     }
+  //     else {
+  //       setNewFriends([])
+  //     }
+  //   });
+    
+
+  //   return unsubscribe;
+  // }, []);
+
+  
+  // // Add listeners to see if you've been sent a request. If you have, mark them as a friend
+  // useEffect(() => {
+
+  //   const unsubscribe = onValue(ref_db(database, `friendRequests/${currentUser.uid}`), (snapshot) => {
+  //     if (snapshot.val()) {
+  //       setRequesters(Object.keys(snapshot.val()));
+  //     }
+  //     else {
+  //       setRequesters([])
+  //     }
+  //   });
+    
+
+  //   return unsubscribe;
+  // }, []);
 
   // For rendering contacts with accounts
   const renderExistingItem = ({item}) => {
@@ -237,25 +272,10 @@ export default function NewFriends({ navigation }) {
     return (
       <FriendRequest 
         contact={item} 
-        // allFriendReqs={allFriendRequests}
-        // setAllFriendReqs={setAllFriendRequests}
-        // allExisting={allExistingAccounts}
-        // setAllExisting={setAllExistingAccounts}
         currUser={currentUser}
-        // handleAcceptBig={handleAcceptBig}
       />
     )
   };
-
-  // const handleAcceptBig = async (requesterId) => {
-  //   console.log(allFriendRequests);
-  //   console.log(allExistingAccounts);
-  //   await addFriend(requesterId, currentUser.uid);
-  //   await removeFriendRequest(requesterId, currentUser.uid);
-  //   setAllFriendRequests([...allFriendRequests.filter(user => user.id !== requesterId)]);
-  //   setAllExistingAccounts([...allExistingAccounts.filter(user => user.id !== requesterId)]);
-  //   handleSearch(search);
-  // }
 
   const handleNext = () => {
     navigation.navigate('CalendarSync');
@@ -314,9 +334,9 @@ export default function NewFriends({ navigation }) {
     return (
       <View style={styles.container}>
         <Text style={styles.deniedText}>Please enable contacts to add your friends</Text>
-        <Pressable style={styles.nextButton} onPress={handleNext}>
+        {/* <Pressable style={styles.nextButton} onPress={handleNext}>
           <Text style={styles.nextLabel}>Next</Text>
-        </Pressable>
+        </Pressable> */}
       </View>
     )
   }

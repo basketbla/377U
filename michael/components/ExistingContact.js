@@ -12,20 +12,26 @@ import React, {
 import { COLORS } from '../utils/constants';
 import { addFriendRequest, addSentFriendRequest } from '../utils/firebase';
 import { useAuth } from '../contexts/AuthContext';
+import { useFriends } from '../contexts/FriendsContext';
+import * as Analytics from 'expo-firebase-analytics';
 
 
 export default function ExistingContact({ contact }) {
 
-  const { currentUser } = useAuth();
+  const { currentUser, userFirebaseDetails } = useAuth();
+  const { allUsers } = useFriends();
 
-  const [sent, setSent] = useState(contact.requestSent);
   const [loading, setLoading] = useState(false);
+  const [requestSent, setRequestSent] = useState(contact.requestSent);
 
   const handleSendRequest = async () => {
     setLoading(true);
+
+    Analytics.logEvent('SendFriendRequest')
+
+    setRequestSent(true);
     await addFriendRequest(currentUser.uid, contact.id);
-    await addSentFriendRequest(currentUser.uid, contact.id);
-    setSent(true);
+    await addSentFriendRequest(currentUser.uid, contact.id, allUsers[contact.id]?.pushToken, userFirebaseDetails);
     setLoading(false);
   }
 
@@ -53,16 +59,16 @@ export default function ExistingContact({ contact }) {
       </View>
       {
         contact.isFriend ?
-        <></>
+        <View style={styles.padding}/>
         :
-        <Pressable style={(sent || loading) ? styles.acceptRequestButtonDisabled : styles.acceptRequestButton} onPress={handleSendRequest} disabled={sent || loading}>
+        <Pressable style={(requestSent || loading) ? styles.acceptRequestButtonDisabled : styles.acceptRequestButton} onPress={handleSendRequest} disabled={requestSent || loading}>
           {
             loading ?
             <ActivityIndicator/>
             :
             <>
               {
-                sent ?
+                requestSent ?
                 <Text style={styles.acceptRequestText}>Sent!</Text>
                 :
                 <Text style={styles.acceptRequestText}>Add</Text>
@@ -189,5 +195,11 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     textAlign: 'center',
+  },
+  padding: {
+    marginLeft: 'auto',
+    marginRight: 15,
+    padding: 10,
+    width: 80,
   },
 })

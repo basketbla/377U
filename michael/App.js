@@ -9,7 +9,9 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <PretendApp/>
+      <FriendsProvider>
+        <PretendApp/>
+      </FriendsProvider>
     </AuthProvider>
   )
 }

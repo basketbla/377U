@@ -16,7 +16,7 @@ import React, {
 } from 'react'
 import * as Contacts from 'expo-contacts';
 import { COLORS, DEFUALT_PROFILE_PIC } from '../utils/constants';
-import { addFriend, getFriendRequests, getFriends, getSentFriendRequests, getUsers, removeFriendRequest } from '../utils/firebase';
+import { addFriend, getFriendRequests, getFriends, getSentFriendRequests, removeFriendRequest } from '../utils/firebase';
 import * as SMS from 'expo-sms';
 import { useAuth } from '../contexts/AuthContext'
 import { useIsFocused, useNavigation } from '@react-navigation/native';
@@ -28,6 +28,7 @@ import { useFriends } from '../contexts/FriendsContext';
 export default function ContactsPageNew({ navigation }) {
 
   const { currentUser, setIsNew } = useAuth();
+  const { allUsers } = useFriends();
 
   const isFocused = useIsFocused();
 
@@ -66,7 +67,7 @@ export default function ContactsPageNew({ navigation }) {
       });
 
       // Check which contacts have dindin and which ones don't
-      let users = await getUsers();
+      let users = allUsers;
 
       // Get friendRequests
       let friendRequests = await getFriendRequests(currentUser.uid);

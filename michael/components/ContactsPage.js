@@ -14,9 +14,9 @@ import React, {
 } from 'react'
 import * as Contacts from 'expo-contacts';
 import { COLORS, DEFUALT_PROFILE_PIC, PROFILE_COLORS } from '../utils/constants';
-import { getUsers } from '../utils/firebase';
 import * as SMS from 'expo-sms';
 import ExistingContact from './ExistingContact';
+import { useFriends } from '../contexts/FriendsContext';
 
 // Entry for contacts list
 const ContactEntry = ({ contact, type, profilePicsMap }) => (
@@ -41,14 +41,14 @@ const ContactEntry = ({ contact, type, profilePicsMap }) => (
     if (!contact.phoneNumbers && contact.emails) {
       await SMS.sendSMSAsync(
         [contact.emails[0].email],
-        'Download dindin! https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+        'Download dindin! https://testflight.apple.com/join/ZfW7d93U'
       );
       return
     }
 
     await SMS.sendSMSAsync(
       [contact.phoneNumbers[0].digits],
-      'Download dindin! https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+      'Download dindin! https://testflight.apple.com/join/ZfW7d93U'
     );
   }}>
     {/* <View style={{...styles.profilePic, backgroundColor: `${PROFILE_COLORS[contact.firstName.charCodeAt(1) % PROFILE_COLORS.length]}`}}>
@@ -92,6 +92,8 @@ const ContactEntry = ({ contact, type, profilePicsMap }) => (
 
 export default function ContactsPage({ navigation }) {
 
+  const { allUsers } = useFriends();
+
 
   const [contactStatus, setContactStatus] = useState('');
   const [search, setSearch] = useState('');
@@ -113,7 +115,7 @@ export default function ContactsPage({ navigation }) {
         });
 
         // Check which contacts have dindin and which ones don't
-        let users = await getUsers();
+        let users = allUsers;
         let existingEmails = Object.values(users).map(user => user.email);
         let existingNumbers = Object.values(users).map(user => user.phoneNumber);
         

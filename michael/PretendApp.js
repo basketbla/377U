@@ -1,19 +1,24 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, Image } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useAuth } from './contexts/AuthContext';
-import { COLORS } from './utils/constants';
+import { COLORS, NOTIFICATION_TYPES } from './utils/constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import React, { 
   useEffect,
-  useRef
+  useRef,
+  useState
 } from 'react';
 import { registerForPushNotificationsAsync } from './utils/expo';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { addUserPushToken, getCurrentUser, getUsers, database } from './utils/firebase';
+import { onValue, ref as ref_db } from 'firebase/database';
+import { useFriends } from './contexts/FriendsContext';
 
 import VerifyPhone from './components/VerifyPhone';
 import SendTexts from './components/SendTexts';
@@ -40,7 +45,6 @@ import ContactsPageNew from './components/ContactsPageNew';
 import GroupAvailability from './components/GroupAvailability';
 import AddCalendar from './components/AddCalendar';
 import Welcome from './components/Welcome';
-import { addUserPushToken } from './utils/firebase';
 
 
 const Stack = createNativeStackNavigator();
@@ -50,10 +54,14 @@ const matTab = createMaterialTopTabNavigator();
 
 export default function PretendApp() {
 
-  const { currentUser, isNew, userFirebaseDetails, setUserFirebaseDetails } = useAuth();
+  const { currentUser, setCurrentUser, isNew, setIsNew, userFirebaseDetails, setUserFirebaseDetails } = useAuth();
+  const { allUsers, setAllUsers, setNavigateTo } = useFriends();
 
   const notificationListener = useRef();
   const responseListener = useRef();
+
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(async () => {
     // If user doesn't have a push notification token, make one.
@@ -62,13 +70,19 @@ export default function PretendApp() {
       return;
     }
 
+    // Need to change this. Instead, store an array of push tokens. Save device token in async storage.
+    // When you sign out, remove the local token from the array in firebase
+    // When you sign in, generate a new token if there isn't one in storage, and add that to the array in firebase
+    // Change all the notification functions to instead send push notifs to ALL tokens in array
     if (userFirebaseDetails.uid && !userFirebaseDetails.pushToken) {
       if (!Device.isDevice) {
         return
       }
       let token = await registerForPushNotificationsAsync();
-      setUserFirebaseDetails({...userFirebaseDetails, pushToken: token})
-      await addUserPushToken(userFirebaseDetails.uid, token);
+      // setUserFirebaseDetails({...userFirebaseDetails, pushToken: token})
+      if (token) {
+        await addUserPushToken(userFirebaseDetails.uid, token);
+      }
     }
 
   }, [userFirebaseDetails])
@@ -93,7 +107,18 @@ export default function PretendApp() {
 
     // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log(response);
+
+      // This approach is gonna be buggy if people have the app running in background not on people screen... whatever
+      let data = response.notification.request.content.data;
+
+      if (data.type === NOTIFICATION_TYPES.message) {
+        if (data.group) {
+          setNavigateTo({to: 'Chat', group: data.group})
+        }
+      }
+      else if (data.type === NOTIFICATION_TYPES.newFriendRequest) {
+        setNavigateTo({to: 'FriendsTab'})
+      }
     });
 
     return () => {
@@ -102,6 +127,63 @@ export default function PretendApp() {
     };
   }, []);
 
+  // Check async storage to see if user is signed in
+  useEffect(async () => {
+    try {
+      const value = await AsyncStorage.getItem('currentUser')
+      if(value !== null) {
+        let tempCurrUser = JSON.parse(value);
+        setCurrentUser(tempCurrUser);
+        setIsNew(false)
+      }
+
+      // Also fetch all users. Just need all the loading to be in one place :/
+      let daUsers = await getUsers();
+      if (Object.keys(daUsers).length === 0) {
+        // Normally want this to error, but it's legitimate if there are no users
+        // setError(true);
+      }
+      setAllUsers(daUsers);
+
+      setLoading(false);
+    } catch(e) {
+      // error reading value
+      setLoading(false);
+      setError(true);
+    }
+  }, [])
+
+  // Listener that changes user details when updated in firebase
+  useEffect(() => {
+    if (!currentUser) {
+      return
+    }
+
+    const unsubscribe = onValue(ref_db(database, `users/${currentUser.uid}`), (snapshot) => {
+      setUserFirebaseDetails({...snapshot.val(), uid: currentUser.uid})
+    });
+    return unsubscribe;
+
+  }, [currentUser]);
+
+  // If we're loading, just display the splash screen
+  if (loading) {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Image source={require('./assets/dindinsplash.png')} style={{width: '100%', height: '100%'}}/>
+      </View>
+    )
+  }
+
+  if (error) {
+    // TODO: Make this error screen prettier
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Text>There was an error. Try reloading the app</Text>
+      </View>
+    );
+  }
+
   // User is not signed in
   if (currentUser === null || isNew === null) {
     return (
@@ -109,8 +191,8 @@ export default function PretendApp() {
     );
   }
 
-  // User just signed up, do onboarding
-  if (!!currentUser && isNew) {
+  // User just signed up, do onboarding. ALSO catch the case where they restarted after signing up
+  if ((!!currentUser && isNew) || (userFirebaseDetails && Object.keys(userFirebaseDetails).length === 1)) {
     return (
       <OnboardingStack/>
     );
@@ -144,7 +226,7 @@ function SignInStack() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ animationEnabled: false, headerShown: false, gestureEnabled: 'false'}}>
-        <Stack.Screen name="Welcome" component={Welcome}/> 
+        {/* <Stack.Screen name="Welcome" component={Welcome}/>  */}
         <Stack.Screen name="SignUpWithPhone" component={SignUpWithPhone}/>
         <Stack.Screen name="SignIn" component={SignIn}/>
         <Stack.Screen name="SignUp" component={SignUp}/> 

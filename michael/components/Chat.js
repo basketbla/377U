@@ -2,42 +2,46 @@ import { StyleSheet, Text, View, Pressable } from 'react-native'
 import React, { useState, useCallback, useEffect } from "react";
 import { GiftedChat, InputToolbar, Send } from "react-native-gifted-chat";
 import firebase from "@firebase/app";
-import { addMessageByObj, getCurrentUser, getGroup } from '../utils/firebase';
+import { addMessageByObj, getCurrentUser, getGroup, updateLocalLastSeen } from '../utils/firebase';
 import { useAuth } from '../contexts/AuthContext';
-import { onChildAdded, ref as ref_db} from "firebase/database";
+import { onChildAdded, ref as ref_db, set} from "firebase/database";
 import { database } from '../utils/firebase';
-import { COLORS } from '../utils/constants';
+import { COLORS, NOTIFICATION_TYPES } from '../utils/constants';
+import { beautifyDate } from './GroupAvailability.js'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Analytics from 'expo-firebase-analytics';
 
 
 export default function Chat({ navigation, route }) {
   
-  const { group } = route.params;
+  const { group, chosenSlot } = route.params;
   const { userFirebaseDetails } = useAuth();
   const [messages, setMessages] = useState([]);
   const [groupTokens, setGroupTokens] = useState([]);
+  // const [localLastSeen, setLocalLastSeen] = useState();
+
+  // Testing analytics
+  useEffect(() => {
+    Analytics.logEvent('OpenChat')
+  }, [])
 
   useEffect(() => {
-    // Kind of can't test this well right now. TODO: TEST WITH TWO PHONES
-    const unsubscribe = onChildAdded(ref_db(database, `groups/${group.id}/messages`), (snapshot, previousMessages) => {
-      // I can't think of a better way to do this
-      // console.log(messages.map(message => message.text));
-      // console.log(snapshot.val());
-      // if (!messages.map(message => message._id).includes(snapshot.key)) {
-      //   let newMessage = snapshot.val();
-      //   newMessage = {...newMessage, _id: snapshot.key, createdAt: JSON.parse(newMessage.createdAt)};
-      //   setMessages([...messages, newMessage]);
-      // }
-      // console.log(snapshot.val())
+    const unsubscribe = onChildAdded(ref_db(database, `messages/${group.id}`), (snapshot, previousMessages) => {
 
       let newMessage = snapshot.val();
       newMessage = {...newMessage, _id: snapshot.key, createdAt: JSON.parse(newMessage.createdAt)};
 
+      // if (newMessage.createdAt > localLastSeen) {
+      //   setLocalLastSeen(group.newMessage.createdAt)
+      //   updateLocalLastSeen(userFirebaseDetails.uid, group.id, JSON.stringify(newMessage.createdAt))
+      // }
+
       // Okay still so confused on what this is doing but it works so whatever
-      setMessages((previousMessages) =>
-        GiftedChat.append(previousMessages, newMessage)
+      setMessages((prevMessages) =>
+        GiftedChat.append(prevMessages, newMessage)
       );
     })
 
@@ -45,11 +49,11 @@ export default function Chat({ navigation, route }) {
       <View style={{flexDirection: 'row'}} > 
 
     
-      <Pressable onPress={() => navigation.navigate('ChatDetails', { group: group })} style={styles.headerButtonRight}>
+      <Pressable onPress={() => {Analytics.logEvent('PressChatDetails'); navigation.navigate('ChatDetails', { group: group })}} style={styles.headerButtonRight}>
           <Ionicons name="information-circle" size={30} color={COLORS.yellow}/>
         </Pressable>
 
-       <Pressable onPress={() => navigation.navigate('GroupAvailability', { group: group })} style={styles.headerButtonRight}>
+       <Pressable onPress={() => {Analytics.logEvent('PressCalendar'); navigation.navigate('GroupAvailability', { group: group })}} style={styles.headerButtonRight}>
           <Ionicons name="calendar" size={30} color={COLORS.yellow}/>
       </Pressable>
           </View> 
@@ -58,7 +62,7 @@ export default function Chat({ navigation, route }) {
     ), });
 
 
-    return [unsubscribe];
+    return unsubscribe;
   }, []);
 
   useEffect(async () => {
@@ -73,7 +77,7 @@ export default function Chat({ navigation, route }) {
         userTokens.push(token);
       }
     }
-    console.log(userTokens);
+    // console.log("userTokens: ", userTokens);
     setGroupTokens(userTokens);
 
     if (route.params.sendNotif) {
@@ -81,10 +85,18 @@ export default function Chat({ navigation, route }) {
     }
   }, [])
 
+  // On open, save the last message seen in async storage
+  // Also need to do this every time we send a message
+  // useEffect(async () => {
+  //   setLocalLastSeen(JSON.parse(group.lastMessage.createdAt))
+  //   updateLocalLastSeen(userFirebaseDetails.uid, group.id, group.lastMessage.createdAt)
+  // }, [])
+
+  // Could redo this to use the function from expo.js...
   const sendPushNotifications = async (messageBody, userTokens) => {
 
-    console.log('sending text')
-    console.log(groupTokens)
+    Analytics.logEvent('SendChat')
+
     let tokens = groupTokens;
     if (userTokens) {
       tokens = userTokens;
@@ -100,7 +112,7 @@ export default function Chat({ navigation, route }) {
         sound: 'default',
         title: userFirebaseDetails.name,
         body: messageBody,
-        // data: { someData: 'goes here' },
+        data: { group: group, type: NOTIFICATION_TYPES.message },
       };
     
       await fetch('https://exp.host/--/api/v2/push/send', {
@@ -117,11 +129,8 @@ export default function Chat({ navigation, route }) {
   }
 
   // firebase onsend or non-firebase onsend
-  //** Dvaid's changes added async to it
   const onSend = useCallback((messages = []) => {
-    addMessageByObj(group.id, messages[0]);
-    // await schedulePushNotification()
-    // sendPushNotifications(messages[0].text);
+    addMessageByObj(group.id, messages[0], userFirebaseDetails.uid);
   }, []);
 
 
@@ -146,7 +155,21 @@ export default function Chat({ navigation, route }) {
  //      </View>
 
   return (
-    <View style={styles.container}> 
+    <View style={styles.container}>
+      {chosenSlot ? 
+        <>
+        <Text style={styles.headerText}> You're on for: </Text>
+        <Pressable 
+          onPress={() => navigation.navigate('GroupAvailability', { group: group })} 
+          style={[styles.buttonText]}>
+          <Text>{beautifyDate(chosenSlot.startDate, chosenSlot.endDate)}</Text>
+      
+        </Pressable>
+        </>
+        :
+        <></>
+      }
+      
       {/*<Pressable onPress={() => navigation.navigate('GroupAvailability', { group: group })} style={styles.header}>
           <Text style={styles.headerTitle}>See when everyone's free</Text>
       </Pressable>*/}
@@ -184,6 +207,29 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.yellow,
    // paddingTop: '10%', // Feels kind of bad,
   },
+  buttonText: {
+    backgroundColor: COLORS.yellow,
+    height: 50,
+    alignItems: 'center', 
+    justifyContent: 'center',
+    marginTop: 15,
+    marginRight:20,
+    marginLeft:20,
+    paddingLeft:8,
+    paddingRight:8,
+    borderRadius: 10,
+    fontSize: 20,
+  },
+  headerText: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    marginTop:20,
+    color: COLORS.darkGrey,
+    fontSize:14,
+    marginBottom:10,
+
+ },
   headerTitle: {
     fontWeight: 'bold',
     fontSize: 15,

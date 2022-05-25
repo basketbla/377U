@@ -4,7 +4,6 @@ import React, {
   useState
 } from 'react'
 import { COLORS } from '../utils/constants';
-import { getUsers } from '../utils/firebase';
 
 export default function BlandUser({ contact }) {
 

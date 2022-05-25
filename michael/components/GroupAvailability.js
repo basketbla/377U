@@ -4,6 +4,7 @@ import { Text, View, Button, Platform, StyleSheet, Pressable, Alert, ScrollView}
 import * as Linking from 'expo-linking';
 import { COLORS } from '../utils/constants';
 import { useAuth } from '../contexts/AuthContext'
+
 // import * as CalendarAvailability from "./addCalendarInfo.js";
 import * as Calendar from 'expo-calendar';
 import { getAvailability, getCalEvents} from '../utils/firebase';
@@ -129,7 +130,7 @@ export default function GroupAvailability({ route, navigation }) {
     if (events.length == 0) {
         freeSlots.push({startDate: startInterval, endDate: endInterval});
     }
-    console.log("FREE: ", freeSlots);
+    // console.log("FREE: ", freeSlots);
     var temp = {}, hourSlots = [];
 
     //breaks down the total free slots into chunks based on the interval set (1, 2, 3, hours, etc)
@@ -212,7 +213,9 @@ export default function GroupAvailability({ route, navigation }) {
             } else {
                   
 
-                  if (freeStart.getHours() < night.getHours() ) {
+                  // console.log(convertDate(freeStart));
+
+                  if (freeStart.getHours() != night.getHours() ) {
                     hourSlots.push({startDate:convertDate(freeStart), endDate: convertDate(night)});
 
 
@@ -221,9 +224,10 @@ export default function GroupAvailability({ route, navigation }) {
 
                   }
 
-                  if (freeEnd.getHours() > morning.getHours() ) {
-                    console.log(freeEnd.getHours());
-                    console.log(morning.getHours());
+                  if (freeEnd.getHours() != morning.getHours() ) {
+                    // console.log(freeEnd.getHours());
+                    // console.log(morning.getHours());
+
 
                     hourSlots.push({startDate:convertDate(morning), endDate: convertDate(freeEnd)});
                   } 
@@ -260,13 +264,13 @@ export default function GroupAvailability({ route, navigation }) {
     hourSlots.sort(
       (objA, objB) => new Date(objA.startDate) - new Date(objB.startDate),
     );
-    console.log("HOURS:" , hourSlots)
+    // console.log("HOURS:" , hourSlots)
     return hourSlots;
   } 
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Your whole group is free during these times, according to your Google Calendars.</Text>
+      <Text style={styles.headerText}>Your whole group is free during these times, according to your calendars.</Text>
       {/*<Text style={styles.detailText}>Suggested Times</Text>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           {suggestedSlots.map((slot, i) =>
@@ -286,7 +290,10 @@ export default function GroupAvailability({ route, navigation }) {
           <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           {freeSlots.map((slot, i) =>
                        
-              <Pressable key={i} style={[styles.buttonText]}>
+              <Pressable 
+                onPress={() => navigation.navigate('Chat', { group: group, chosenSlot: slot })} 
+                key={i} 
+                style={[styles.buttonText]}>
                 <Text>{beautifyDate(slot.startDate, slot.endDate)}</Text>
                 
               </Pressable>
@@ -361,7 +368,7 @@ const styles = StyleSheet.create({
 })
 
 
-function beautifyDate(start, end) {
+export function beautifyDate(start, end) {
   start = new Date(start);
   let minStart = start.getMinutes();
   if (minStart < 10) {

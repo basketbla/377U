@@ -16,11 +16,12 @@ import React, {
 } from 'react'
 import * as Contacts from 'expo-contacts';
 import { COLORS, DEFUALT_PROFILE_PIC } from '../utils/constants';
-import { getFriendRequests, getFriends, getUsers, removeFriend, getSentFriendRequests } from '../utils/firebase';
-import * as SMS from 'expo-sms';
+import { getFriendRequests, getFriends, removeFriend, getSentFriendRequests, database } from '../utils/firebase';
+import { ref as ref_db, onValue } from 'firebase/database'
 import { useAuth } from '../contexts/AuthContext';
 import { useIsFocused } from "@react-navigation/native";
 import ExistingContact from './ExistingContact';
+import { useFriends } from '../contexts/FriendsContext';
 
 // const User = ({ contact }) => {
 
@@ -53,47 +54,170 @@ export default function AllUsers({ navigation }) {
   const isFocused = useIsFocused();
 
   const { currentUser } = useAuth();
+  const { allUsers, setAllUsers } = useFriends();
 
   const [search, setSearch] = useState('');
   const [friends, setFriends] = useState([]);
   const [friendsToDisplay, setFriendsToDisplay] = useState([]);
-  const [loading, setLoading] = useState(true);
-
+  const [loading, setLoading] = useState(false);
+  const [requesters, setRequesters] = useState([]);
+  const [newFriends, setNewFriends] = useState([]);
+  const [requestees, setRequestees] = useState([]);
 
   // Fetch all friends
+  // Can take out since I have listeners now I think...
   useEffect(async () => {
-      let users = await getUsers();
-      users = Object.keys(users).map(id => {return {...users[id], id: id}});
+      // let users = allUsers;
+      // users = Object.keys(users).map(id => {return {...users[id], id: id}});
 
-      let sentRequestsSnapshot = await getSentFriendRequests(currentUser.uid);
+      // let sentRequestsSnapshot = await getSentFriendRequests(currentUser.uid);
 
-      // Show if friend request has been sent or not
-      if (sentRequestsSnapshot && sentRequestsSnapshot.val()) {
-        let requestees = Object.keys(sentRequestsSnapshot.val());
-        users = users.map(user => {return {...user, requestSent: requestees.includes(user.id)}})
+
+      // // Show if friend request has been sent or not
+      // if (sentRequestsSnapshot && sentRequestsSnapshot.val()) {
+      //   let requestees = Object.keys(sentRequestsSnapshot.val());
+      //   users = users.map(user => {return {...user, requestSent: requestees.includes(user.id)}})
+      // }
+      // else {
+      //   users = users.map(user => {return {...user, requestSent: false}})
+      // }
+
+      // // Show if friend or not
+      // let friendsSnapshot = await getFriends(currentUser.uid);
+      // if (friendsSnapshot && friendsSnapshot.val()) {
+      //   let friendIds = Object.keys(friendsSnapshot.val());
+      //   users = users.map(user => {return {...user, isFriend: friendIds.includes(user.id)}})
+      // }
+      // else {
+      //   users = users.map(user => {return {...user, isFriend: false}})
+      // }
+
+      // // Also mark as friend if they've sent you a request
+      // let receivedSnapshot = await getFriendRequests(currentUser.uid);
+      // if (receivedSnapshot && receivedSnapshot.val()) {
+      //   let requesters = Object.keys(receivedSnapshot.val());
+      //   users = users.map(user => {return {...user, isFriend: requesters.includes(user.id)}})
+      // }
+
+      // // Don't show the current user
+      // users = users.filter(user => user.id !== currentUser.uid)
+
+      // setFriends(users);
+      // setFriendsToDisplay(users);
+      // setLoading(false);
+  }, []);
+
+
+  // Add listeners to see if you've been sent a request. If you have, mark them as a friend
+  useEffect(() => {
+
+    const unsubscribe = onValue(ref_db(database, `friendRequests/${currentUser.uid}`), (snapshot) => {
+      if (snapshot.val()) {
+        setRequesters(Object.keys(snapshot.val()));
       }
       else {
-        users = users.map(user => {return {...user, requestSent: false}})
+        setRequesters([])
       }
+    });
+    
 
-      // Show if friend or not
-      let friendsSnapshot = await getFriends(currentUser.uid);
-      if (friendsSnapshot && friendsSnapshot.val()) {
-        let friendIds = Object.keys(friendsSnapshot.val());
-        users = users.map(user => {return {...user, isFriend: friendIds.includes(user.id)}})
+    return unsubscribe;
+  }, []);
+
+   // Add listeners to see if your sent requests have changed.
+   useEffect(() => {
+
+    const unsubscribe = onValue(ref_db(database, `sentFriendRequests/${currentUser.uid}`), (snapshot) => {
+      if (snapshot.val()) {
+        setRequestees(Object.keys(snapshot.val()));
       }
       else {
-        users = users.map(user => {return {...user, isFriend: false}})
+        setRequestees([])
       }
+    });
+    
 
+    return unsubscribe;
+  }, []);
+
+  // Add listener to see if someone has accepted your request. Not super necessary? Also assumes that you can't stop being friends
+  useEffect(() => {
+
+    const unsubscribe = onValue(ref_db(database, `friends/${currentUser.uid}`), (snapshot) => {
+      if (snapshot.val()) {
+        setNewFriends(Object.keys(snapshot.val()));
+      }
+      else {
+        setNewFriends([])
+      }
+    });
+    
+
+    return unsubscribe;
+  }, []);
+
+  // Add listener to see if all users have changed. If we get big enough, this could be bad.
+  useEffect(() => {
+
+    const unsubscribe = onValue(ref_db(database, `users`), (snapshot) => {
+      if (snapshot.val()) {
+        setAllUsers(snapshot.val());
+      }
+    });
+    
+
+    return unsubscribe;
+  }, []);
+
+  // // Update display based on new friend requests
+  // useEffect(() => {
+  //   let temp = [...friends]
+  //   if (temp.length !== 0) {
+  //     temp = temp.map(user => {return {...user, isFriend: requesters.includes(user.id) || user.isFriend}})
+  //     setFriends(temp)
+  //     setFriendsToDisplay(temp)
+  //   }
+  // }, [requesters])
+
+  // // Update display based on accepted friend requests. 
+  // useEffect(() => {
+  //   let temp = [...friends]
+  //   if (temp.length !== 0) {
+  //     temp = temp.map(user => {return {...user, isFriend: newFriends.includes(user.id), requestSent: (user.requestSent && !newFriends.includes(user.id))}})
+  //     setFriends(temp)
+  //     setFriendsToDisplay(temp)
+  //   }
+  // }, [newFriends])
+
+  // // Update display based on new sent friend requests
+  // useEffect(() => {
+  //   let temp = [...friends]
+  //   if (temp.length !== 0) {
+  //     temp = temp.map(user => {return {...user, requestSent: requestees.includes(user.id)}})
+  //     setFriends(temp)
+  //     setFriendsToDisplay(temp)
+  //   }
+  // }, [requestees])
+
+  // Update display based on all users changed
+  useEffect(() => {
+    let temp = Object.keys(allUsers).map(id => {return {...allUsers[id], id: id}});
+    if (temp.length !== 0) {
+      temp = temp.map(user => {return {...user, isFriend: requesters.includes(user.id) || user.isFriend || newFriends.includes(user.id), requestSent: (requestees.includes(user.id) && !newFriends.includes(user.id)) }})
+      
       // Don't show the current user
-      users = users.filter(user => user.id !== currentUser.uid)
+      temp = temp.filter(user => user.id !== currentUser.uid)
 
+      setFriends(temp)
+      setFriendsToDisplay(temp)
+    }
+    else {
+      setFriends([])
+      setFriendsToDisplay([])
+    }
 
-      setFriends(users);
-      setFriendsToDisplay(users);
-      setLoading(false);
-  }, [isFocused]);
+  }, [allUsers, requestees, requesters, newFriends])
+
 
   // For rendering contacts with accounts
   const renderItem = ({item}) => {
@@ -128,12 +252,12 @@ export default function AllUsers({ navigation }) {
       />
       {
         friends.length === 0 ?
-        <Text style={{flex: 1, fontSize: 20, color: COLORS.darkGrey}}>You have no friends :(</Text>
+        <Text style={{flex: 1, fontSize: 20, color: COLORS.darkGrey}}>There are no other users???</Text>
         :
         <>
           {
             friendsToDisplay.length === 0 ?
-            <Text style={{flex: 1, fontSize: 20, color: COLORS.darkGrey}}>No matching friends</Text>
+            <Text style={{flex: 1, fontSize: 20, color: COLORS.darkGrey}}>No matching users</Text>
             :
             <FlatList
               data={friendsToDisplay}

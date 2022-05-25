@@ -16,10 +16,12 @@ import React, {
 } from 'react'
 import * as Contacts from 'expo-contacts';
 import { COLORS, DEFUALT_PROFILE_PIC } from '../utils/constants';
-import { getFriendRequests, getFriends, getUsers, removeFriend } from '../utils/firebase';
+import { getFriendRequests, getFriends, removeFriend, database, getUsers } from '../utils/firebase';
+import { onValue, ref as ref_db } from 'firebase/database';
 import * as SMS from 'expo-sms';
 import { useAuth } from '../contexts/AuthContext';
 import { useIsFocused } from "@react-navigation/native";
+import { useFriends } from '../contexts/FriendsContext'
 
 const User = ({ contact, handleRemoveFriend }) => {
 
@@ -80,6 +82,7 @@ export default function OldFriends({ navigation }) {
   const isFocused = useIsFocused();
 
   const { currentUser } = useAuth();
+  const { allUsers, setAllUsers } = useFriends();
 
   const [search, setSearch] = useState('');
   const [friends, setFriends] = useState([]);
@@ -90,7 +93,7 @@ export default function OldFriends({ navigation }) {
   // Fetch all friends
   useEffect(async () => {
       let friendsSnapshot = await getFriends(currentUser.uid);
-      let users = await getUsers();
+      let users = allUsers;
       let friendUsers = [];
       if (friendsSnapshot && friendsSnapshot.val()) {
         friendUsers = Object.keys(friendsSnapshot.val()).map(id => {return {...users[id], id: id}});
@@ -98,7 +101,43 @@ export default function OldFriends({ navigation }) {
       setFriends(friendUsers);
       setFriendsToDisplay(friendUsers);
       setLoading(false);
-  }, [isFocused]);
+  }, []);
+
+  // Add listeners to see if anyone accepted requests
+  useEffect(() => {
+
+    // Wasting a time setting friendRequests the first time, but I think it's fine
+    const unsubscribe = onValue(ref_db(database, `friends/${currentUser.uid}`), async (snapshot) => {
+      if (snapshot.val()) {
+        let friendIds = Object.keys(snapshot.val());
+
+        // Same thing as in newFriends. Still hacky
+        let shouldRefresh = false;
+        for (let id of friendIds) {
+          if (allUsers[id] === undefined) {
+            shouldRefresh = true;
+          }
+        }
+
+        let newAllUsers = allUsers;
+        if (shouldRefresh) {
+          newAllUsers = await getUsers();
+          setAllUsers(newAllUsers)
+        }
+
+        let friendUsers = Object.keys(snapshot.val()).map(id => {return {...newAllUsers[id], id: id}});
+        setFriends(friendUsers)
+        setFriendsToDisplay(friendUsers)
+      }
+      else {
+        setFriends([])
+        setFriendsToDisplay([])
+      }
+    });
+    
+
+    return unsubscribe;
+  }, []);
 
   // For rendering contacts with accounts
   const renderItem = ({item}) => {
