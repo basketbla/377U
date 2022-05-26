@@ -21,9 +21,6 @@ import { FirebaseRecaptchaVerifierModal, FirebaseRecaptchaBanner } from 'expo-fi
 import { PhoneAuthProvider, signInWithCredential } from 'firebase/auth';
 import { app, auth } from '../utils/firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { logEvent } from "firebase/analytics";
-import { analytics } from '../utils/firebase';
-import * as Analytics from 'expo-firebase-analytics';
 
 export default function SignUpWithPhone() {
 
@@ -123,13 +120,10 @@ export default function SignUpWithPhone() {
       // Should have put this in firebase.js but I don't want to so whatever
       let response = await signInWithCredential(auth, credential);
 
-      // Login event for analytics
-      Analytics.logEvent('login')
-
       // Only save logged in if they aren't a new user.
-      if (!response._tokenResponse.isNewUser) {
+      // if (!response._tokenResponse.isNewUser) {
         await AsyncStorage.setItem('currentUser', JSON.stringify(currentUser));
-      }
+      // }
 
       setIsNew(response._tokenResponse.isNewUser);
     } catch (err) {

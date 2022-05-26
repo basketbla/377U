@@ -85,7 +85,7 @@ export default function CalendarSync({ navigation }) {
     endInterval.setHours(23, 59 , 59);
 
     let events =  await accessCalendar(startInterval, endInterval);
-    setCalEvents(currentUser.uid, events);
+    // setCalEvents(currentUser.uid, events);
 
     let currStart = new Date();
     currStart.setDate(currStart.getDate() -2 ); //get essentially yesterday at 11:59 to tomorrow at 12:00

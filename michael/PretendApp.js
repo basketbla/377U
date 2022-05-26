@@ -258,7 +258,7 @@ function LandingTab() {
 
   return (
     <>
-      <CalendarSync /> 
+      {/* <CalendarSync />  */}
       {/* <AddCalendar />  */}
       <Tab.Navigator screenOptions={({ route }) => ({
         headerShown: false,

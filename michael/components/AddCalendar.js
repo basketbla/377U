@@ -41,7 +41,7 @@ export default function AddCalendar({ navigation }) {
     const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
     // console.log('Here are all your calendars:');
     // console.log({ calendars });
-    setCalendars(calendars);
+    // setCalendars(calendars);
     // console.log("CALS: ", calendars);
 
     let calIDArray = [];

@@ -30,7 +30,7 @@ export default function GroupAvailability({ route, navigation }) {
       setFreeSlots(freeSlots);
       // setSuggestedSlots(pickFreeSlots(freeSlots));
       setSuggestedSlots(freeSlots);
-      
+      console.log("final free slots!!!!!!!!: ", freeSlots);
       
       // } else {
         //tell users to enable cal permissions
@@ -58,6 +58,7 @@ export default function GroupAvailability({ route, navigation }) {
     endInterval.setHours(latestTime, 0 , 0);
 
     let events = await accessCalendars();
+    console.log("accessedevents: ", events);
 
     return getAvailability(events, startInterval.toISOString(), endInterval.toISOString(), meetingInterval);
   }
@@ -130,7 +131,8 @@ export default function GroupAvailability({ route, navigation }) {
     if (events.length == 0) {
         freeSlots.push({startDate: startInterval, endDate: endInterval});
     }
-    // console.log("FREE: ", freeSlots);
+
+    console.log("FREE: ", freeSlots);
     var temp = {}, hourSlots = [];
 
     //breaks down the total free slots into chunks based on the interval set (1, 2, 3, hours, etc)
@@ -166,10 +168,16 @@ export default function GroupAvailability({ route, navigation }) {
 
         if( Math.abs(freeHours) >= freeInterval ) {
 
-        if(freeStart.getDate() >= rootStart.getDate() && freeEnd.getDate() <= rootEnd.getDate()) { 
+        // if(freeStart.getDate() >= rootStart.getDate() && freeEnd.getDate() <= rootEnd.getDate()) { 
 
             //if on same day
             if (freeStart.getDate() == freeEnd.getDate()){
+              // freeSlots.push({
+              //   startDate: event.endDate, 
+              //   endDate: endInterval,
+              //   start: convertDate(event.endDate),
+              //   end: convertDate(endInterval),
+              // });
                hourSlots.push({startDate:convertDate(freeStart), endDate: convertDate(freeEnd)});
 
             } else {
@@ -195,7 +203,7 @@ export default function GroupAvailability({ route, navigation }) {
                   }
 
             }
-       }
+      //  }
          //  }
 
    {/*     if(startHours >= rootStart.getHours() && endHours <= rootEnd.getHours()) { 
@@ -221,7 +229,7 @@ export default function GroupAvailability({ route, navigation }) {
     hourSlots.sort(
       (objA, objB) => new Date(objA.startDate) - new Date(objB.startDate),
     );
-    // console.log("HOURS:" , hourSlots)
+    console.log("HOURS:" , hourSlots);
     return hourSlots;
   } 
 
